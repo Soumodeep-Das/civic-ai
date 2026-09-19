@@ -32,7 +32,7 @@ No frontend, authentication, images, ML, classification, prioritization, severit
 
 The public foundation is at https://github.com/Soumodeep-Das/civic-ai. Origin is configured locally. Earlier browser publication created separate remote history. Issue #1 is a local source checkpoint pending verification and publication; no remote history has been rewritten. Terminal Git network access and connector writes were blocked during publication setup.
 
-Remaining: runtime acceptance, tested dependency pins after resolution, and Git history reconciliation before the next push. Future dataset sourcing and annotation decisions remain open. The approved synopsis is in docs/reference/project-synopsis.docx; academic cover placeholders still need the student's details.
+An incremental push of feat/complaint-persistence was attempted after the source checkpoint commit and failed to connect to github.com:443. The checkpoint exists locally; it is not published. Remaining: runtime acceptance, tested dependency pins after resolution, and Git history reconciliation before merging with remote main. Future dataset sourcing and annotation decisions remain open. The approved synopsis is in docs/reference/project-synopsis.docx; academic cover placeholders still need the student's details.
 
 ## Exactly one next implementation issue
 
