@@ -1,52 +1,39 @@
 # Current State
 
-## Foundation checkpoint
+## Issue #1 progress
 
-As of 19 September 2026, the repository contains planning documentation and reserved top-level directories only. Application implementation has not begun.
+- [x] Read approved project foundation and issue decisions.
+- [x] Write Python 3.12 package and environment example.
+- [x] Write anonymous create/retrieve/list API and liveness endpoint.
+- [x] Separate request/response schemas, service logic and SQLAlchemy persistence.
+- [x] Write migration 0001 with UUID, timestamps and database constraints.
+- [x] Write API tests, migration/model comparison and constraint tests.
+- [x] Compile Python source and check whitespace.
+- [ ] Install dependencies successfully.
+- [ ] Apply migration against PostgreSQL successfully.
+- [ ] Run pytest successfully.
+- [ ] Start API and demonstrate /docs.
 
-### Completed
+Source is implemented on local branch feat/complaint-persistence. **Issue #1 is not runtime-verified or complete.**
 
-- Created the repository structure and initialized Git.
-- Established a concise root `AGENTS.md` that points to detailed documentation.
-- Recorded the intended React, FastAPI, PostgreSQL, and Python ML direction.
-- Defined the distinction between classification and prioritization.
-- Drafted architecture, research, data, API, decision, and workflow documents.
-- Preserved both the approved synopsis and the original blank template under `docs/reference/`.
+## Verification evidence
 
-### Not completed
+Python 3.12.14 is available and a virtual environment exists. Compilation passed. Dependency installation failed with WinError 10013 (outbound socket access denied); no locally built wheels were cached. Attempts to run pytest, Alembic and Uvicorn failed because their modules are not installed. No tests are claimed passed, no successful migration is claimed, and no running API is claimed.
 
-- No frontend or backend project has been scaffolded.
-- No dependencies have been installed.
-- No database schema or migrations exist.
-- No API endpoint or UI exists.
-- No dataset has been acquired, licensed, curated, split, or labeled.
-- No model has been trained or evaluated.
-- No experiment result, metric, research finding, or novelty result is claimed.
-- No deployment or GitHub remote has been configured.
+PostgreSQL 18 is installed, but initialization of an isolated cluster failed under the sandbox account with restricted-token/filesystem errors. Docker engine access is denied. The README documents commands to run outside these restrictions. Successful runtime acceptance remains required.
 
-## Synopsis reconciliation
+## Implemented scope
 
-The approved synopsis, `docs/reference/project-synopsis.docx`, has been reviewed against the foundation. It commits the proposed prototype to citizen and municipal roles, complaint submission with text/image/location, classification, a separate transparent priority mechanism, dashboard, department assignment, status tracking, map visualization, and comparative evaluation. These are staged targets rather than implemented features. Learned priority ranking, duplicate clustering, hotspot analysis, and richer spatial-temporal modeling remain future extensions.
+Seven fields only: complaint_id, description, latitude, longitude, status, created_at and updated_at. Anonymous create, detail, list and health are implemented in source. Coordinates are independently optional; descriptions are trimmed. Health means liveness. Only submitted status is supported.
 
-## Assumptions used for this foundation
+No frontend, authentication, images, ML, classification, prioritization, severity, routing, maps, deployment, datasets or research results are implemented.
 
-- The current project title and scope in the latest conversation supersede older distributed-team development plans.
-- The student and Codex will own engineering and experiment execution; other team members may support literature and dataset review without owning core code.
-- The eight-category taxonomy is provisional.
-- The minor research centers on modality comparison and conditionally evaluates a transparent contextual priority mechanism; learned ranking and richer context modeling are future directions.
-- A web application is the initial delivery vehicle; a mobile app is only a possible extension.
+## Repository and remaining work
 
-## Unresolved decisions before implementation
+The public foundation is at https://github.com/Soumodeep-Das/civic-ai. Origin is configured locally. Earlier browser publication created separate remote history. Issue #1 is a local source checkpoint pending verification and publication; no remote history has been rewritten. Terminal Git network access and connector writes were blocked during publication setup.
 
-1. Fill or verify the group number, member enrolment numbers, and guide name placeholders in the approved synopsis outside this repository workflow.
-2. Confirm the first complaint domain fields and whether location is required in the first vertical slice.
-3. Decide the initial local PostgreSQL development method and migration tooling.
-4. Define repository language/runtime versions and dependency-management conventions.
-5. Confirm whether the first API is anonymous development-only input or includes a minimal identity concept.
-6. Establish an initial test strategy and CI choice before merging substantial code.
+Remaining: runtime acceptance, tested dependency pins after resolution, and Git history reconciliation before the next push. Future dataset sourcing and annotation decisions remain open. The approved synopsis is in docs/reference/project-synopsis.docx; academic cover placeholders still need the student's details.
 
-## Exactly one recommended next issue
+## Exactly one next implementation issue
 
-**Bootstrap the minimal FastAPI and PostgreSQL backend and implement a tested complaint domain model and persistence flow, without authentication, frontend, image upload, prioritization, or ML.**
-
-Do not start this issue until the first complaint fields and local database approach have been reviewed.
+After Issue #1 passes runtime acceptance: implement a minimal React complaint form and list connected to this anonymous API, including loading and validation-error states. Do not start automatically.

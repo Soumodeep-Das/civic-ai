@@ -6,6 +6,8 @@ Use one narrowly scoped issue at a time. Before implementation, read `CURRENT_ST
 
 ## Git workflow
 
+User direction (2026-09-19): show progress during work, opening relevant artifacts or a running preview when available. After each coherent task, update documentation, commit with a clear explanation, and push incremental progress when access and repository history permit. Record testing or publishing blockers explicitly; never label unverified work complete or force-push to solve divergent history without authorization.
+
 - Keep the default branch releasable and avoid direct experimental work on it once collaboration begins.
 - Use short-lived branches named by purpose, such as `feat/complaint-create` or `docs/data-guideline`.
 - Rebase or merge according to the repository's eventual hosting policy; no policy is selected yet.
@@ -53,4 +55,3 @@ Add the smallest justified dependency, pin or lock it through the chosen package
 ## Definition of done
 
 A work item is done when its acceptance criteria are met, relevant tests pass, docs and decisions are current, no secret or prohibited artifact is staged, and remaining limitations are stated. Deployment, performance, accessibility, privacy, and security checks should be proportional to the scope of the item rather than assumed complete.
-

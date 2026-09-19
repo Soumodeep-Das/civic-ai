@@ -43,3 +43,31 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 - Status: accepted
 - Decision: Citations, dataset rights, labels, metrics, findings, statistical claims, and novelty statements must be traceable to verified sources or reproducible project outputs.
 - Consequence: Placeholder or invented results are prohibited, and limitations must be reported.
+
+## D007 Issue 1 runtime and dependency management
+
+- Date: 2026-09-19
+- Status: accepted; runtime verification pending
+- Decision: Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, Psycopg 3, Alembic and pytest. Use setuptools/pyproject.toml and pip editable installation with a test extra.
+- Consequence: No uv requirement. Supported dependency ranges are declared; a resolved pinned environment remains pending because package downloads are blocked.
+
+## D008 Anonymous first complaint API
+
+- Date: 2026-09-19
+- Status: accepted by Issue 1
+- Decision: Create, retrieve and list complaints anonymously, with exactly the seven fields authorized in the issue. Only submitted status is allowed; status transitions are deferred.
+- Consequence: Use demonstration data locally. Trim descriptions; reject extra fields; coordinates are independently optional. Lists are ordered and unpaginated. UUIDs are application-generated; PostgreSQL initializes timezone-aware timestamps. SQLAlchemy updates updated_at on future ORM updates; direct SQL update tracking is not implemented.
+
+## D009 PostgreSQL migrations and test isolation
+
+- Date: 2026-09-19
+- Status: accepted; execution pending
+- Decision: Alembic owns schema changes. Tests use real PostgreSQL, not SQLite. Require a separate database ending in _test, create a uniquely named schema, apply migrations, roll back each API test, and drop only that schema after the suite.
+- Consequence: Test role needs CREATE SCHEMA permission; missing configuration fails instead of skipping. No normal developer database is modified by tests. Database constraints defend text, coordinates and status in addition to HTTP validation.
+
+## D010 Health and error contract
+
+- Date: 2026-09-19
+- Status: accepted
+- Decision: GET /health reports liveness only; operational database failures return a sanitized 503 on complaint routes. Use code/message error objects, adding field details for validation failures.
+- Consequence: Health does not certify database readiness. No credentials or raw request values are included in error responses.

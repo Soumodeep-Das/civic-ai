@@ -4,6 +4,8 @@
 
 This document defines an intended, deliberately small architecture. It is not an implementation report. The design favors clear component boundaries, replaceable ML models, testability, and a vertical-slice delivery sequence.
 
+Issue #1 implementation lives in backend/src/civicai: routes.py delegates to service.py; schemas.py handles HTTP validation/serialization; models.py and database.py handle SQLAlchemy persistence. domain.py defines complaint status and missing-record semantics. main.py owns application lifecycle and error handlers. Alembic migrations are separate from app startup. Runtime verification is pending; see CURRENT_STATE.md.
+
 ## Intended system
 
 ```text

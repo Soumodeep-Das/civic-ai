@@ -4,6 +4,8 @@
 
 This is a proposed canonical record, not an existing database schema or dataset. Fields are grouped to prevent application state, human labels, model inputs, and predictions from being conflated.
 
+Issue #1 implements only complaint_id, description, latitude, longitude, status, created_at and updated_at in source/migration 0001. Other fields below remain future proposals. PostgreSQL uses UUID, TEXT, DOUBLE PRECISION coordinates, constrained VARCHAR status and TIMESTAMP WITH TIME ZONE. Only submitted is supported. Runtime migration verification is pending.
+
 ## Canonical complaint record
 
 | Group | Field | Type or form | Purpose |
@@ -69,4 +71,3 @@ Raw data is immutable and access controlled. Derived data should be reproducible
 - Who may annotate, and how will disagreements be resolved?
 - What severity and priority definitions can be defended?
 - What minimum class support is feasible without fabricating or over-augmenting data?
-

@@ -1,34 +1,63 @@
 # CivicAI
 
-CivicAI is an MCA final-year project currently titled **AI-Based Urban Civic Complaint Classification and Prioritization System**. It combines a civic complaint management application with reproducible machine-learning research.
+MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The planned system will let citizens submit complaint text, an optional image, and a location; store and track complaints; and support a municipal-style administrative view. The research track will compare text-only, image-only, and text-image multimodal methods for complaint-category classification. A transparent contextual priority engine is part of the approved prototype, while learned priority ranking and richer spatial-temporal prioritization remain future major-project research.
+Issue #1 adds an anonymous FastAPI/PostgreSQL complaint API, migration and tests. Source is written; runtime verification is pending because this workspace blocks package downloads and PostgreSQL startup. No frontend, accounts, images, maps, ML or priority engine is implemented.
 
-## Current status
+## Setup on Windows
 
-The repository is in the **foundation stage**. No frontend, backend, database schema, API, dataset, or ML model has been implemented. The files under `docs/` define the current project boundaries and working agreements.
+Run from this repository folder in PowerShell. Use Python 3.12 and PostgreSQL (18 is installed on this computer). Dependencies are managed with standard pip and pyproject.toml; uv is not needed.
 
-The approved synopsis is preserved as `docs/reference/project-synopsis.docx`. The original blank university template is retained beside it for traceability.
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e ".[test]"
+Copy-Item .env.example .env
+```
 
-## Intended technology direction
+If the Python launcher is unavailable, use the full path to Python 3.12 instead of py -3.12. On this computer the bundled interpreter is:
 
-- Frontend: React
-- Backend: Python and FastAPI
-- Database: PostgreSQL
-- ML and research: Python, scikit-learn, and, when justified, PyTorch and Hugging Face Transformers
-- Collaboration: Git and GitHub
+```powershell
+& 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m venv .venv
+```
 
-These are intended directions, not installed dependencies or completed components.
+Use PostgreSQL's administration tools to create two empty databases: civicai and civicai_test. Give the test role permission to create schemas in civicai_test. Edit the ignored .env with your database URLs. Replace the placeholders; URL-encode special characters in credentials. Never share the password in chat. Environment variables take precedence over .env.
 
-## Repository map
+## Migrate and run
 
-- `docs/`: project context, architecture, research and engineering plans
-- `docs/reference/`: supplied source documents
-- `frontend/`: reserved for the citizen and administrative web interface
-- `backend/`: reserved for the API and application services
-- `ml/`: reserved for training and inference code
-- `research/`: reserved for experiment definitions, reports, and paper support material
-- `data/`: reserved for documented local data workflows; datasets are not committed by default
-- `tests/`: reserved for cross-component and acceptance tests
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic current
+.\.venv\Scripts\python.exe -m uvicorn civicai.main:app --host 127.0.0.1 --port 8000 --reload
+```
 
-Start with `docs/CURRENT_STATE.md` and `docs/PROJECT_CONTEXT.md`.
+Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/complaints, choose Try it out, enter a description and optional coordinates, and Execute. Copy the returned complaint_id into GET /api/v1/complaints/{complaint_id}; use GET /api/v1/complaints to see the list. GET /health reports process liveness without querying PostgreSQL.
+
+Schema creation uses Alembic, never automatic startup table creation. All complaint endpoints are anonymous; use local demonstration data until access control is added.
+
+## Tests
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+```
+
+TEST_DATABASE_URL must point to a separate PostgreSQL database whose name ends in _test. Missing or unsafe configuration fails loudly. Tests create a uniquely named schema, apply the real Alembic migration, roll back each API test, and remove that schema at completion. No developer tables are truncated. A forcibly terminated test may leave its generated schema in the test database.
+
+Health and database-unavailable tests need dependencies but no live PostgreSQL:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_api.py -k "health or unavailable"
+```
+
+Dependency ranges are in pyproject.toml; no resolved lock file is claimed because package installation is blocked here. Record a tested pinned environment after successful resolution.
+
+## Files
+
+- backend/src/civicai: schemas, routes, service logic, persistence, configuration.
+- backend/migrations: Alembic environment and migration 0001.
+- backend/tests: API, migration consistency and database constraint tests.
+- docs: project context and [progress checklist](docs/CURRENT_STATE.md).
+- docs/reference/project-synopsis.docx: approved synopsis.
+- frontend, ml, research, data and tests: reserved for later milestones.
+
+[Public repository](https://github.com/Soumodeep-Das/civic-ai). Earlier browser uploads created a separate GitHub history. Reconcile local/remote histories before pushing; no force push has been performed.
