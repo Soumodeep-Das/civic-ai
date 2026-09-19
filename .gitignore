@@ -1,0 +1,63 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# JavaScript
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local runtime data
+uploads/
+logs/
+tmp/
+*.log
+
+# Databases and caches
+*.db
+*.sqlite
+*.sqlite3
+*.pkl
+*.joblib
+
+# ML data, models, and experiment artifacts
+data/raw/**
+data/interim/**
+data/processed/**
+data/external/**
+!data/**/.gitkeep
+models/
+checkpoints/
+runs/
+wandb/
+mlruns/
+research/results/**
+!research/results/.gitkeep
+
+# Generated reports
+*.pdf
+*.html
+
