@@ -1,5 +1,16 @@
 # Decision Log
 
+## D014 Issue #4 accessible issue-location selection (2026-09-20, accepted)
+
+- Treat location as the issue location, which may differ from the reporter's current position.
+- Offer explicit text search, current device location and optional map refinement. Search-result confirmation must not require map use.
+- Require photo evidence and a confirmed location in the citizen frontend. Keep backend fields nullable for existing rows and API compatibility; this is a UI policy, not a retroactive database constraint.
+- Store nullable `location_label`, `location_precision` (`exact`, `approximate`, `broad`) and `location_details` alongside coordinates. Never present a locality centroid as an exact surveyed point.
+- Put geocoding behind a provider adapter and backend endpoint. Start with policy-compliant, rate-limited, cached, user-triggered Nominatim-compatible search; forbid typeahead against the public service and keep the provider configurable.
+- Use an interactive map renderer only for optional refinement. Do not add navigation, continuous tracking, PostGIS or routing.
+
+Consequences: migration 0003 is additive; the complaint response expands; public geocoding remains a local-demo dependency without a production SLA; frontend validation becomes stricter than the backward-compatible API.
+
 ## D013 Issue #3 photos and citizen location (2026-09-20, accepted)
 
 - Keep optional coordinates in the backend for future geospatial capabilities; remove manual coordinate entry from citizen UX.

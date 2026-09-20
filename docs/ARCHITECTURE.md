@@ -30,9 +30,13 @@ The browser will communicate with the backend through a versioned JSON API. The 
 
 Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission and the recent complaint list. `frontend/src/api/complaints.ts` owns HTTP access; the React component owns the small amount of form and request state. Vite proxies `/api` and `/health` to the local FastAPI server during development, avoiding a backend CORS change. No router, component library, global state library or map provider is needed for the MVP.
 
+Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from optional map adjustment. The map renderer consumes normalized coordinates and never calls the geocoder directly.
+
 ### Backend
 
 A FastAPI service will expose API endpoints, validate input, apply complaint workflow rules, and coordinate persistence and later inference. Domain logic should remain separate from HTTP handlers and database-specific code.
+
+Issue #4 adds a provider-neutral geocoding service and a small API endpoint. Provider response parsing, throttling and caching stay outside route handlers. The first adapter is Nominatim-compatible and configured through environment variables; the browser receives only CivicAI's normalized result contract.
 
 ### Database
 

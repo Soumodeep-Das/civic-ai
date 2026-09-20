@@ -1,8 +1,12 @@
 # Current State
 
-## Issue #3 implemented and locally verified
+## Issue #4 in progress after verified Issue #3
 
-Branch: feat/complaint-images-location.
+Branch: feat/accessible-location-picker.
+
+Issue #4 acceptance criteria and provider constraints are recorded in `ISSUE_004_LOCATION_SELECTION.md`. Implementation will add accessible issue-place search, current-location reuse, optional map refinement and truthful location precision. The citizen frontend will require a photo and confirmed location while the API/database remain compatible with existing optional records.
+
+### Verified Issue #3 baseline
 
 - Anonymous multipart complaint creation with optional JPEG/PNG evidence.
 - Nullable image_ref added by migration 0002; original migration unchanged.
