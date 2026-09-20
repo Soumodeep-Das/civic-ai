@@ -1,5 +1,10 @@
 # Development Log
 
+## 2026-09-20 — Issue #3 backend checkpoint
+
+Implemented multipart submission, optional image_ref migration 0002, bounded JPEG/PNG decoding and storage, safe image retrieval and isolated temporary upload storage in tests. 38 backend tests passed; final size-guard rerun and development migration remain pending. Frontend integration is next. Existing Issue #1 warnings remain non-blocking.
+
+
 This log records engineering checkpoints and reproducible evidence. It is not a research-results log.
 
 ## 2026-09-20 — Issue #1 verified locally

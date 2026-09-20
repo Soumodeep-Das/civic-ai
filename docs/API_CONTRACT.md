@@ -1,34 +1,25 @@
 # API Contract
 
-Issue #1 is implemented and locally verified against PostgreSQL.
+Issue #3 changes POST /api/v1/complaints to multipart/form-data. JSON creation now returns 415; clients must migrate. GET list/detail and health paths remain unchanged.
 
-| Method | Path | Success |
-|---|---|---|
-| GET | /health | 200, {"status":"ok"} |
-| POST | /api/v1/complaints | 201, created complaint |
-| GET | /api/v1/complaints/{complaint_id} | 200, complaint |
-| GET | /api/v1/complaints | 200, array of complaints |
+## Submission
 
-All endpoints are anonymous for local development. Listing returns all records ordered by created_at then UUID; no filtering or pagination.
+Multipart fields: description (required trimmed nonempty text), latitude (optional number -90..90), longitude (optional number -180..180), image (optional JPEG/PNG file). Omit unavailable coordinates. Duplicate, unknown and server-owned fields are rejected. Do not set the Content-Type header manually in browser code; FormData supplies the boundary.
 
-## Creation request
+POST returns 201 with complaint_id, description, latitude, longitude, image_ref, status, created_at, updated_at. image_ref is null without an image, otherwise a relative /api/v1/complaint-images/<generated-name> URL. Status remains submitted; UUID and UTC timestamps remain server-owned.
 
-```json
-{"description":"Large pothole near the school entrance","latitude":22.5726,"longitude":88.3639}
-```
+## Reads
 
-Description is a required string, trimmed before storage. Empty and whitespace-only values fail validation. Latitude and longitude are independently optional/nullable with inclusive ranges [-90,90] and [-180,180]. Nonfinite coordinates fail. Extra fields are rejected, including client-supplied status, UUID, timestamps or future fields.
+- GET /api/v1/complaints returns an array ordered by creation time then UUID.
+- GET /api/v1/complaints/{complaint_id} returns the record or 404.
+- GET /api/v1/complaint-images/{filename} returns validated raster content or 404. Names are restricted to generated hexadecimal UUIDs and jpg/png extensions.
+- GET /health returns 200 {"status":"ok"} as liveness only.
+- /docs and /openapi.json describe the multipart endpoint.
 
-## Response
+## Errors and limits
 
-Exactly seven fields: complaint_id (generated UUID v4), description, latitude, longitude, status, created_at and updated_at. Status is restricted to submitted. PostgreSQL initializes both timestamps together. Responses serialize timezone-aware timestamps to ISO 8601 UTC ending in Z.
+Errors use code/message, with details for field-validation errors. Invalid fields/images return 422, oversized uploads 413, wrong request media type 415, missing resources 404, and database unavailability 503.
 
-## Errors and health
+Images: 5 MiB input and re-encoded output; 20 million pixels. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata. Original filenames are ignored.
 
-- Unknown valid UUID: 404, {"code":"complaint_not_found","message":"Complaint not found"}.
-- Invalid input or UUID: 422, {"code":"validation_error","message":"Invalid request","details":[...]}. Detail entries contain location, message and type; raw input is not echoed.
-- Database operational error: 503, {"code":"database_unavailable","message":"Database temporarily unavailable"}.
-
-GET /health is liveness only. DATABASE_URL is required at startup, but no connection is opened for health. FastAPI serves /docs and /openapi.json.
-
-No update/delete routes, accounts, images, ML, category/priority/severity fields or routing exist in this issue.
+All endpoints, including images, are anonymous for local demonstrations. Do not expose this service publicly or submit private evidence until access controls and operational storage policy are designed.

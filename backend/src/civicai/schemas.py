@@ -21,6 +21,7 @@ class ComplaintRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     complaint_id: UUID
+    image_ref: str | None
     description: str
     latitude: float | None
     longitude: float | None

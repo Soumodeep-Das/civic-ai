@@ -11,7 +11,7 @@ from civicai.database import Base
 
 def test_migration_matches_models(migrated_engine):
     with migrated_engine.connect() as connection:
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0001"
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0002"
         context = MigrationContext.configure(connection)
         assert compare_metadata(context, Base.metadata) == []
 

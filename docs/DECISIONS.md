@@ -1,5 +1,16 @@
 # Decision Log
 
+## D013 Issue #3 photos and citizen location (2026-09-20, accepted)
+
+- Keep optional coordinates in the backend for future geospatial capabilities; remove manual coordinate entry from citizen UX.
+- Capture location only after a user action and browser permission. Failure or refusal does not block submission.
+- Location is metadata only and is excluded from the current text/image/multimodal minor-project experiment.
+- Use multipart creation with optional image_ref in PostgreSQL and local files in data/uploads/complaints (UPLOAD_DIR override). Never store blobs in PostgreSQL.
+- JPEG/PNG only, 5 MiB input/output, 20 million pixels, generated UUID names, decoded-format validation and metadata-free re-encoding. Uploaded files are ignored by Git and served as raster content with nosniff.
+- Local anonymous images are accessible to anyone who can reach the server. Production authentication, retention, malware scanning and orphan reconciliation remain future work.
+- Video is deferred because storage, transcoding, moderation and ML processing exceed this issue.
+
+
 Only decisions actually made are recorded here. Proposed choices remain in the relevant design document until accepted. Each future entry should include context, decision, consequences, status, and date.
 
 ## D001 Separate classification from prioritization

@@ -50,7 +50,8 @@ def migrated_engine():
 
 
 @pytest.fixture
-def client(migrated_engine):
+def client(migrated_engine, tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOAD_DIR", str(tmp_path / "uploads"))
     with migrated_engine.connect() as connection:
         transaction = connection.begin()
         app = create_app(migrated_engine.url)

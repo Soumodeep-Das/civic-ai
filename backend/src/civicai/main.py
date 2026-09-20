@@ -9,12 +9,15 @@ from civicai.config import database_url
 from civicai.database import build_engine
 from civicai.domain import ComplaintNotFound
 from civicai.routes import router
+from civicai.uploads import upload_directory
+from starlette.exceptions import HTTPException
 
 
 def create_app(url: str | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.engine = build_engine(url or database_url())
+        app.state.upload_directory = upload_directory()
         try:
             yield
         finally:
@@ -22,6 +25,13 @@ def create_app(url: str | None = None) -> FastAPI:
 
     app = FastAPI(title="CivicAI", version="0.1.0", lifespan=lifespan)
     app.include_router(router)
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request: Request, exc: HTTPException):
+        return JSONResponse(status_code=exc.status_code, content={
+            "code": "validation_error" if exc.status_code in (400, 413, 422) else "request_error",
+            "message": str(exc.detail),
+        })
 
     @app.get("/health")
     def health():

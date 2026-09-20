@@ -8,8 +8,8 @@ from civicai.models import Complaint
 from civicai.schemas import ComplaintCreate
 
 
-def create_complaint(session: Session, data: ComplaintCreate) -> Complaint:
-    complaint = Complaint(**data.model_dump())
+def create_complaint(session: Session, data: ComplaintCreate, image_ref: str | None = None) -> Complaint:
+    complaint = Complaint(**data.model_dump(), image_ref=image_ref)
     session.add(complaint)
     session.commit()
     session.refresh(complaint)

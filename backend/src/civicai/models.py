@@ -18,6 +18,7 @@ class Complaint(Base):
 
     complaint_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     description: Mapped[str] = mapped_column(Text)
+    image_ref: Mapped[str | None] = mapped_column(String(200))
     latitude: Mapped[float | None] = mapped_column(Double)
     longitude: Mapped[float | None] = mapped_column(Double)
     status: Mapped[str] = mapped_column(String(20), server_default=text("'submitted'"))
