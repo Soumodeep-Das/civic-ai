@@ -2,11 +2,19 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints with optional JPEG/PNG evidence and browser location, persisted through FastAPI in PostgreSQL. Accounts, video, maps, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Accounts, video, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+
+## Issue #4: accessible issue-location selection
+
+Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
+
+The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.
+
+Search is sent only when the user presses Search or Enter; there is no type-ahead traffic. The local-demo adapter is compatible with public Nominatim and applies one-request-per-second pacing plus a short bounded cache. Public Nominatim and the default MapLibre demonstration style provide no production availability guarantee. Configure or replace both providers before public deployment; see `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
 
 ## Issue #3: photos and location
 
-After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, then run `python -m alembic upgrade head`. Restart both servers. Migration 0002 preserves existing complaints and adds nullable image_ref.
+After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, then run `python -m alembic upgrade head`. Restart both servers. Migrations 0002 and 0003 preserve existing complaints while adding nullable image and location-context fields.
 
 POST now uses multipart/form-data, including for text-only submissions. JSON clients must migrate; see docs/API_CONTRACT.md. The frontend handles this automatically.
 
@@ -16,7 +24,7 @@ Files are stored under data/uploads/complaints, excluded from Git, outside execu
 
 Use “Use my current location” while near the issue. Permission is requested on demand; denial or timeout does not prevent submission. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. Location remains optional metadata and does not enter the current classification experiment.
 
-Video, maps and manual coordinate entry are not offered. Avoid real private evidence in the demonstration database.
+Video and manual coordinate entry are not offered. Issue #4 provides an optional map for refining a searched or device-derived location. Avoid real private evidence in the demonstration database.
 
 ## Setup on Windows
 
@@ -35,7 +43,7 @@ If the Python launcher is unavailable, use the full path to Python 3.12 instead 
 & 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m venv .venv
 ```
 
-Use PostgreSQL's administration tools to create two empty databases: civicai and civicai_test. Give the test role permission to create schemas in civicai_test. Edit the ignored .env with your database URLs. Replace the placeholders; URL-encode special characters in credentials. Never share the password in chat. Environment variables take precedence over .env.
+Use PostgreSQL's administration tools to create two empty databases: civicai and civicai_test. Give the test role permission to create schemas in civicai_test. Edit the ignored .env with your database URLs and geocoder configuration. Replace the placeholders; URL-encode special characters in credentials. Never share the password in chat. Environment variables take precedence over .env.
 
 ## Migrate and run
 
@@ -96,6 +104,8 @@ npm run build
 
 Frontend dependencies are captured in `frontend/package-lock.json`.
 
+`VITE_MAP_STYLE_URL` selects the MapLibre style and defaults to MapLibre's public demonstration style. The map code is loaded only when a user opens the optional map. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
+
 ### If the frontend reports 404 or “Queue unavailable”
 
 Run the repository startup helper first:
@@ -115,9 +125,9 @@ The development proxy is loaded when Vite starts. Restarting is required after a
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and migration 0001.
+- backend/migrations: Alembic environment and migrations through 0003.
 - backend/tests: API, migration consistency and database constraint tests.
-- frontend/src: React complaint form, recent-complaint list, API client, styles and interaction tests.
+- frontend/src: React complaint form, accessible location picker, lazy-loaded map, recent-complaint list, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
 - docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.

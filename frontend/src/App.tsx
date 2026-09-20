@@ -1,12 +1,11 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { Complaint, ComplaintInput, createComplaint, listComplaints, imageUrl } from "./api/complaints";
+import LocationPicker, { LocationSelection } from "./LocationPicker";
 
 type FormFields = { description: string };
-type FormErrors = { description?: string };
+type FormErrors = { description?: string; image?: string; location?: string };
 const initialFields: FormFields = { description: "" };
-const LOCATION_TIMEOUT_MS = 30_000;
-const LOCATION_MAX_AGE_MS = 5 * 60_000;
 function validate(fields: FormFields): FormErrors {
   return fields.description.trim() ? {} : { description: "Tell us what needs attention." };
 }
@@ -29,6 +28,13 @@ function ComplaintCard({ complaint }: { complaint: Complaint }) {
       </div>
       <p>{complaint.description}</p>
       {complaint.image_ref && <img className="evidence-image" src={imageUrl(complaint.image_ref)} alt="Photo attached to this complaint" loading="lazy" />}
+      {complaint.location_label && (
+        <div className="complaint-location">
+          <strong>{complaint.location_label}</strong>
+          <span>{complaint.location_precision === "exact" ? "Confirmed point" : complaint.location_precision === "broad" ? "Broad area" : "Approximate place"}</span>
+          {complaint.location_details && <p>{complaint.location_details}</p>}
+        </div>
+      )}
       <div className="card-footer">
         <span className="reference">#{complaint.complaint_id.slice(0, 8)}</span>
         <span>{hasLocation ? "Location provided" : "Location not provided"}</span>
@@ -43,10 +49,7 @@ export default function App() {
   const [image, setImage] = useState<File | undefined>();
   const [imageError, setImageError] = useState("");
   const imageInput = useRef<HTMLInputElement>(null);
-  const [location, setLocation] = useState<{ latitude: number; longitude: number }>();
-  const [locationMessage, setLocationMessage] = useState("Location is optional. You can submit without it.");
-  const [locating, setLocating] = useState(false);
-  const locationRequest = useRef(0);
+  const [location, setLocation] = useState<LocationSelection>();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +83,7 @@ export default function App() {
     setSuccessMessage("");
     setImage(undefined);
     setImageError("");
+    setErrors((current) => ({ ...current, image: undefined }));
     if (!file) return;
     if (!["image/jpeg", "image/png"].includes(file.type)) {
       setImageError("Choose a JPEG or PNG image.");
@@ -98,54 +102,11 @@ export default function App() {
     if (imageInput.current) imageInput.current.value = "";
   }
 
-  function clearLocation() {
-    locationRequest.current += 1;
-    setLocation(undefined);
-    setLocating(false);
-    setLocationMessage("Location omitted. You can submit without it.");
-  }
-
-  function captureLocation() {
-    const requestId = ++locationRequest.current;
-    setLocation(undefined);
-    if (!navigator.geolocation) {
-      setLocationMessage("This browser does not support location. You can submit without it.");
-      return;
-    }
-    setLocating(true);
-    setLocationMessage("Finding your location…");
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (requestId !== locationRequest.current) return;
-        setLocating(false);
-        const { latitude, longitude } = position.coords;
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
-          setLocationMessage("Location could not be determined. You can submit without it.");
-          return;
-        }
-        setLocation({ latitude, longitude });
-        setLocationMessage("Location captured successfully");
-      },
-      (error) => {
-        if (requestId !== locationRequest.current) return;
-        setLocating(false);
-        setLocationMessage(error.code === 1
-          ? "Location permission denied. You can submit without it."
-          : error.code === 3
-            ? "Location was not available within 30 seconds. Check that device Location Services and Wi-Fi are on, then try again or submit without it."
-            : "Location could not be determined. You can submit without it.");
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: LOCATION_TIMEOUT_MS,
-        maximumAge: LOCATION_MAX_AGE_MS,
-      },
-    );
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextErrors = validate(fields);
+    if (!image) nextErrors.image = "Attach a JPEG or PNG photo of the issue.";
+    if (!location?.confirmed) nextErrors.location = "Search for or capture the issue location, then confirm it.";
     setErrors(nextErrors);
     setSubmitError("");
     setSuccessMessage("");
@@ -154,11 +115,14 @@ export default function App() {
 
     const input: ComplaintInput = { description: fields.description.trim() };
     if (imageError) return;
-    if (location) Object.assign(input, location);
+    if (location) Object.assign(input, {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      location_label: location.label,
+      location_precision: location.precision,
+      location_details: location.details.trim() || undefined,
+    });
     if (image) input.image = image;
-    // Ignore any geolocation callback that arrives after submission begins.
-    locationRequest.current += 1;
-    setLocating(false);
 
     setIsSubmitting(true);
     try {
@@ -168,7 +132,6 @@ export default function App() {
       setImage(undefined);
       if (imageInput.current) imageInput.current.value = "";
       setLocation(undefined);
-      setLocationMessage("Location is optional. You can submit without it.");
       setListError("");
       setSuccessMessage(`Complaint #${created.complaint_id.slice(0, 8)} was submitted.`);
     } catch (error) {
@@ -192,7 +155,7 @@ export default function App() {
         <div>
           <p className="eyebrow">Your street. Your voice.</p>
           <h1>Report what needs<br /><em>attention.</em></h1>
-          <p className="hero-copy">Send a clear description of a local civic problem. Add a photo and your location if you wish, then submit your report.</p>
+          <p className="hero-copy">Send a clear description, photo evidence and the issue location. Search by place or use your current position, then confirm before submitting.</p>
         </div>
         <div className="hero-number" aria-hidden="true">01</div>
       </section>
@@ -218,22 +181,30 @@ export default function App() {
             {errors.description ? <p className="field-error" id="description-error">{errors.description}</p> : <p className="field-help" id="description-help">Include a landmark or nearby building when useful.</p>}
 
             <fieldset disabled={isSubmitting}>
-              <legend>Photo evidence <span>Optional</span></legend>
+              <legend>Photo evidence <span>Required</span></legend>
               <label htmlFor="image">Attach a photo</label>
               <input ref={imageInput} id="image" type="file" accept="image/jpeg,image/png"
-                onChange={(event) => chooseImage(event.target.files?.[0])} aria-describedby="image-help" />
+                onChange={(event) => chooseImage(event.target.files?.[0])}
+                aria-invalid={Boolean(errors.image || imageError)}
+                aria-describedby={errors.image || imageError ? "image-error" : "image-help"} />
               <p className="field-help" id="image-help">JPEG or PNG, up to 5 MiB. Avoid faces and private information.</p>
               {image && <p className="field-help">Selected: {image.name}</p>}
               {(image || imageError) && <button className="secondary-button" type="button" onClick={removeImage}>Remove image</button>}
-              {imageError && <p className="field-error" role="alert">{imageError}</p>}
+              {(imageError || errors.image) && <p className="field-error" id="image-error" role="alert">{imageError || errors.image}</p>}
             </fieldset>
 
             <fieldset disabled={isSubmitting}>
-              <legend>Where is the issue? <span>Optional</span></legend>
-              <p className="field-help">Use this only while you are near the problem. Your browser will ask for permission.</p>
-              <button className="secondary-button" type="button" onClick={captureLocation} disabled={locating}>Use my current location</button>
-              {(location || locating) && <button className="secondary-button" type="button" onClick={clearLocation}>Continue without location</button>}
-              <p className="field-help" aria-live="polite">{locationMessage}</p>
+              <legend>Where is the issue? <span>Required</span></legend>
+              <p className="field-help">Choose the issue location—not necessarily where you are now. Search works without using the map.</p>
+              <LocationPicker
+                value={location}
+                error={errors.location}
+                disabled={isSubmitting}
+                onChange={(selection) => {
+                  setLocation(selection);
+                  if (selection?.confirmed) setErrors((current) => ({ ...current, location: undefined }));
+                }}
+              />
             </fieldset>
 
             {submitError && <div className="notice error-notice" role="alert">{submitError}</div>}

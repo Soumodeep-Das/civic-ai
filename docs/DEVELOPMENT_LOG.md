@@ -10,6 +10,18 @@ Reviewed FixMyStreet, W3C Geolocation, MapLibre, OSMF Nominatim policy and Googl
 
 Added migration 0003, nullable human-readable location context, controlled precision and an explicit location-search endpoint. Search provider parsing, one-request-per-second pacing and a 15-minute bounded cache are isolated in `geocoding.py`; tests inject a fake or mock transport and make no external calls. Development migration reached 0003 head. Full backend suite passed 62 tests. A first run failed only because the ignored `tmp` parent directory did not exist; after creating that local directory the conclusive suite passed. Dependency refresh initially hit the network sandbox, then network access was granted for package retrieval; installed runtime packages already supported the test run.
 
+### Frontend checkpoint
+
+Added explicit place/PIN/street/landmark search, current-device capture, nearby details, explicit confirmation and an optional MapLibre map with pointer, drag and keyboard adjustment. The citizen form now requires a valid photo and confirmed issue location while the backend remains backward compatible. Search is explicit rather than autocomplete, map loading is optional, and stale browser-location callbacks cannot replace a newer user selection.
+
+MapLibre 6.10 is locked in the frontend package lock; npm reported zero known vulnerabilities at installation. The host's global npm wrapper still points to a missing roaming `npm-cli.js`, so repository-local Node entry points were used. All 20 frontend interaction tests passed, TypeScript compilation passed and the production build succeeded. Lazy loading reduced initial JavaScript from about 1.27 MB to 236 kB. The optional map chunk remains about 1.03 MB and triggers Vite's non-blocking size advisory.
+
+Live verification searched for Baranagar Municipality through the real backend adapter and returned a relevant result. Search-only selection, on-demand map loading, keyboard adjustment, confirmation invalidation/reconfirmation and missing-description/photo feedback were exercised in the browser. No complaint was submitted during this checkpoint.
+
+### Final regression
+
+Development PostgreSQL reports migration 0003 at head. The complete backend suite passed 62 tests and the complete frontend suite passed 20 tests; TypeScript compilation and the production build passed. Backend output contains the same three dependency deprecations plus the known local pytest cache-permission warning. The build contains a 236 kB initial JavaScript bundle and a lazy 1.03 MB map chunk; Vite's warning applies only to that optional chunk. No Issue #1 complaint behavior was changed and no Issue #5 work was started.
+
 ## 2026-09-20 — Location timeout correction
 
 Reproduced the user-visible condition where browser location permission was granted but the application reported a timeout. The frontend imposed a fresh-only ten-second acquisition deadline; permission grants access but do not guarantee that Windows can supply a position within that deadline. W3C, MDN and Microsoft guidance was reviewed and recorded in `ISSUE_003_EDGE_CASES.md`.

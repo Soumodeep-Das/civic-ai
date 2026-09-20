@@ -4,9 +4,22 @@ export type Complaint = {
   description: string;
   latitude: number | null;
   longitude: number | null;
+  location_label: string | null;
+  location_precision: LocationPrecision | null;
+  location_details: string | null;
   status: "submitted";
   created_at: string;
   updated_at: string;
+};
+
+export type LocationPrecision = "exact" | "approximate" | "broad";
+
+export type LocationSearchResult = {
+  provider_id: string;
+  label: string;
+  latitude: number;
+  longitude: number;
+  precision: Exclude<LocationPrecision, "exact">;
 };
 
 export type ComplaintInput = {
@@ -14,6 +27,9 @@ export type ComplaintInput = {
   description: string;
   latitude?: number;
   longitude?: number;
+  location_label?: string;
+  location_precision?: LocationPrecision;
+  location_details?: string;
 };
 
 type ApiErrorBody = {
@@ -71,10 +87,21 @@ export function createComplaint(input: ComplaintInput): Promise<Complaint> {
   body.append("description", input.description);
   if (input.latitude !== undefined) body.append("latitude", String(input.latitude));
   if (input.longitude !== undefined) body.append("longitude", String(input.longitude));
+  if (input.location_label !== undefined) body.append("location_label", input.location_label);
+  if (input.location_precision !== undefined) body.append("location_precision", input.location_precision);
+  if (input.location_details !== undefined) body.append("location_details", input.location_details);
   if (input.image) body.append("image", input.image);
   return request<Complaint>("/api/v1/complaints", {
     method: "POST",
     body,
+  });
+}
+
+export function searchLocations(query: string): Promise<LocationSearchResult[]> {
+  return request<LocationSearchResult[]>("/api/v1/location-search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
   });
 }
 

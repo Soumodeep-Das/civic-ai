@@ -1,14 +1,20 @@
 # Current State
 
-## Issue #4 in progress after verified Issue #3
+## Issue #4 implemented and locally verified
 
 Branch: feat/accessible-location-picker.
 
-Issue #4 acceptance criteria and provider constraints are recorded in `ISSUE_004_LOCATION_SELECTION.md`. Implementation will add accessible issue-place search, current-location reuse, optional map refinement and truthful location precision. The citizen frontend will require a photo and confirmed location while the API/database remain compatible with existing optional records.
+Issue #4 acceptance criteria and provider constraints are recorded in `ISSUE_004_LOCATION_SELECTION.md`. The implementation adds accessible issue-place search, current-location reuse, optional map refinement and truthful location precision. The citizen frontend requires a photo and confirmed location while the API/database remain compatible with existing optional records.
 
 ### Issue #4 backend checkpoint
 
-Migration 0003 is applied to development PostgreSQL and adds nullable label, precision and nearby-detail fields without changing old rows. Complaint create/read/list expose the additions while remaining compatible with coordinate-only or location-free clients. `POST /api/v1/location-search` validates explicit queries and returns a normalized provider-neutral result contract. The Nominatim-compatible adapter enforces upstream pacing, caching, country configuration and sanitized failures. Backend suite: 62 passing tests; the same three dependency deprecations plus the known pytest cache warning remain non-blocking. Frontend Issue #4 integration is next.
+Migration 0003 is applied to development PostgreSQL and adds nullable label, precision and nearby-detail fields without changing old rows. Complaint create/read/list expose the additions while remaining compatible with coordinate-only or location-free clients. `POST /api/v1/location-search` validates explicit queries and returns a normalized provider-neutral result contract. The Nominatim-compatible adapter enforces upstream pacing, caching, country configuration and sanitized failures.
+
+### Issue #4 frontend checkpoint
+
+The citizen form now requires a valid photo and a confirmed issue location. Users may search explicitly by place/PIN/street/landmark, choose a result without a map, use their current location, add nearby details, or open a lazy-loaded MapLibre map for pointer, marker-drag and keyboard refinement. Changing the point invalidates confirmation. Search, browser-position and map errors retain the rest of the form. Stored complaints display location label, precision and details when present.
+
+Frontend verification: TypeScript compilation passes, all 20 interaction tests pass and the production build succeeds. Lazy loading reduced the initial JavaScript bundle from about 1.27 MB to 236 kB; the optional map chunk is about 1.03 MB and retains Vite's non-blocking large-chunk advisory. A live search for Baranagar Municipality returned a relevant result; selection without a map, optional map loading, keyboard adjustment, reconfirmation and mandatory-field feedback were exercised in the browser. No demonstration complaint was created during that check.
 
 ### Verified Issue #3 baseline
 
@@ -24,7 +30,7 @@ Migration 0003 is applied to development PostgreSQL and adds nullable label, pre
 
 ## Verification
 
-Development migration is at 0002 (head). Four pre-existing complaints survived migration. Backend suite: 42 passing tests. Frontend suite: 15 passing tests. Production frontend build passes. Three pre-existing dependency deprecations remain non-blocking.
+The Issue #3 checkpoint originally verified migration 0002 with 42 backend and 15 frontend tests. Issue #4 has advanced development PostgreSQL to migration 0003. The final combined regression passed 62 backend tests and 20 frontend tests; TypeScript compilation and the production build also passed. Three existing dependency deprecations, the known pytest cache warning and Vite's optional-map chunk-size advisory remain non-blocking.
 
 Local availability was rechecked after the frontend development process stopped and produced a browser “site can't be reached” error. The backend remained healthy. `scripts/start-dev.ps1` now checks and starts the missing local services and verifies the Vite complaint API proxy before reporting readiness. The site and proxied complaint list were reachable again after using it.
 
