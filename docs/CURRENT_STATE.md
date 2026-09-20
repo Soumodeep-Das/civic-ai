@@ -6,6 +6,10 @@ Branch: feat/accessible-location-picker.
 
 Issue #4 acceptance criteria and provider constraints are recorded in `ISSUE_004_LOCATION_SELECTION.md`. Implementation will add accessible issue-place search, current-location reuse, optional map refinement and truthful location precision. The citizen frontend will require a photo and confirmed location while the API/database remain compatible with existing optional records.
 
+### Issue #4 backend checkpoint
+
+Migration 0003 is applied to development PostgreSQL and adds nullable label, precision and nearby-detail fields without changing old rows. Complaint create/read/list expose the additions while remaining compatible with coordinate-only or location-free clients. `POST /api/v1/location-search` validates explicit queries and returns a normalized provider-neutral result contract. The Nominatim-compatible adapter enforces upstream pacing, caching, country configuration and sanitized failures. Backend suite: 62 passing tests; the same three dependency deprecations plus the known pytest cache warning remain non-blocking. Frontend Issue #4 integration is next.
+
 ### Verified Issue #3 baseline
 
 - Anonymous multipart complaint creation with optional JPEG/PNG evidence.
@@ -30,4 +34,4 @@ Successful device location capture is now verified in the live browser. A compla
 
 ## References
 
-API_CONTRACT.md describes the multipart breaking change and limits. ISSUE_003_EDGE_CASES.md records primary-source research and tradeoffs. DEVELOPMENT_LOG.md contains checkpoints. No production security, public deployment or research-results claim is made.
+API_CONTRACT.md describes multipart/search contracts and limits. ISSUE_003_EDGE_CASES.md and ISSUE_004_LOCATION_SELECTION.md record primary-source research and tradeoffs. DEVELOPMENT_LOG.md contains checkpoints. No production security, geocoding SLA, public deployment or research-results claim is made.

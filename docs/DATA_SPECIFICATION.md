@@ -2,9 +2,11 @@
 
 ## Status
 
-The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, status, created_at and updated_at; no research dataset is claimed.
+The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, status, created_at and updated_at; no research dataset is claimed.
 
 Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are local runtime files; only their relative serving URL is stored in PostgreSQL. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only, excluded from the current text/image/multimodal classification experiment. No location_accuracy_m or reporter_id field is implemented.
+
+Migration 0003 adds nullable location_label VARCHAR(300), location_precision VARCHAR(20) and location_details VARCHAR(500). Precision is controlled to exact, approximate or broad. New context requires both coordinates plus a label and precision; legacy coordinate-only rows remain valid. `exact` means the citizen confirmed a device position or map point, not a surveyed measurement. These fields are application metadata and remain excluded from the current classification experiment.
 
 ## Canonical complaint record
 
@@ -14,6 +16,9 @@ Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing 
 | Application | `description` | text | Citizen-provided complaint text |
 | Application | `image_ref` | nullable URI/key | Reference to submitted image |
 | Application | `latitude`, `longitude` | nullable decimal | Submitted or selected location |
+| Application | `location_label` | nullable string | Human-readable selected place |
+| Application | `location_precision` | nullable exact/approximate/broad | Truthful selection granularity |
+| Application | `location_details` | nullable string | Citizen-provided nearby guidance |
 | Application | `location_accuracy_m` | nullable decimal | Accuracy when available |
 | Application | `status` | controlled value | Workflow state, not an ML label |
 | Application | `created_at`, `updated_at` | UTC timestamp | Record lifecycle |

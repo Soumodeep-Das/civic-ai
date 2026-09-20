@@ -13,6 +13,24 @@ class Complaint(Base):
         CheckConstraint("description ~ '[^[:space:]]'", name="ck_complaints_description"),
         CheckConstraint("latitude BETWEEN -90 AND 90", name="ck_complaints_latitude"),
         CheckConstraint("longitude BETWEEN -180 AND 180", name="ck_complaints_longitude"),
+        CheckConstraint(
+            "location_precision IS NULL OR location_precision IN ('exact', 'approximate', 'broad')",
+            name="ck_complaints_location_precision",
+        ),
+        CheckConstraint(
+            "location_label IS NULL OR location_label ~ '[^[:space:]]'",
+            name="ck_complaints_location_label",
+        ),
+        CheckConstraint(
+            "location_details IS NULL OR location_details ~ '[^[:space:]]'",
+            name="ck_complaints_location_details",
+        ),
+        CheckConstraint(
+            "(location_label IS NULL AND location_precision IS NULL AND location_details IS NULL) OR "
+            "(latitude IS NOT NULL AND longitude IS NOT NULL AND "
+            "location_label IS NOT NULL AND location_precision IS NOT NULL)",
+            name="ck_complaints_location_context",
+        ),
         CheckConstraint("status = 'submitted'", name="ck_complaints_status"),
     )
 
@@ -21,6 +39,9 @@ class Complaint(Base):
     image_ref: Mapped[str | None] = mapped_column(String(200))
     latitude: Mapped[float | None] = mapped_column(Double)
     longitude: Mapped[float | None] = mapped_column(Double)
+    location_label: Mapped[str | None] = mapped_column(String(300))
+    location_precision: Mapped[str | None] = mapped_column(String(20))
+    location_details: Mapped[str | None] = mapped_column(String(500))
     status: Mapped[str] = mapped_column(String(20), server_default=text("'submitted'"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

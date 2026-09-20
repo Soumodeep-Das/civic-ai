@@ -12,9 +12,22 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
 from civicai.database import get_session
+from civicai.domain import LocationPrecision
+from civicai.geocoding import LocationCandidate
 from civicai.main import create_app
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+class StubGeocoder:
+    async def search(self, query):
+        return [LocationCandidate(
+            provider_id="101",
+            label="Baranagar, North 24 Parganas, West Bengal, India",
+            latitude=22.641,
+            longitude=88.377,
+            precision=LocationPrecision.BROAD,
+        )]
 
 
 @pytest.fixture(scope="session")
@@ -54,7 +67,7 @@ def client(migrated_engine, tmp_path, monkeypatch):
     monkeypatch.setenv("UPLOAD_DIR", str(tmp_path / "uploads"))
     with migrated_engine.connect() as connection:
         transaction = connection.begin()
-        app = create_app(migrated_engine.url)
+        app = create_app(migrated_engine.url, geocoder=StubGeocoder())
 
         def test_session():
             with Session(bind=connection, join_transaction_mode="create_savepoint") as session:

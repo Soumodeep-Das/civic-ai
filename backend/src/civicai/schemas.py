@@ -2,11 +2,14 @@ from datetime import datetime, timezone
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_serializer, model_validator
 
-from civicai.domain import ComplaintStatus
+from civicai.domain import ComplaintStatus, LocationPrecision
 
 Description = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+LocationLabel = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)]
+LocationDetails = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+SearchQuery = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=200)]
 
 
 class ComplaintCreate(BaseModel):
@@ -15,6 +18,21 @@ class ComplaintCreate(BaseModel):
     description: Description
     latitude: float | None = Field(default=None, ge=-90, le=90, allow_inf_nan=False)
     longitude: float | None = Field(default=None, ge=-180, le=180, allow_inf_nan=False)
+    location_label: LocationLabel | None = None
+    location_precision: LocationPrecision | None = None
+    location_details: LocationDetails | None = None
+
+    @model_validator(mode="after")
+    def validate_location_context(self):
+        context_present = any((self.location_label, self.location_precision, self.location_details))
+        if context_present and (
+            self.latitude is None
+            or self.longitude is None
+            or self.location_label is None
+            or self.location_precision is None
+        ):
+            raise ValueError("Location context requires coordinates, label and precision")
+        return self
 
 
 class ComplaintRead(BaseModel):
@@ -25,6 +43,9 @@ class ComplaintRead(BaseModel):
     description: str
     latitude: float | None
     longitude: float | None
+    location_label: str | None
+    location_precision: LocationPrecision | None
+    location_details: str | None
     status: ComplaintStatus
     created_at: datetime
     updated_at: datetime
@@ -32,3 +53,17 @@ class ComplaintRead(BaseModel):
     @field_serializer("created_at", "updated_at")
     def serialize_utc(self, value: datetime) -> str:
         return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class LocationSearchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: SearchQuery
+
+
+class LocationSearchResult(BaseModel):
+    provider_id: str
+    label: str
+    latitude: float
+    longitude: float
+    precision: LocationPrecision

@@ -10,11 +10,16 @@ from sqlalchemy.orm import Session
 
 from civicai import service
 from civicai.database import get_session
-from civicai.schemas import ComplaintCreate, ComplaintRead
+from civicai.geocoding import Geocoder
+from civicai.schemas import ComplaintCreate, ComplaintRead, LocationSearchRequest, LocationSearchResult
 from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
 
 router = APIRouter(tags=["complaints"])
 DatabaseSession = Annotated[Session, Depends(get_session)]
+
+
+def get_geocoder(request: Request) -> Geocoder:
+    return request.app.state.geocoder
 
 
 @router.post("/api/v1/complaints", response_model=ComplaintRead, status_code=201,
@@ -23,6 +28,9 @@ DatabaseSession = Annotated[Session, Depends(get_session)]
                             "properties": {"description": {"type": "string", "minLength": 1},
                                            "latitude": {"type": "number", "minimum": -90, "maximum": 90},
                                            "longitude": {"type": "number", "minimum": -180, "maximum": 180},
+                                           "location_label": {"type": "string", "maxLength": 300},
+                                           "location_precision": {"type": "string", "enum": ["exact", "approximate", "broad"]},
+                                           "location_details": {"type": "string", "maxLength": 500},
                                            "image": {"type": "string", "format": "binary"}}}}}}})
 async def create(request: Request, session: DatabaseSession):
     if not request.headers.get("content-type", "").startswith("multipart/form-data"):
@@ -36,7 +44,7 @@ async def create(request: Request, session: DatabaseSession):
     async def receive():
         return {"type": "http.request", "body": bytes(body), "more_body": False}
     parsed = Request(request.scope, receive)
-    async with parsed.form(max_files=1, max_fields=4, max_part_size=64 * 1024) as form:
+    async with parsed.form(max_files=1, max_fields=7, max_part_size=64 * 1024) as form:
         values = {}
         upload = None
         for key, value in form.multi_items():
@@ -68,6 +76,14 @@ async def create(request: Request, session: DatabaseSession):
             if image_ref is not None:
                 (request.app.state.upload_directory / image_ref.rsplit("/", 1)[1]).unlink(missing_ok=True)
             raise
+
+
+@router.post("/api/v1/location-search", response_model=list[LocationSearchResult])
+async def search_locations(
+    data: LocationSearchRequest,
+    geocoder: Annotated[Geocoder, Depends(get_geocoder)],
+):
+    return await geocoder.search(data.query)
 
 
 @router.get("/api/v1/complaints", response_model=list[ComplaintRead])
