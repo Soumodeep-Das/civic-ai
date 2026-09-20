@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-09-21 — Issue #4 full workflow accepted locally
+
+Completed the final real-browser demonstration using only synthetic test content. The citizen flow accepted a required PNG, searched Baranagar with MapTiler autocomplete, selected a result, rendered the Leaflet/OpenStreetMap map, adjusted the pin, reverse-geocoded it, recorded nearby details, required explicit location confirmation and submitted the complaint. The live queue increased from eight to nine and displayed complaint prefix `ecd45acb` with its photo, confirmed address and details.
+
+The API returned the full UUID `ecd45acb-63d3-42bd-b295-c758ac17694b`. A direct PostgreSQL query matched that UUID and verified submitted status, persisted image reference, non-null coordinates, location label, exact precision, map source, nearby details and both timestamps. The image endpoint returned HTTP 200 with `image/png` and 7,211 bytes. The record remains as clearly labeled local demonstration data.
+
+Final regression after submission: 79 backend tests passed, 24 frontend tests passed, TypeScript compilation and the production build passed, and Alembic reported migration `0004 (head)`. Output contained the same three recorded dependency deprecations plus the known non-blocking pytest cache-permission warning. No GitHub push was attempted; publication remains the user's step after review.
+
 ## 2026-09-21 — MapTiler activation and local port recovery
 
 The user configured the MapTiler key in the ignored root `.env`; no credential was printed, documented or staged. A stale host-level listener still occupied port 8000, and attempting to stop its obsolete PID correctly reported that no such process existed. Added a validated `BACKEND_PORT` setting shared by `scripts/start-dev.ps1` and Vite's API proxy. The tracked default remains 8000, while this machine uses 8001 in its ignored `.env`.

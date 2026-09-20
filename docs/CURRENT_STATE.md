@@ -16,6 +16,8 @@ The citizen form now requires a valid photo and a confirmed issue location. User
 
 Frontend verification: TypeScript compilation passes, all 24 interaction tests pass and the production build succeeds. The initial JavaScript bundle is about 238 kB and the lazy Leaflet map chunk is about 151 kB. MapTiler was configured locally through the ignored `.env` and verified through the running frontend: searching for Baranagar returned eight typeahead results, selecting one opened a detailed Leaflet/OpenStreetMap street map, and clicking the map moved the pin and reverse-geocoded the adjusted point to a nearby road/address. No location was confirmed and no demonstration complaint was created during that check. The key remains local and uncommitted.
 
+The complete Issue #4 citizen workflow is now live-verified with a clearly labeled synthetic complaint. The browser accepted the description and PNG evidence, searched and selected Baranagar, adjusted the map pin, reverse-geocoded the point, accepted nearby details, required explicit confirmation, submitted successfully and increased the queue from eight to nine. API and direct PostgreSQL checks matched complaint `ecd45acb-63d3-42bd-b295-c758ac17694b`, including submitted status, image reference, coordinates, exact precision, map source, location label/details and timestamps. The stored image endpoint returned HTTP 200 as `image/png`. The demonstration record remains in the local development database.
+
 ### Verified Issue #3 baseline
 
 - Anonymous multipart complaint creation with optional JPEG/PNG evidence.
@@ -30,7 +32,7 @@ Frontend verification: TypeScript compilation passes, all 24 interaction tests p
 
 ## Verification
 
-The Issue #3 checkpoint originally verified migration 0002 with 42 backend and 15 frontend tests. Issue #4 has advanced development PostgreSQL to migration 0004. The final combined regression passed 79 backend tests and 24 frontend tests; TypeScript compilation and the production build also passed. Three existing dependency deprecations and the known pytest cache-permission warning remain non-blocking.
+The Issue #3 checkpoint originally verified migration 0002 with 42 backend and 15 frontend tests. Issue #4 has advanced development PostgreSQL to migration 0004. The final combined regression was rerun after the live end-to-end submission: 79 backend tests and 24 frontend tests passed; TypeScript compilation and the production build also passed; Alembic reports `0004 (head)`. Three existing dependency deprecations and the known pytest cache-permission warning remain non-blocking.
 
 Local availability was rechecked after the frontend development process stopped and produced a browser “site can't be reached” error. The backend remained healthy. `scripts/start-dev.ps1` now checks and starts the missing local services and verifies the Vite complaint API proxy before reporting readiness. The site and proxied complaint list were reachable again after using it.
 
