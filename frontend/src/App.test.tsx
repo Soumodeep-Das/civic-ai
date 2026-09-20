@@ -115,6 +115,11 @@ test("captures location and sends multipart coordinates", async () => {
   await screen.findByText("No complaints yet");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
   expect(screen.getByText("Location captured successfully")).toBeInTheDocument();
+  expect(navigator.geolocation.getCurrentPosition).toHaveBeenCalledWith(
+    expect.any(Function),
+    expect.any(Function),
+    { enableHighAccuracy: false, timeout: 30_000, maximumAge: 300_000 },
+  );
   await user.type(screen.getByLabelText(/What is happening/), "Issue");
   await user.click(screen.getByRole("button", { name: "Submit complaint" }));
   await screen.findByRole("status");
@@ -132,7 +137,7 @@ test.each(["denied", "timeout", "unavailable"] as const)("location %s allows sub
   render(<App />);
   await screen.findByText("No complaints yet");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
-  expect(screen.getByText(/(permission denied|timed out|could not be determined)/)).toBeInTheDocument();
+  expect(screen.getByText(/(permission denied|not available within 30 seconds|could not be determined)/)).toBeInTheDocument();
   await user.type(screen.getByLabelText(/What is happening/), "Issue");
   await user.click(screen.getByRole("button", { name: "Submit complaint" }));
   await screen.findByRole("status");

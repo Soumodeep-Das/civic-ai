@@ -9,6 +9,7 @@ Branch: feat/complaint-images-location.
 - Local images in data/uploads/complaints (UPLOAD_DIR override); bytes are not stored in PostgreSQL.
 - Citizen form has optional photo selection/removal and one-shot browser geolocation, without manual coordinate fields.
 - Location denial, unavailable browser, timeout and omission permit submission.
+- Location acquisition accepts a device fix up to five minutes old and waits up to 30 seconds; timeout guidance distinguishes browser permission from device provider availability.
 - Complaint list displays image evidence and friendly location confirmation.
 - Coordinates remain metadata, excluded from the current minor-project classification experiment.
 - No ML, category, priority, severity, accounts, routing, maps or video.
@@ -21,7 +22,7 @@ Local availability was rechecked after the frontend development process stopped 
 
 Real browser: uploaded synthetic PNG, submitted without location, displayed image, submitted text after an actual location timeout, reloaded and confirmed both records remained. PostgreSQL confirmed the image reference and nullable coordinates. Browser console was clear.
 
-Successful device location capture and a visible browser permission-denial prompt could not be verified on this device; automated tests cover success, denial, timeout, unavailable API and late callbacks. This is an outstanding manual verification item.
+Successful device location capture remains blocked on this device by the current Windows user's global location consent, which is set to deny even though browser permission was granted. The Windows Location Service is running and desktop-app access is allowed. Automated tests cover success, denial, timeout, unavailable API and late callbacks. Live diagnosis after the timeout fix is recorded in `DEVELOPMENT_LOG.md`.
 
 ## References
 

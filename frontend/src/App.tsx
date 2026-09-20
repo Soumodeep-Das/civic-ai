@@ -5,6 +5,8 @@ import { Complaint, ComplaintInput, createComplaint, listComplaints, imageUrl } 
 type FormFields = { description: string };
 type FormErrors = { description?: string };
 const initialFields: FormFields = { description: "" };
+const LOCATION_TIMEOUT_MS = 30_000;
+const LOCATION_MAX_AGE_MS = 5 * 60_000;
 function validate(fields: FormFields): FormErrors {
   return fields.description.trim() ? {} : { description: "Tell us what needs attention." };
 }
@@ -130,10 +132,14 @@ export default function App() {
         setLocationMessage(error.code === 1
           ? "Location permission denied. You can submit without it."
           : error.code === 3
-            ? "Location request timed out. Try again or submit without it."
+            ? "Location was not available within 30 seconds. Check that device Location Services and Wi-Fi are on, then try again or submit without it."
             : "Location could not be determined. You can submit without it.");
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 },
+      {
+        enableHighAccuracy: false,
+        timeout: LOCATION_TIMEOUT_MS,
+        maximumAge: LOCATION_MAX_AGE_MS,
+      },
     );
   }
 

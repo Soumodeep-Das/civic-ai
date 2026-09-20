@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-09-20 — Location timeout correction
+
+Reproduced the user-visible condition where browser location permission was granted but the application reported a timeout. The frontend imposed a fresh-only ten-second acquisition deadline; permission grants access but do not guarantee that Windows can supply a position within that deadline. W3C, MDN and Microsoft guidance was reviewed and recorded in `ISSUE_003_EDGE_CASES.md`.
+
+Location capture now accepts a device fix no older than five minutes and waits up to 30 seconds. The timeout message explains that device Location Services and Wi-Fi may still be needed. Location remains explicit, optional and omitted after any failure. Frontend tests assert the acquisition policy and preserve denial, unavailable-provider, timeout and late-callback behavior. Live verification results follow after the automated checks.
+
+Verification: all 15 frontend tests passed and the production build succeeded using the repository-local Node binaries; the host's global npm launcher remains broken because its roaming `npm-cli.js` target is missing. A live request exercised the revised UI but Windows still returned `TIMEOUT`. Read-only diagnosis found the Windows Location Service running, machine consent allowed and desktop-app consent allowed, while the current user's global location consent was `Deny`. The Windows Location settings page was opened for the user; successful live capture requires the user to enable “Let apps access your location,” after which the browser flow must be retested. No system privacy setting was changed automatically.
+
 ## 2026-09-20 — Local MVP availability fix
 
 The reported browser “site can't be reached” failure was reproduced. FastAPI remained healthy on port 8000, but no process was listening on the Vite port 5173; the earlier frontend development process had ended. This was a local process-lifecycle failure rather than an Issue #3 complaint-flow defect.

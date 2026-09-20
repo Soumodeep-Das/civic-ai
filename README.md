@@ -14,7 +14,7 @@ Attach one optional JPEG/PNG (5 MiB maximum). Images must decode successfully an
 
 Files are stored under data/uploads/complaints, excluded from Git, outside executable source paths. UPLOAD_DIR can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Anonymous image URLs are suitable for local demonstration only.
 
-Use “Use my current location” while near the issue. Permission is requested on demand; denial or timeout does not prevent submission. Browser location requires a secure context (HTTPS or trusted localhost) and device location availability. Location remains optional metadata and does not enter the current classification experiment.
+Use “Use my current location” while near the issue. Permission is requested on demand; denial or timeout does not prevent submission. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. Location remains optional metadata and does not enter the current classification experiment.
 
 Video, maps and manual coordinate entry are not offered. Avoid real private evidence in the demonstration database.
 

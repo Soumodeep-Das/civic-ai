@@ -9,6 +9,7 @@
 - JPEG/PNG only, 5 MiB input/output, 20 million pixels, generated UUID names, decoded-format validation and metadata-free re-encoding. Uploaded files are ignored by Git and served as raster content with nosniff.
 - Local anonymous images are accessible to anyone who can reach the server. Production authentication, retention, malware scanning and orphan reconciliation remain future work.
 - Video is deferred because storage, transcoding, moderation and ML processing exceed this issue.
+- Browser location uses low-power accuracy, accepts a device fix up to five minutes old, and waits up to 30 seconds. This replaces the original fresh-only ten-second request, which caused avoidable timeouts after permission was granted on Windows. Provider failure still leaves location optional and gives device-settings guidance.
 
 
 Only decisions actually made are recorded here. Proposed choices remain in the relevant design document until accepted. Each future entry should include context, decision, consequences, status, and date.
