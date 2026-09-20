@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-Issue #1 provides a locally verified anonymous FastAPI/PostgreSQL complaint API, migration and 27-test suite. Issue #2 is beginning with a minimal React complaint form and stored-complaint list. Accounts, images, maps, ML and priority logic are not implemented.
+The active goal is a minimal viable product: submit an anonymous civic complaint from a React interface, persist it through FastAPI in PostgreSQL, and see it in the complaint queue. Accounts, images, maps, ML, classification and priority logic are deliberately deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
 ## Setup on Windows
 
@@ -51,13 +51,35 @@ Health and database-unavailable tests need dependencies but no live PostgreSQL:
 
 Dependency ranges are in pyproject.toml; no resolved lock file is claimed yet. The current non-blocking dependency deprecation warnings are recorded in `docs/DEVELOPMENT_LOG.md`.
 
+## Frontend setup and run
+
+Use Node.js 22.12 or newer. In a second PowerShell window, while the backend is running on port 8000:
+
+```powershell
+Set-Location frontend
+npm install
+npm run dev
+```
+
+Open http://127.0.0.1:5173. Vite proxies API calls to the local FastAPI server, so no backend CORS change is required. A separately hosted frontend may set `VITE_API_BASE_URL` using `frontend/.env.example` as a guide.
+
+Run the frontend tests and production build with:
+
+```powershell
+npm test
+npm run build
+```
+
+Frontend dependencies are captured in `frontend/package-lock.json`.
+
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
 - backend/migrations: Alembic environment and migration 0001.
 - backend/tests: API, migration consistency and database constraint tests.
+- frontend/src: React complaint form, recent-complaint list, API client, styles and interaction tests.
 - docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.
-- frontend, ml, research, data and tests: reserved for later milestones.
+- ml, research and data: reserved for later milestones.
 
 [Public repository](https://github.com/Soumodeep-Das/civic-ai). Earlier browser uploads created a separate GitHub history. Reconcile local/remote histories before pushing; no force push has been performed.

@@ -24,4 +24,15 @@ The warnings did not fail tests or affect the verified complaint flow. They are 
 
 ## 2026-09-20 — Issue #2 started
 
-Issue #2 scope is a minimal React complaint form and stored-complaint list using the existing anonymous API. The implementation must include loading, empty, validation and backend-error states and must not add authentication, images, maps or ML features.
+User direction narrowed all implementation to the MVP in `MVP_SCOPE.md`. Issue #2 supplies its visible frontend half.
+
+- Added a React 19 and TypeScript interface using Vite.
+- Added anonymous complaint submission with optional coordinate validation.
+- Added stored-complaint loading, empty, retry, success and failure states.
+- Added six frontend interaction tests; all pass.
+- Created a successful production build.
+- Inspected the live browser against the local backend; an existing PostgreSQL complaint rendered and the browser reported no console errors.
+- Submitted the demonstration complaint `MVP verification: damaged streetlight near the community park` through the browser. The API returned reference prefix `f5c85b80`, and the persisted complaint appeared immediately in the live queue.
+- No Issue #1 API or database behavior was changed.
+
+The initial Vitest run could not start its default fork worker in the managed workspace. Configuring a single worker-thread pool made the test process compatible with the environment; this changes test execution only, not product behavior.

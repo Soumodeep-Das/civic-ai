@@ -2,7 +2,7 @@
 
 ## Status and principles
 
-This document defines an intended, deliberately small architecture. It is not an implementation report. The design favors clear component boundaries, replaceable ML models, testability, and a vertical-slice delivery sequence.
+This document defines a deliberately small architecture. The design favors clear component boundaries, replaceable future ML models, testability, and a vertical-slice delivery sequence.
 
 Issue #1 implementation lives in backend/src/civicai: routes.py delegates to service.py; schemas.py handles HTTP validation/serialization; models.py and database.py handle SQLAlchemy persistence. domain.py defines complaint status and missing-record semantics. main.py owns application lifecycle and error handlers. Alembic migrations are separate from app startup. The backend, migration and persistence flow are locally verified; see CURRENT_STATE.md.
 
@@ -28,7 +28,7 @@ The browser will communicate with the backend through a versioned JSON API. The 
 
 ### Frontend
 
-A React application will eventually provide citizen complaint submission and tracking plus an administrative complaint list. Route structure, component library, state-management approach, mapping provider, and accessibility baseline are unresolved.
+Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission and the recent complaint list. `frontend/src/api/complaints.ts` owns HTTP access; the React component owns the small amount of form and request state. Vite proxies `/api` and `/health` to the local FastAPI server during development, avoiding a backend CORS change. No router, component library, global state library or map provider is needed for the MVP.
 
 ### Backend
 
@@ -46,9 +46,9 @@ Images should be represented by metadata and a storage reference rather than dat
 
 Training/evaluation code and online inference are separate concerns. Experiments will create versioned model artifacts and reports; the application will eventually call a narrow inference interface. Models must not be trained inside an API request.
 
-## First vertical slice
+## MVP vertical slice
 
-The first implementation issue should establish one complaint domain model and the smallest tested backend persistence flow. It should exclude frontend scaffolding, authentication, uploads, mapping, prioritization, department routing, and ML; those approved synopsis capabilities follow in later milestones.
+Issue #1 established the tested backend persistence flow. Issue #2 adds the browser form and stored-complaint list to complete the smallest end-to-end product. The binding boundary and acceptance criteria are in `MVP_SCOPE.md`. Authentication, uploads, mapping, prioritization, department routing and ML remain deferred.
 
 ## Cross-cutting requirements
 

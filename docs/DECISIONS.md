@@ -71,3 +71,17 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 - Status: accepted
 - Decision: GET /health reports liveness only; operational database failures return a sanitized 503 on complaint routes. Use code/message error objects, adding field details for validation failures.
 - Consequence: Health does not certify database readiness. No credentials or raw request values are included in error responses.
+
+## D011 MVP before feature expansion
+
+- Date: 2026-09-20
+- Status: accepted by user direction
+- Decision: Complete and accept the anonymous complaint submission-to-persisted-list workflow as the sole MVP before implementing any broader synopsis capability.
+- Consequence: Authentication, images, maps, ML, classification, prioritization, routing, analytics and deployment work are deferred. `MVP_SCOPE.md` is the binding scope for the active work.
+
+## D012 Minimal frontend stack and local API proxy
+
+- Date: 2026-09-20
+- Status: accepted for Issue #2
+- Decision: Use React 19, TypeScript, Vite and Vitest with Testing Library. Keep request code in a small API client and use Vite's local proxy for the existing `/api` and `/health` paths.
+- Consequence: The MVP needs no router, component library, global state library or backend CORS change. Node.js 22.12 or newer is required. npm manages and locks frontend dependencies.

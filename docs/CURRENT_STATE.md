@@ -28,6 +28,21 @@ The public repository is at https://github.com/Soumodeep-Das/civic-ai. The verif
 
 Dependency ranges are declared in `pyproject.toml`, but there is not yet a resolved lock file. Three non-blocking dependency deprecation warnings are recorded in `DEVELOPMENT_LOG.md`.
 
-## Active issue
+## Active issue and MVP focus
 
-Issue #2 is starting: build a minimal React complaint form and stored-complaint list connected to the anonymous Issue #1 API, with visible loading and error states. Authentication, images, maps, ML, classification and prioritization remain excluded.
+Issue #2 completes the MVP's visible end-to-end complaint workflow. The React/TypeScript interface now includes the complaint form, coordinate validation, live stored-complaint list, and loading, empty, success and error states. It uses the unchanged Issue #1 API through a Vite development proxy.
+
+Frontend status:
+
+- [x] React and TypeScript project setup with an npm lock file.
+- [x] Anonymous complaint form and optional coordinate inputs.
+- [x] Client-side required/range validation.
+- [x] Stored complaint list and retryable unavailable state.
+- [x] Six frontend interaction tests passing.
+- [x] Production frontend build passing.
+- [x] Live browser render verified against the local backend with no console errors.
+- [x] Browser submission verified against PostgreSQL; the new complaint appeared immediately in the queue.
+- [x] Issue #2 checkpoint committed locally.
+- [ ] Publish the Issue #2 branch when GitHub authentication is available.
+
+The binding MVP scope is in `MVP_SCOPE.md`. Authentication, images, maps, ML, classification, prioritization, routing and analytics remain deferred.
