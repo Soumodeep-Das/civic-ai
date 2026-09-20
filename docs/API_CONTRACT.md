@@ -20,6 +20,6 @@ POST returns 201 with complaint_id, description, latitude, longitude, image_ref,
 
 Errors use code/message, with details for field-validation errors. Invalid fields/images return 422, oversized uploads 413, wrong request media type 415, missing resources 404, and database unavailability 503.
 
-Images: 5 MiB input and re-encoded output; 20 million pixels. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata. Original filenames are ignored.
+Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 
 All endpoints, including images, are anonymous for local demonstrations. Do not expose this service publicly or submit private evidence until access controls and operational storage policy are designed.

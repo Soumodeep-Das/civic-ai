@@ -2,7 +2,21 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The active goal is a minimal viable product: submit an anonymous civic complaint from a React interface, persist it through FastAPI in PostgreSQL, and see it in the complaint queue. Accounts, images, maps, ML, classification and priority logic are deliberately deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints with optional JPEG/PNG evidence and browser location, persisted through FastAPI in PostgreSQL. Accounts, video, maps, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+
+## Issue #3: photos and location
+
+After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, then run `python -m alembic upgrade head`. Restart both servers. Migration 0002 preserves existing complaints and adds nullable image_ref.
+
+POST now uses multipart/form-data, including for text-only submissions. JSON clients must migrate; see docs/API_CONTRACT.md. The frontend handles this automatically.
+
+Attach one optional JPEG/PNG (5 MiB maximum). Images must decode successfully and match their declared MIME, be at most 20 million pixels and have one frame. Re-encoding preserves orientation while removing EXIF/text metadata. Total multipart body is bounded to 5 MiB + 256 KiB. Stored filenames are generated, original names ignored, and image responses use explicit raster MIME plus nosniff. These measures reduce upload risks but do not replace production access controls or malware scanning.
+
+Files are stored under data/uploads/complaints, excluded from Git, outside executable source paths. UPLOAD_DIR can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Anonymous image URLs are suitable for local demonstration only.
+
+Use “Use my current location” while near the issue. Permission is requested on demand; denial or timeout does not prevent submission. Browser location requires a secure context (HTTPS or trusted localhost) and device location availability. Location remains optional metadata and does not enter the current classification experiment.
+
+Video, maps and manual coordinate entry are not offered. Avoid real private evidence in the demonstration database.
 
 ## Setup on Windows
 

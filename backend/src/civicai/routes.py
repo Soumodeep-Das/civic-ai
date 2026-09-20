@@ -57,7 +57,10 @@ async def create(request: Request, session: DatabaseSession):
         image_ref = None
         if upload is not None:
             content = await upload.read(MAX_IMAGE_BYTES + 1)
-            image_ref = save_image(content, upload.content_type, request.app.state.upload_directory)
+            try:
+                image_ref = save_image(content, upload.content_type, request.app.state.upload_directory)
+            except OSError:
+                raise HTTPException(503, "Image storage is temporarily unavailable.") from None
         try:
             return service.create_complaint(session, data, image_ref)
         except Exception:

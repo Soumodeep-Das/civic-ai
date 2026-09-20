@@ -11,8 +11,16 @@ from civicai.schemas import ComplaintCreate
 def create_complaint(session: Session, data: ComplaintCreate, image_ref: str | None = None) -> Complaint:
     complaint = Complaint(**data.model_dump(), image_ref=image_ref)
     session.add(complaint)
-    session.commit()
+    session.flush()
     session.refresh(complaint)
+    # Load server defaults before commit so a later refresh failure cannot trigger
+    # removal of an image whose database row was already successfully committed.
+    expire_on_commit = session.expire_on_commit
+    session.expire_on_commit = False
+    try:
+        session.commit()
+    finally:
+        session.expire_on_commit = expire_on_commit
     return complaint
 
 

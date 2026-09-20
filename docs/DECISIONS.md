@@ -88,7 +88,7 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 - Date: 2026-09-20
 - Status: accepted by user direction
 - Decision: Complete and accept the anonymous complaint submission-to-persisted-list workflow as the sole MVP before implementing any broader synopsis capability.
-- Consequence: Authentication, images, maps, ML, classification, prioritization, routing, analytics and deployment work are deferred. `MVP_SCOPE.md` is the binding scope for the active work.
+- Consequence: Issue #2 deferred authentication, images, maps, ML, classification, prioritization, routing, analytics and deployment. Issue #3 subsequently added optional images and browser location while preserving the MVP boundary documented in `MVP_SCOPE.md`; the other capabilities remain deferred.
 
 ## D012 Minimal frontend stack and local API proxy
 

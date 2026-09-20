@@ -1,36 +1,12 @@
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
-import { Complaint, ComplaintInput, createComplaint, listComplaints } from "./api/complaints";
+import { Complaint, ComplaintInput, createComplaint, listComplaints, imageUrl } from "./api/complaints";
 
-type FormFields = {
-  description: string;
-  latitude: string;
-  longitude: string;
-};
-
-type FormErrors = Partial<Record<keyof FormFields, string>>;
-
-const initialFields: FormFields = { description: "", latitude: "", longitude: "" };
-
-function coordinateValue(value: string): number | undefined {
-  if (value.trim() === "") return undefined;
-  return Number(value);
-}
-
+type FormFields = { description: string };
+type FormErrors = { description?: string };
+const initialFields: FormFields = { description: "" };
 function validate(fields: FormFields): FormErrors {
-  const errors: FormErrors = {};
-  const latitude = coordinateValue(fields.latitude);
-  const longitude = coordinateValue(fields.longitude);
-
-  if (!fields.description.trim()) errors.description = "Tell us what needs attention.";
-  if (latitude !== undefined && (!Number.isFinite(latitude) || latitude < -90 || latitude > 90)) {
-    errors.latitude = "Latitude must be between -90 and 90.";
-  }
-  if (longitude !== undefined && (!Number.isFinite(longitude) || longitude < -180 || longitude > 180)) {
-    errors.longitude = "Longitude must be between -180 and 180.";
-  }
-
-  return errors;
+  return fields.description.trim() ? {} : { description: "Tell us what needs attention." };
 }
 
 function readableDate(value: string): string {
@@ -50,9 +26,10 @@ function ComplaintCard({ complaint }: { complaint: Complaint }) {
         <time dateTime={complaint.created_at}>{readableDate(complaint.created_at)}</time>
       </div>
       <p>{complaint.description}</p>
+      {complaint.image_ref && <img className="evidence-image" src={imageUrl(complaint.image_ref)} alt="Photo attached to this complaint" loading="lazy" />}
       <div className="card-footer">
         <span className="reference">#{complaint.complaint_id.slice(0, 8)}</span>
-        <span>{hasLocation ? `${complaint.latitude ?? "—"}, ${complaint.longitude ?? "—"}` : "Location not provided"}</span>
+        <span>{hasLocation ? "Location provided" : "Location not provided"}</span>
       </div>
     </article>
   );
@@ -61,6 +38,13 @@ function ComplaintCard({ complaint }: { complaint: Complaint }) {
 export default function App() {
   const [fields, setFields] = useState<FormFields>(initialFields);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [image, setImage] = useState<File | undefined>();
+  const [imageError, setImageError] = useState("");
+  const imageInput = useRef<HTMLInputElement>(null);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number }>();
+  const [locationMessage, setLocationMessage] = useState("Location is optional. You can submit without it.");
+  const [locating, setLocating] = useState(false);
+  const locationRequest = useRef(0);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,6 +74,69 @@ export default function App() {
     setSuccessMessage("");
   }
 
+  function chooseImage(file?: File) {
+    setSuccessMessage("");
+    setImage(undefined);
+    setImageError("");
+    if (!file) return;
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      setImageError("Choose a JPEG or PNG image.");
+    } else if (file.size > 5 * 1024 * 1024) {
+      setImageError("Image must be 5 MiB or smaller.");
+    } else {
+      setImage(file);
+      return;
+    }
+    if (imageInput.current) imageInput.current.value = "";
+  }
+
+  function removeImage() {
+    setImage(undefined);
+    setImageError("");
+    if (imageInput.current) imageInput.current.value = "";
+  }
+
+  function clearLocation() {
+    locationRequest.current += 1;
+    setLocation(undefined);
+    setLocating(false);
+    setLocationMessage("Location omitted. You can submit without it.");
+  }
+
+  function captureLocation() {
+    const requestId = ++locationRequest.current;
+    setLocation(undefined);
+    if (!navigator.geolocation) {
+      setLocationMessage("This browser does not support location. You can submit without it.");
+      return;
+    }
+    setLocating(true);
+    setLocationMessage("Finding your location…");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (requestId !== locationRequest.current) return;
+        setLocating(false);
+        const { latitude, longitude } = position.coords;
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+          setLocationMessage("Location could not be determined. You can submit without it.");
+          return;
+        }
+        setLocation({ latitude, longitude });
+        setLocationMessage("Location captured successfully");
+      },
+      (error) => {
+        if (requestId !== locationRequest.current) return;
+        setLocating(false);
+        setLocationMessage(error.code === 1
+          ? "Location permission denied. You can submit without it."
+          : error.code === 3
+            ? "Location request timed out. Try again or submit without it."
+            : "Location could not be determined. You can submit without it.");
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 },
+    );
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextErrors = validate(fields);
@@ -100,16 +147,23 @@ export default function App() {
     if (Object.keys(nextErrors).length > 0) return;
 
     const input: ComplaintInput = { description: fields.description.trim() };
-    const latitude = coordinateValue(fields.latitude);
-    const longitude = coordinateValue(fields.longitude);
-    if (latitude !== undefined) input.latitude = latitude;
-    if (longitude !== undefined) input.longitude = longitude;
+    if (imageError) return;
+    if (location) Object.assign(input, location);
+    if (image) input.image = image;
+    // Ignore any geolocation callback that arrives after submission begins.
+    locationRequest.current += 1;
+    setLocating(false);
 
     setIsSubmitting(true);
     try {
       const created = await createComplaint(input);
       setComplaints((current) => [created, ...current.filter((item) => item.complaint_id !== created.complaint_id)]);
       setFields(initialFields);
+      setImage(undefined);
+      if (imageInput.current) imageInput.current.value = "";
+      setLocation(undefined);
+      setLocationMessage("Location is optional. You can submit without it.");
+      setListError("");
       setSuccessMessage(`Complaint #${created.complaint_id.slice(0, 8)} was submitted.`);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "The complaint could not be submitted.");
@@ -132,7 +186,7 @@ export default function App() {
         <div>
           <p className="eyebrow">Your street. Your voice.</p>
           <h1>Report what needs<br /><em>attention.</em></h1>
-          <p className="hero-copy">Send a clear description of a local civic problem. Your report is stored in the project database and added to the complaint queue.</p>
+          <p className="hero-copy">Send a clear description of a local civic problem. Add a photo and your location if you wish, then submit your report.</p>
         </div>
         <div className="hero-number" aria-hidden="true">01</div>
       </section>
@@ -157,20 +211,23 @@ export default function App() {
             />
             {errors.description ? <p className="field-error" id="description-error">{errors.description}</p> : <p className="field-help" id="description-help">Include a landmark or nearby building when useful.</p>}
 
-            <fieldset>
-              <legend>Location coordinates <span>Optional</span></legend>
-              <div className="coordinate-grid">
-                <div>
-                  <label htmlFor="latitude">Latitude</label>
-                  <input id="latitude" inputMode="decimal" value={fields.latitude} onChange={(event) => updateField("latitude", event.target.value)} placeholder="22.5726" aria-invalid={Boolean(errors.latitude)} aria-describedby={errors.latitude ? "latitude-error" : undefined} />
-                  {errors.latitude && <p className="field-error" id="latitude-error">{errors.latitude}</p>}
-                </div>
-                <div>
-                  <label htmlFor="longitude">Longitude</label>
-                  <input id="longitude" inputMode="decimal" value={fields.longitude} onChange={(event) => updateField("longitude", event.target.value)} placeholder="88.3639" aria-invalid={Boolean(errors.longitude)} aria-describedby={errors.longitude ? "longitude-error" : undefined} />
-                  {errors.longitude && <p className="field-error" id="longitude-error">{errors.longitude}</p>}
-                </div>
-              </div>
+            <fieldset disabled={isSubmitting}>
+              <legend>Photo evidence <span>Optional</span></legend>
+              <label htmlFor="image">Attach a photo</label>
+              <input ref={imageInput} id="image" type="file" accept="image/jpeg,image/png"
+                onChange={(event) => chooseImage(event.target.files?.[0])} aria-describedby="image-help" />
+              <p className="field-help" id="image-help">JPEG or PNG, up to 5 MiB. Avoid faces and private information.</p>
+              {image && <p className="field-help">Selected: {image.name}</p>}
+              {(image || imageError) && <button className="secondary-button" type="button" onClick={removeImage}>Remove image</button>}
+              {imageError && <p className="field-error" role="alert">{imageError}</p>}
+            </fieldset>
+
+            <fieldset disabled={isSubmitting}>
+              <legend>Where is the issue? <span>Optional</span></legend>
+              <p className="field-help">Use this only while you are near the problem. Your browser will ask for permission.</p>
+              <button className="secondary-button" type="button" onClick={captureLocation} disabled={locating}>Use my current location</button>
+              {(location || locating) && <button className="secondary-button" type="button" onClick={clearLocation}>Continue without location</button>}
+              <p className="field-help" aria-live="polite">{locationMessage}</p>
             </fieldset>
 
             {submitError && <div className="notice error-notice" role="alert">{submitError}</div>}

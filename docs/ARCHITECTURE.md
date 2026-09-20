@@ -40,7 +40,7 @@ PostgreSQL will store complaint records and workflow state. Geospatial extension
 
 ### Media storage
 
-Images should be represented by metadata and a storage reference rather than database blobs unless later evidence supports another choice. Local development storage and any production object store remain undecided. Upload validation, privacy, retention, and access control must be designed before accepting images.
+Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local storage under data/uploads/complaints (UPLOAD_DIR override). PostgreSQL stores a nullable image_ref. A restricted API image route serves raster content. Multipart creation coordinates validation, file storage and complaint persistence. This remains a local anonymous demonstration; production retention, quotas, authorization and orphan recovery are unresolved.
 
 ### ML pipeline
 

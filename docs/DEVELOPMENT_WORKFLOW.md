@@ -2,6 +2,10 @@
 
 ## Work units
 
+Permanent user direction (2026-09-20): before and during every feature, investigate relevant edge cases and research how comparable applications handle them. Use official product documentation, standards and security guidance where possible. Record source links, what we adopted, what is deferred and why. Translate findings into scoped implementation and meaningful tests; never claim every possible edge case has been eliminated.
+
+Consider missing/invalid input, permission denial, unavailable devices, slow/offline connections, retries and duplicate submissions, races and cancellation, partial persistence failures, accessibility, privacy, storage limits, backwards compatibility and recovery as relevant. Do not expand the issue automatically to copy unrelated competitor features.
+
 Use one narrowly scoped issue at a time. Before implementation, read `CURRENT_STATE.md`, the relevant design documents, and existing code. State acceptance criteria and explicit exclusions. Finish with tests, documentation updates, and a short record of unresolved risks.
 
 ## Git workflow

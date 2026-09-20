@@ -63,3 +63,4 @@ research/results/**
 # Generated reports
 *.pdf
 *.html
+!frontend/index.html

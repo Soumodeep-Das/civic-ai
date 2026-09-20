@@ -2,9 +2,9 @@
 
 ## Status
 
-This is a proposed canonical record, not an existing database schema or dataset. Fields are grouped to prevent application state, human labels, model inputs, and predictions from being conflated.
+The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, status, created_at and updated_at; no research dataset is claimed.
 
-Issue #1 implements only complaint_id, description, latitude, longitude, status, created_at and updated_at in source/migration 0001. Other fields below remain future proposals. PostgreSQL uses UUID, TEXT, DOUBLE PRECISION coordinates, constrained VARCHAR status and TIMESTAMP WITH TIME ZONE. Only submitted is supported. Migration 0001 and complaint persistence are locally verified.
+Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are local runtime files; only their relative serving URL is stored in PostgreSQL. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only, excluded from the current text/image/multimodal classification experiment. No location_accuracy_m or reporter_id field is implemented.
 
 ## Canonical complaint record
 

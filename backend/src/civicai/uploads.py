@@ -7,7 +7,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fastapi import HTTPException
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 MAX_IMAGE_PIXELS = 20_000_000
@@ -29,12 +29,12 @@ def save_image(content: bytes, content_type: str | None, directory: Path) -> str
             warnings.simplefilter("error", Image.DecompressionBombWarning)
             with Image.open(io.BytesIO(content)) as source:
                 expected = {"image/jpeg": "JPEG", "image/png": "PNG"}[content_type]
-                if source.format != expected or source.width * source.height > MAX_IMAGE_PIXELS:
+                if source.format != expected or source.width * source.height > MAX_IMAGE_PIXELS or getattr(source, "n_frames", 1) != 1:
                     raise ValueError("Invalid image format or dimensions")
                 source.verify()
             with Image.open(io.BytesIO(content)) as source:
                 source.load()
-                clean = source.convert("RGB" if expected == "JPEG" else "RGBA")
+                clean = ImageOps.exif_transpose(source).convert("RGB" if expected == "JPEG" else "RGBA")
                 # Fresh pixels discard EXIF (including GPS), text and trailing payloads.
                 clean = Image.frombytes(clean.mode, clean.size, clean.tobytes())
                 output = io.BytesIO()
@@ -50,6 +50,9 @@ def save_image(content: bytes, content_type: str | None, directory: Path) -> str
     try:
         with path.open("xb") as target:
             target.write(encoded)
+    except FileExistsError:
+        # Never remove or overwrite an existing file, even on an improbable UUID collision.
+        raise
     except OSError:
         path.unlink(missing_ok=True)
         raise

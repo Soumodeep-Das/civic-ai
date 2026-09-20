@@ -1,5 +1,6 @@
 export type Complaint = {
   complaint_id: string;
+  image_ref: string | null;
   description: string;
   latitude: number | null;
   longitude: number | null;
@@ -9,6 +10,7 @@ export type Complaint = {
 };
 
 export type ComplaintInput = {
+  image?: File;
   description: string;
   latitude?: number;
   longitude?: number;
@@ -65,9 +67,17 @@ export function listComplaints(): Promise<Complaint[]> {
 }
 
 export function createComplaint(input: ComplaintInput): Promise<Complaint> {
+  const body = new FormData();
+  body.append("description", input.description);
+  if (input.latitude !== undefined) body.append("latitude", String(input.latitude));
+  if (input.longitude !== undefined) body.append("longitude", String(input.longitude));
+  if (input.image) body.append("image", input.image);
   return request<Complaint>("/api/v1/complaints", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
+    body,
   });
+}
+
+export function imageUrl(reference: string): string {
+  return apiBaseUrl + reference;
 }
