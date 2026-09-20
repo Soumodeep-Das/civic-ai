@@ -36,3 +36,5 @@ User direction narrowed all implementation to the MVP in `MVP_SCOPE.md`. Issue #
 - No Issue #1 API or database behavior was changed.
 
 The initial Vitest run could not start its default fork worker in the managed workspace. Configuring a single worker-thread pool made the test process compatible with the environment; this changes test execution only, not product behavior.
+
+The MVP checkpoint was committed locally as `f4ad009` on `feat/frontend-complaint-flow`. Remote fetch succeeds, but push exits with code 128 because this terminal has no usable GitHub authentication. No force push or history rewrite was attempted; the browser-visible public repository is unchanged.
