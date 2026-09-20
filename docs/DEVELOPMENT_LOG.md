@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-09-21 — MapTiler activation and local port recovery
+
+The user configured the MapTiler key in the ignored root `.env`; no credential was printed, documented or staged. A stale host-level listener still occupied port 8000, and attempting to stop its obsolete PID correctly reported that no such process existed. Added a validated `BACKEND_PORT` setting shared by `scripts/start-dev.ps1` and Vite's API proxy. The tracked default remains 8000, while this machine uses 8001 in its ignored `.env`.
+
+After restarting the intended backend with network access, the live frontend reported autocomplete and reverse-geocoding capabilities enabled. Searching for Baranagar produced eight MapTiler suggestions. Selecting the first result rendered a non-blank Leaflet/OpenStreetMap street map with roads, labels, zoom controls, attribution and a draggable marker. Clicking the map adjusted the pin and successfully reverse-geocoded it to a nearby road/address. No location was confirmed and no complaint was submitted. Frontend proxy health and complaint access remained successful.
+
 ## 2026-09-21 — Issue #4 interaction refinement completed
 
 Implemented the accepted autocomplete and pin-refinement design without breaking the existing complaint endpoints. Added the MapTiler search/reverse adapter, provider capability discovery, 350 ms debounced typeahead for capable providers, explicit-search fallback for public Nominatim, keyboard-accessible suggestions, reverse geocoding after pin movement, and persisted `search`/`device`/`map` source plus optional device accuracy through additive migration 0004. Development PostgreSQL reports `0004 (head)` and the eight existing complaints remain intact.

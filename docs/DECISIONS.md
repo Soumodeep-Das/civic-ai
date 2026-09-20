@@ -1,5 +1,11 @@
 # Decision Log
 
+## D017 Configurable local backend port (2026-09-21, accepted)
+
+- Decision: `BACKEND_PORT` controls both the local FastAPI launcher and Vite development proxy. It defaults to 8000 and must be an integer from 1 through 65535.
+- Context: a stale host-level listener can occupy the default port and make the launcher attach the frontend to the wrong backend even when that process cannot be managed by its previously reported PID.
+- Consequence: developers may select a free local port in the ignored `.env` without editing source or exposing credentials. Both services must be restarted after a port change; production deployment configuration is unchanged.
+
 ## D016 Raster map compatibility fallback (2026-09-21, accepted)
 
 - Replace the Issue #4 MapLibre/OpenFreeMap renderer with lazy-loaded Leaflet and configurable raster tiles after the vector style and attribution loaded but the WebGL canvas remained blank in the actual in-app browser.

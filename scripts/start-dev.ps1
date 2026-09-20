@@ -3,6 +3,22 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $logDirectory = Join-Path $projectRoot "logs"
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
+$backendPort = 8000
+$environmentPath = Join-Path $projectRoot ".env"
+
+if (Test-Path -LiteralPath $environmentPath -PathType Leaf) {
+    $configuredPort = Get-Content -LiteralPath $environmentPath |
+        Where-Object { $_ -match '^BACKEND_PORT=' } |
+        Select-Object -Last 1
+    if ($null -ne $configuredPort) {
+        $portText = ($configuredPort -replace '^BACKEND_PORT=', '').Trim()
+        $parsedPort = 0
+        if (-not [int]::TryParse($portText, [ref]$parsedPort) -or $parsedPort -lt 1 -or $parsedPort -gt 65535) {
+            throw "BACKEND_PORT in .env must be an integer between 1 and 65535."
+        }
+        $backendPort = $parsedPort
+    }
+}
 
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 
@@ -41,7 +57,7 @@ function Wait-ForEndpoint {
     throw "$Name did not become available at $Uri. Check the latest files in $logDirectory."
 }
 
-$backendHealthUrl = "http://127.0.0.1:8000/health"
+$backendHealthUrl = "http://127.0.0.1:$backendPort/health"
 $frontendUrl = "http://127.0.0.1:5173/"
 $proxyUrl = "http://127.0.0.1:5173/api/v1/complaints"
 
@@ -56,7 +72,7 @@ else {
 
     Start-Process `
         -FilePath $pythonPath `
-        -ArgumentList @("-m", "uvicorn", "civicai.main:app", "--host", "127.0.0.1", "--port", "8000") `
+        -ArgumentList @("-m", "uvicorn", "civicai.main:app", "--host", "127.0.0.1", "--port", "$backendPort") `
         -WorkingDirectory $projectRoot `
         -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $logDirectory "backend-$runId.out.log") `

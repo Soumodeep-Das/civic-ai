@@ -69,6 +69,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 
 The helper checks the backend and frontend first, starts only the service that is missing, waits for both ports, and verifies that the Vite API proxy returns JSON. Services are started as hidden local processes so closing this PowerShell window does not immediately stop the site. Runtime output is written to the ignored `logs` directory. Re-run the same command whenever http://127.0.0.1:5173 cannot be reached.
 
+The backend defaults to port `8000`. If that port is already occupied by a stale or unrelated local process, set `BACKEND_PORT=8001` (or another free port) in the ignored root `.env` before starting. The startup helper and Vite proxy read the same setting, so browser API requests continue to reach the intended backend. Restart both affected development processes after changing the value. Do not add the MapTiler key or any other credential to a tracked file.
+
 ## Tests
 
 ```powershell
