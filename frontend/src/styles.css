@@ -87,15 +87,17 @@ fieldset legend { width: 100%; } fieldset legend span { float: right; color: #85
 
 .location-picker { margin-top: 14px; }
 .location-search label { margin-bottom: 8px; color: #516964; font-size: 12px; }
+.search-mode { margin: 7px 0 0; color: #788a86; font-size: 10px; }
 .search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
 .search-row .secondary-button { min-width: 100px; margin: 0; }
 .location-divider { height: 30px; display: flex; align-items: center; gap: 12px; color: #879690; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .location-divider::before, .location-divider::after { content: ""; flex: 1; height: 1px; background: rgba(22,59,55,.14); }
 .location-action { width: 100%; margin: 0; }
 .location-status { min-height: 34px; margin-top: 12px; }
-.search-results { margin-top: 12px; display: grid; gap: 8px; }
-.search-results button { width: 100%; padding: 13px 14px; border: 1px solid #b9c3bd; border-radius: 3px; background: #fff; color: #234d47; text-align: left; }
-.search-results button:hover, .search-results button:focus-visible { border-color: #d8593c; box-shadow: 0 0 0 3px rgba(216,89,60,.1); outline: none; }
+.search-results { max-height: 280px; margin-top: 6px; overflow-y: auto; display: grid; border: 1px solid #b9c3bd; border-radius: 3px; background: #fff; box-shadow: 0 12px 28px rgba(22,59,55,.12); }
+.search-results button { width: 100%; padding: 13px 14px; border: 0; border-bottom: 1px solid #e3e7e3; background: #fff; color: #234d47; text-align: left; }
+.search-results button:last-child { border-bottom: 0; }
+.search-results button:hover, .search-results button:focus-visible, .search-results button.active { background: #f4eee8; box-shadow: inset 3px 0 #d8593c; outline: none; }
 .search-results strong, .search-results span { display: block; }
 .search-results strong { font-size: 12px; line-height: 1.45; }
 .search-results span { margin-top: 5px; color: #778983; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
@@ -115,8 +117,8 @@ fieldset legend { width: 100%; } fieldset legend span { float: right; color: #85
 .map-adjuster { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(22,59,55,.14); }
 .map-loading { min-height: 180px; margin-top: 16px; display: grid; place-items: center; border: 1px dashed #aebbb5; color: #667b75; font-size: 12px; }
 .location-map { width: 100%; height: 330px; border: 1px solid #aebbb5; border-radius: 3px; background: #dce5e1; }
-.map-nudge-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin-top: 10px; }
-.map-nudge-controls button { padding: 8px 10px; border: 1px solid #9aaba5; border-radius: 3px; background: #fff; color: #31534d; font-size: 11px; }
+.issue-map-marker span { display: block; width: 24px; height: 24px; border: 3px solid #fff; border-radius: 50% 50% 50% 0; background: #dd583a; box-shadow: 0 2px 6px rgba(22,59,55,.38); transform: rotate(-45deg); }
+.issue-map-marker span::after { content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; transform: translate(6px, 6px); }
 .map-attribution { margin: 8px 0 0; color: #82918c; font-size: 9px; line-height: 1.4; }
 
 footer { padding: 24px clamp(24px, 5vw, 80px); display: flex; justify-content: space-between; border-top: 1px solid rgba(22,59,55,.15); color: #758580; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }

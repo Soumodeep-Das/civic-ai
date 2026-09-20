@@ -1,6 +1,6 @@
 # Issue #4 — Accessible issue-location selection
 
-Status: accepted; interaction refinement in progress on `feat/accessible-location-picker`.
+Status: implemented and locally verified on `feat/accessible-location-picker`.
 
 ## User outcome
 
@@ -32,7 +32,7 @@ MapTiler is the selected autocomplete and reverse-geocoding adapter. It is enabl
 
 The provider base URL, country restriction and user agent are environment configuration. Provider failure returns a sanitized availability error. Public Nominatim is not a production SLA and may be replaced without changing the frontend contract.
 
-The map renderer is separate from geocoding. MapLibre GL JS renders OpenFreeMap's detailed Liberty street style by default; it does not supply search data itself. OpenFreeMap requires attribution and offers no SLA, so the style remains replaceable through frontend configuration.
+The map renderer is separate from geocoding. The initial MapLibre/OpenFreeMap implementation loaded its style and attribution but produced a blank WebGL canvas in the actual in-app browser. The completed implementation therefore lazy-loads Leaflet with configurable raster tiles; standard OpenStreetMap tiles are the local-demo default. This renderer does not supply search data. It includes visible attribution, does not prefetch, and remains replaceable through `VITE_MAP_TILE_URL`; public tiles offer no production SLA.
 
 ## Data additions
 
@@ -44,16 +44,16 @@ Migration 0003 adds nullable fields so existing data remains valid:
 
 New metadata is accepted only with both coordinates and a label/precision pair. Legacy coordinate-only records remain valid. These fields are application metadata and remain excluded from the current classification experiment.
 
-Migration 0004 will add nullable `location_source` (`search`, `device` or `map`) and `location_accuracy_m`. Device accuracy is stored only when the browser supplies a finite non-negative value. Map adjustment changes the source to `map` and clears device accuracy. Existing rows remain valid with both fields null.
+Migration 0004 adds nullable `location_source` (`search`, `device` or `map`) and `location_accuracy_m`. Device accuracy is stored only when the browser supplies a finite non-negative value. Map adjustment changes the source to `map` and clears device accuracy. Existing rows remain valid with both fields null.
 
 ## Research basis
 
 - [FixMyStreet citizen experience](https://fixmystreet.org/pro-manual/citizens-experience/) supports address/place search or GPS followed by optional map refinement. Adopt the multi-path location flow, not unrelated routing or duplicate-report features.
 - [W3C Geolocation](https://www.w3.org/TR/geolocation/) defines permission, timeout and cached-position behavior for current-location capture.
-- [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/) supplies an interactive TypeScript map renderer and marker controls but requires a separate tile/style and geocoding provider.
+- [Leaflet quick start](https://leafletjs.com/examples/quick-start/) documents the raster tile layer, visible attribution and interactive marker/map primitives used by the compatible renderer.
+- [OpenStreetMap tile policy](https://operations.osmfoundation.org/policies/tiles/) permits normal interactive human viewing subject to URL, attribution, referrer and caching requirements, while prohibiting bulk download/prefetch and offering no SLA.
 - [OSMF Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/) permits moderate user-triggered searches but requires attribution and identification, caps use at one request per second, recommends caching/switchability and prohibits client-side autocomplete.
 - [MapTiler geocoding API](https://docs.maptiler.com/cloud/api/geocoding/) explicitly supports autocomplete, fuzzy matching, country filters, proximity bias, reverse geocoding and up to ten results. Adopt its capabilities behind the existing provider boundary rather than exposing its key to the browser.
-- [OpenFreeMap quick start](https://openfreemap.org/quick_start/) documents a detailed MapLibre-compatible Liberty style with automatic attribution. Use it for the academic prototype while recording its lack of an SLA.
 - [Google Places](https://developers.google.com/maps/documentation/places/web-service) is a future provider option with strong place search, but it requires credentials, billing and quota management; it is not selected for this local academic issue.
 
 ## Explicit exclusions
@@ -62,5 +62,5 @@ Migration 0004 will add nullable `location_source` (`search`, `device` or `map`)
 - No municipal boundary enforcement, department routing, duplicate detection or PostGIS.
 - No automatic photo-EXIF location; downloaded images and screenshots often lack trustworthy metadata, and CivicAI strips image metadata.
 - No Google Maps/Places account, key or billing configuration.
-- No promise that public OpenFreeMap tiles or a free MapTiler account are production municipal infrastructure.
+- No promise that public OpenStreetMap tiles or a free MapTiler account are production municipal infrastructure.
 - No claim that public geocoding or public map tiles are production infrastructure.

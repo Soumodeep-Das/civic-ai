@@ -7,12 +7,15 @@ export type Complaint = {
   location_label: string | null;
   location_precision: LocationPrecision | null;
   location_details: string | null;
+  location_source: LocationSource | null;
+  location_accuracy_m: number | null;
   status: "submitted";
   created_at: string;
   updated_at: string;
 };
 
 export type LocationPrecision = "exact" | "approximate" | "broad";
+export type LocationSource = "search" | "device" | "map";
 
 export type LocationSearchResult = {
   provider_id: string;
@@ -30,6 +33,8 @@ export type ComplaintInput = {
   location_label?: string;
   location_precision?: LocationPrecision;
   location_details?: string;
+  location_source?: LocationSource;
+  location_accuracy_m?: number;
 };
 
 type ApiErrorBody = {
@@ -90,6 +95,8 @@ export function createComplaint(input: ComplaintInput): Promise<Complaint> {
   if (input.location_label !== undefined) body.append("location_label", input.location_label);
   if (input.location_precision !== undefined) body.append("location_precision", input.location_precision);
   if (input.location_details !== undefined) body.append("location_details", input.location_details);
+  if (input.location_source !== undefined) body.append("location_source", input.location_source);
+  if (input.location_accuracy_m !== undefined) body.append("location_accuracy_m", String(input.location_accuracy_m));
   if (input.image) body.append("image", input.image);
   return request<Complaint>("/api/v1/complaints", {
     method: "POST",
@@ -102,6 +109,18 @@ export function searchLocations(query: string): Promise<LocationSearchResult[]> 
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query }),
+  });
+}
+
+export function getLocationCapabilities(): Promise<{ autocomplete: boolean; reverse_geocoding: boolean }> {
+  return request("/api/v1/location-capabilities");
+}
+
+export function reverseLocation(latitude: number, longitude: number): Promise<LocationSearchResult | null> {
+  return request<LocationSearchResult | null>("/api/v1/location-reverse", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude, longitude }),
   });
 }
 

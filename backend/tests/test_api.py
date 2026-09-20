@@ -35,11 +35,14 @@ def test_create_and_persist(client):
     assert body["status"] == "submitted"
     assert set(body) == {
         "complaint_id", "description", "latitude", "longitude", "location_label",
-        "location_precision", "location_details", "status", "created_at", "updated_at", "image_ref",
+        "location_precision", "location_details", "location_source", "location_accuracy_m",
+        "status", "created_at", "updated_at", "image_ref",
     }
     assert body["location_label"] is None
     assert body["location_precision"] is None
     assert body["location_details"] is None
+    assert body["location_source"] is None
+    assert body["location_accuracy_m"] is None
     for field in ("created_at", "updated_at"):
         assert datetime.fromisoformat(body[field]).utcoffset() == timedelta(0)
     assert body["created_at"] == body["updated_at"]
@@ -80,12 +83,16 @@ def test_location_context_is_persisted(client):
         "location_label": "Baranagar Municipality, West Bengal",
         "location_precision": "approximate",
         "location_details": "Opposite the main entrance",
+        "location_source": "device",
+        "location_accuracy_m": 18.5,
     })
     assert response.status_code == 201
     body = response.json()
     assert body["location_label"] == "Baranagar Municipality, West Bengal"
     assert body["location_precision"] == "approximate"
     assert body["location_details"] == "Opposite the main entrance"
+    assert body["location_source"] == "device"
+    assert body["location_accuracy_m"] == 18.5
     assert client.get(f'/api/v1/complaints/{body["complaint_id"]}').json() == body
 
 
@@ -95,6 +102,9 @@ def test_location_context_is_persisted(client):
     {"latitude": 22.641, "longitude": 88.377, "location_precision": "broad"},
     {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar", "location_precision": "surveyed"},
     {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar", "location_precision": "broad", "location_details": " "},
+    {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar", "location_precision": "broad", "location_source": "gps"},
+    {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar", "location_precision": "broad", "location_source": "search", "location_accuracy_m": 5},
+    {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar", "location_precision": "broad", "location_source": "device", "location_accuracy_m": -1},
 ])
 def test_invalid_location_context(client, values):
     assert post_complaint(client, {"description": "Issue", **values}).status_code == 422
@@ -135,6 +145,33 @@ def test_location_search_returns_normalized_results(client):
     }]
 
 
+def test_location_capabilities_reflect_provider(client):
+    assert client.get("/api/v1/location-capabilities").json() == {
+        "autocomplete": True,
+        "reverse_geocoding": True,
+    }
+
+
+def test_location_reverse_returns_normalized_result(client):
+    response = client.post("/api/v1/location-reverse", json={"latitude": 22.65, "longitude": 88.38})
+    assert response.status_code == 200
+    assert response.json() == {
+        "provider_id": "reverse-101",
+        "label": "Selected road, Baranagar, West Bengal, India",
+        "latitude": 22.65,
+        "longitude": 88.38,
+        "precision": "approximate",
+    }
+
+
+@pytest.mark.parametrize("payload", [
+    {}, {"latitude": 91, "longitude": 88}, {"latitude": 22, "longitude": 181},
+    {"latitude": 22, "longitude": 88, "query": "extra"},
+])
+def test_location_reverse_validates_coordinates(client, payload):
+    assert client.post("/api/v1/location-reverse", json=payload).status_code == 422
+
+
 @pytest.mark.parametrize("payload", [
     {}, {"query": "  "}, {"query": "ab"}, {"query": "x" * 201},
     {"query": "Baranagar", "latitude": 22.6},
@@ -147,7 +184,12 @@ def test_location_search_validates_query(client, payload):
 
 def test_location_search_provider_failure_is_sanitized():
     class FailingGeocoder:
+        autocomplete_supported = False
+
         async def search(self, query):
+            raise GeocodingUnavailable
+
+        async def reverse(self, latitude, longitude):
             raise GeocodingUnavailable
 
     with TestClient(create_app(

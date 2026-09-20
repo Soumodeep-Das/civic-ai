@@ -11,7 +11,7 @@ from civicai.database import Base
 
 def test_migration_matches_models(migrated_engine):
     with migrated_engine.connect() as connection:
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0003"
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0004"
         context = MigrationContext.configure(connection)
         assert compare_metadata(context, Base.metadata) == []
 
@@ -44,4 +44,21 @@ def test_database_location_context_constraints(migrated_engine, values):
                 "INSERT INTO complaints "
                 "(complaint_id, description, latitude, longitude, location_label, location_precision, location_details) "
                 "VALUES (:id, 'Issue', :latitude, :longitude, :location_label, :location_precision, :location_details)"
+            ), {"id": uuid4(), **values})
+
+
+@pytest.mark.parametrize("values", [
+    {"location_source": "gps", "location_accuracy_m": None},
+    {"location_source": "search", "location_accuracy_m": 5},
+    {"location_source": "device", "location_accuracy_m": -1},
+    {"location_source": "device", "location_accuracy_m": 100001},
+])
+def test_database_location_quality_constraints(migrated_engine, values):
+    with pytest.raises(IntegrityError):
+        with migrated_engine.begin() as connection:
+            connection.execute(text(
+                "INSERT INTO complaints "
+                "(complaint_id, description, latitude, longitude, location_label, location_precision, "
+                "location_source, location_accuracy_m) "
+                "VALUES (:id, 'Issue', 22.6, 88.4, 'Place', 'exact', :location_source, :location_accuracy_m)"
             ), {"id": uuid4(), **values})

@@ -11,5 +11,11 @@ class LocationPrecision(StrEnum):
     BROAD = "broad"
 
 
+class LocationSource(StrEnum):
+    SEARCH = "search"
+    DEVICE = "device"
+    MAP = "map"
+
+
 class ComplaintNotFound(Exception):
     """No complaint exists with the requested identifier."""

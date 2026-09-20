@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class StubGeocoder:
+    autocomplete_supported = True
+
     async def search(self, query):
         return [LocationCandidate(
             provider_id="101",
@@ -28,6 +30,15 @@ class StubGeocoder:
             longitude=88.377,
             precision=LocationPrecision.BROAD,
         )]
+
+    async def reverse(self, latitude, longitude):
+        return LocationCandidate(
+            provider_id="reverse-101",
+            label="Selected road, Baranagar, West Bengal, India",
+            latitude=latitude,
+            longitude=longitude,
+            precision=LocationPrecision.APPROXIMATE,
+        )
 
 
 @pytest.fixture(scope="session")

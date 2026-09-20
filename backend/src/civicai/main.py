@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 from civicai.config import database_url, geocoding_settings
 from civicai.database import build_engine
 from civicai.domain import ComplaintNotFound
-from civicai.geocoding import Geocoder, GeocodingUnavailable, NominatimGeocoder
+from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
 from civicai.routes import router
 from civicai.uploads import upload_directory
 from starlette.exceptions import HTTPException
@@ -20,9 +20,19 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
         app.state.engine = build_engine(url or database_url())
         app.state.upload_directory = upload_directory()
         settings = geocoding_settings()
-        app.state.geocoder = geocoder or NominatimGeocoder(
-            settings.base_url, settings.user_agent, settings.country_codes
-        )
+        if geocoder is not None:
+            app.state.geocoder = geocoder
+        elif settings.provider == "maptiler":
+            app.state.geocoder = MapTilerGeocoder(
+                settings.maptiler_base_url, settings.maptiler_api_key,
+                settings.country_codes, settings.proximity,
+            )
+        elif settings.provider == "nominatim":
+            app.state.geocoder = NominatimGeocoder(
+                settings.base_url, settings.user_agent, settings.country_codes
+            )
+        else:
+            raise RuntimeError("GEOCODING_PROVIDER must be 'nominatim' or 'maptiler'")
         try:
             yield
         finally:

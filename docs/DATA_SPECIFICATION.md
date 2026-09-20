@@ -2,11 +2,13 @@
 
 ## Status
 
-The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, status, created_at and updated_at; no research dataset is claimed.
+The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at; no research dataset is claimed.
 
-Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are local runtime files; only their relative serving URL is stored in PostgreSQL. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only, excluded from the current text/image/multimodal classification experiment. No location_accuracy_m or reporter_id field is implemented.
+Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are local runtime files; only their relative serving URL is stored in PostgreSQL. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only and excluded from the current text/image/multimodal classification experiment. No reporter_id field is implemented.
 
 Migration 0003 adds nullable location_label VARCHAR(300), location_precision VARCHAR(20) and location_details VARCHAR(500). Precision is controlled to exact, approximate or broad. New context requires both coordinates plus a label and precision; legacy coordinate-only rows remain valid. `exact` means the citizen confirmed a device position or map point, not a surveyed measurement. These fields are application metadata and remain excluded from the current classification experiment.
+
+Migration 0004 adds nullable location_source VARCHAR(20) and location_accuracy_m DOUBLE PRECISION. Source is controlled to `search`, `device` or `map`. Accuracy must be finite, between 0 and 100,000 metres, and is valid only for a device source. Source/accuracy context requires coordinates, label and precision. Existing rows remain null and valid.
 
 ## Canonical complaint record
 
@@ -19,6 +21,7 @@ Migration 0003 adds nullable location_label VARCHAR(300), location_precision VAR
 | Application | `location_label` | nullable string | Human-readable selected place |
 | Application | `location_precision` | nullable exact/approximate/broad | Truthful selection granularity |
 | Application | `location_details` | nullable string | Citizen-provided nearby guidance |
+| Application | `location_source` | nullable search/device/map | How the selected point was produced |
 | Application | `location_accuracy_m` | nullable decimal | Accuracy when available |
 | Application | `status` | controlled value | Workflow state, not an ML label |
 | Application | `created_at`, `updated_at` | UTC timestamp | Record lifecycle |

@@ -30,13 +30,13 @@ The browser will communicate with the backend through a versioned JSON API. The 
 
 Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission and the recent complaint list. `frontend/src/api/complaints.ts` owns HTTP access; the React component owns the small amount of form and request state. Vite proxies `/api` and `/health` to the local FastAPI server during development, avoiding a backend CORS change. No router, component library, global state library or map provider is needed for the MVP.
 
-Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from optional map adjustment. The lazy-loaded map renderer consumes normalized coordinates and never calls the geocoder directly. Pointer, marker-drag and keyboard controls converge on the same location state, and every coordinate change invalidates prior confirmation.
+Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from map adjustment. The lazy-loaded Leaflet renderer consumes normalized coordinates and never calls the geocoder directly. Desktop click, marker drag and touch interaction converge on the same location state, and every coordinate change invalidates prior confirmation. Raster rendering was selected after the WebGL vector canvas stayed blank in the actual in-app browser despite loading its style and attribution.
 
 ### Backend
 
 A FastAPI service will expose API endpoints, validate input, apply complaint workflow rules, and coordinate persistence and later inference. Domain logic should remain separate from HTTP handlers and database-specific code.
 
-Issue #4 adds a provider-neutral geocoding service and a small API endpoint. Provider response parsing, throttling and caching stay outside route handlers. The first adapter is Nominatim-compatible and configured through environment variables; the browser receives only CivicAI's normalized result contract. The adapter is a local-demo dependency, not a promised production SLA.
+Issue #4 adds provider-neutral search, reverse-geocoding and capability endpoints. Provider response parsing, throttling and caching stay outside route handlers. A Nominatim-compatible adapter supplies policy-limited explicit search; a server-configured MapTiler adapter supplies autocomplete and reverse geocoding. The browser receives only CivicAI's normalized contracts and never receives the MapTiler key. Both are local-demo dependencies, not promised production SLAs.
 
 ### Database
 
@@ -52,7 +52,7 @@ Training/evaluation code and online inference are separate concerns. Experiments
 
 ## MVP vertical slice
 
-Issue #1 established the tested backend persistence flow. Issue #2 adds the browser form and stored-complaint list to complete the smallest end-to-end product. The binding boundary and acceptance criteria are in `MVP_SCOPE.md`. Authentication, uploads, mapping, prioritization, department routing and ML remain deferred.
+Issue #1 established the tested backend persistence flow and Issue #2 completed the smallest browser-to-database product. Issues #3 and #4 add bounded image evidence and accurate issue-location capture without introducing accounts, prioritization, department routing or ML. The original MVP boundary and acceptance criteria remain documented in `MVP_SCOPE.md`.
 
 ## Cross-cutting requirements
 

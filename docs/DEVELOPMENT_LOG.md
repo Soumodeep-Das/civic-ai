@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-09-21 — Issue #4 interaction refinement completed
+
+Implemented the accepted autocomplete and pin-refinement design without breaking the existing complaint endpoints. Added the MapTiler search/reverse adapter, provider capability discovery, 350 ms debounced typeahead for capable providers, explicit-search fallback for public Nominatim, keyboard-accessible suggestions, reverse geocoding after pin movement, and persisted `search`/`device`/`map` source plus optional device accuracy through additive migration 0004. Development PostgreSQL reports `0004 (head)` and the eight existing complaints remain intact.
+
+The first live map refinement used MapLibre with OpenFreeMap. Its style, marker and attribution loaded, but the WebGL canvas remained blank in the actual in-app browser. Replaced only the renderer with lazy-loaded Leaflet and configurable raster tiles; standard OpenStreetMap tiles are the local-demo default under its interactive-use policy. Live verification now visibly shows Belghoria Expressway, nearby roads/buildings, zoom controls, attribution and the draggable marker after selecting a Baranagar suggestion. No complaint was submitted during this verification.
+
+Final regression: 79 backend tests passed with the same three dependency deprecations and known pytest cache-permission warning; migration 0004 is at head; 24 frontend tests passed; TypeScript compilation and the production build passed. The production build contains an approximately 238 kB initial JavaScript bundle and a 151 kB lazy map chunk. npm's audit reported zero known vulnerabilities when the new renderer dependency was resolved. Full autocomplete remains deliberately inactive until the user configures a MapTiler key in the ignored `.env`; explicit search, selection and the working street map are available now. The interaction suite also verifies that an in-flight response cannot repopulate stale suggestions after the user edits the query.
+
 ## 2026-09-20 — Issue #4 scope and architecture checkpoint
 
 Accepted an accessible issue-location flow: explicit search by locality/PIN/street/address/landmark, current device location, optional map refinement and plain-language nearby details. Photo plus confirmed location become required in the citizen frontend, while the proven backend remains compatible with old rows and direct clients. Additive migration 0003 will preserve all prior data.

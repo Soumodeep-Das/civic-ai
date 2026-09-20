@@ -10,11 +10,13 @@ Citizens can explicitly search by locality, PIN code, street, address or landmar
 
 The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.
 
-Search is sent only when the user presses Search or Enter; there is no type-ahead traffic. The local-demo adapter is compatible with public Nominatim and applies one-request-per-second pacing plus a short bounded cache. Public Nominatim and the default MapLibre demonstration style provide no production availability guarantee. Configure or replace both providers before public deployment; see `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
+With the default public-Nominatim fallback, search is sent only when the user presses Search or Enter. When `GEOCODING_PROVIDER=maptiler` and a server-side `MAPTILER_API_KEY` are configured, the frontend enables debounced search-as-you-type suggestions. The backend also supports reverse geocoding after the pin moves. Provider capabilities are discovered at runtime, so public Nominatim never receives autocomplete traffic. Both public geocoding modes are local-demo dependencies without a production SLA.
+
+The street map is lazy-loaded and uses Leaflet with OpenStreetMap raster tiles by default. It supports desktop left-click, marker drag, touch pan/zoom and marker drag; the old directional controls are removed. `VITE_MAP_TILE_URL` keeps the tile provider replaceable. The default is appropriate for modest, interactive academic-demo use only and must follow the OpenStreetMap tile policy; select a supported production provider before public deployment. See `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
 
 ## Issue #3: photos and location
 
-After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, then run `python -m alembic upgrade head`. Restart both servers. Migrations 0002 and 0003 preserve existing complaints while adding nullable image and location-context fields.
+After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, run `python -m alembic upgrade head`, and run `npm install` in `frontend`. Restart both servers. Migrations 0002–0004 preserve existing complaints while adding nullable image, location-context, selection-source and device-accuracy fields.
 
 POST now uses multipart/form-data, including for text-only submissions. JSON clients must migrate; see docs/API_CONTRACT.md. The frontend handles this automatically.
 
@@ -22,9 +24,9 @@ Attach one optional JPEG/PNG (5 MiB maximum). Images must decode successfully an
 
 Files are stored under data/uploads/complaints, excluded from Git, outside executable source paths. UPLOAD_DIR can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Anonymous image URLs are suitable for local demonstration only.
 
-Use “Use my current location” while near the issue. Permission is requested on demand; denial or timeout does not prevent submission. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. Location remains optional metadata and does not enter the current classification experiment.
+Use “Use my current location” while near the issue. Permission is requested on demand. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. A failure preserves the draft and lets the citizen search for the issue instead. Location remains optional in the backward-compatible API but is required by the citizen form; it does not enter the current classification experiment.
 
-Video and manual coordinate entry are not offered. Issue #4 provides an optional map for refining a searched or device-derived location. Avoid real private evidence in the demonstration database.
+Video and manual coordinate entry are not offered. Issue #4 provides a street map for refining a searched or device-derived location. Avoid real private evidence in the demonstration database.
 
 ## Setup on Windows
 
@@ -104,7 +106,7 @@ npm run build
 
 Frontend dependencies are captured in `frontend/package-lock.json`.
 
-`VITE_MAP_STYLE_URL` selects the MapLibre style and defaults to MapLibre's public demonstration style. The map code is loaded only when a user opens the optional map. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
+`VITE_MAP_TILE_URL` selects the Leaflet raster-tile template and defaults to `https://tile.openstreetmap.org/{z}/{x}/{y}.png`. The map code is loaded only after a location is selected. Do not add offline prefetching or bulk tile download. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
 
 ### If the frontend reports 404 or “Queue unavailable”
 
@@ -125,7 +127,7 @@ The development proxy is loaded when Vite starts. Restarting is required after a
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and migrations through 0003.
+- backend/migrations: Alembic environment and migrations through 0004.
 - backend/tests: API, migration consistency and database constraint tests.
 - frontend/src: React complaint form, accessible location picker, lazy-loaded map, recent-complaint list, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.

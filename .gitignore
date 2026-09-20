@@ -19,6 +19,7 @@ venv/
 
 # JavaScript
 node_modules/
+.npm-cache/
 dist/
 build/
 .vite/

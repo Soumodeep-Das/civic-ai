@@ -1,13 +1,21 @@
 # Decision Log
 
-## D015 Autocomplete search and detailed pin refinement (2026-09-20, accepted)
+## D016 Raster map compatibility fallback (2026-09-21, accepted)
+
+- Replace the Issue #4 MapLibre/OpenFreeMap renderer with lazy-loaded Leaflet and configurable raster tiles after the vector style and attribution loaded but the WebGL canvas remained blank in the actual in-app browser.
+- Default the local academic demonstration to standard OpenStreetMap tiles with visible attribution. Permit only ordinary human interactive viewing: no prefetch, bulk download or offline mode. Keep `VITE_MAP_TILE_URL` configurable and choose a provider with a suitable SLA/terms before public deployment.
+- Preserve the product behavior and component boundary: selecting a result opens the map; desktop click, marker drag, touch pan/zoom and reverse-geocoding continue to update the same location state.
+
+Consequences: the live map now renders roads and buildings across the verified browser environment, the lazy map chunk is substantially smaller, and the public tile service remains best-effort rather than production infrastructure. D015's renderer choice is superseded; its geocoding, autocomplete and interaction decisions remain active.
+
+## D015 Autocomplete search and detailed pin refinement (2026-09-20, accepted; renderer superseded by D016)
 
 - Replace the one-shot-only citizen experience with debounced suggestions when the configured provider explicitly supports autocomplete. Keep a visible explicit-search fallback and never send typeahead traffic to public Nominatim.
 - Select a backend MapTiler adapter for autocomplete and reverse geocoding. Keep its API key in ignored server environment configuration; expose only provider-neutral CivicAI contracts and capabilities to the browser.
-- Use MapLibre with OpenFreeMap's Liberty street style by default. Remove directional pin buttons; use desktop click, marker drag and touch map interaction. Reverse-geocode the final moved pin before confirmation.
+- The original renderer choice was MapLibre with OpenFreeMap's Liberty style; D016 supersedes that renderer after live compatibility testing. The interaction decision remains: remove directional pin buttons, use desktop click, marker drag and touch interaction, and reverse-geocode the moved pin before confirmation.
 - Add nullable selection-source and device-accuracy metadata through migration 0004. Preserve all existing rows and keep these fields outside the current classification experiment.
 
-Consequences: the full autocomplete experience needs a user-supplied MapTiler key and restart; without one, the safe explicit-search fallback remains available. MapTiler receives search text/coordinates and OpenFreeMap serves map tiles. Neither free public service is treated as a production SLA.
+Consequences: the full autocomplete experience needs a user-supplied MapTiler key and restart; without one, the safe explicit-search fallback remains available. MapTiler receives search text/coordinates. The current tile-provider consequences are recorded in D016. No free public service is treated as a production SLA.
 
 ## D014 Issue #4 accessible issue-location selection (2026-09-20, accepted)
 

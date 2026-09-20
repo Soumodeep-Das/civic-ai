@@ -11,7 +11,10 @@ from sqlalchemy.orm import Session
 from civicai import service
 from civicai.database import get_session
 from civicai.geocoding import Geocoder
-from civicai.schemas import ComplaintCreate, ComplaintRead, LocationSearchRequest, LocationSearchResult
+from civicai.schemas import (
+    ComplaintCreate, ComplaintRead, LocationCapabilities, LocationReverseRequest,
+    LocationSearchRequest, LocationSearchResult,
+)
 from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
 
 router = APIRouter(tags=["complaints"])
@@ -31,6 +34,8 @@ def get_geocoder(request: Request) -> Geocoder:
                                            "location_label": {"type": "string", "maxLength": 300},
                                            "location_precision": {"type": "string", "enum": ["exact", "approximate", "broad"]},
                                            "location_details": {"type": "string", "maxLength": 500},
+                                           "location_source": {"type": "string", "enum": ["search", "device", "map"]},
+                                           "location_accuracy_m": {"type": "number", "minimum": 0, "maximum": 100000},
                                            "image": {"type": "string", "format": "binary"}}}}}}})
 async def create(request: Request, session: DatabaseSession):
     if not request.headers.get("content-type", "").startswith("multipart/form-data"):
@@ -44,7 +49,7 @@ async def create(request: Request, session: DatabaseSession):
     async def receive():
         return {"type": "http.request", "body": bytes(body), "more_body": False}
     parsed = Request(request.scope, receive)
-    async with parsed.form(max_files=1, max_fields=7, max_part_size=64 * 1024) as form:
+    async with parsed.form(max_files=1, max_fields=8, max_part_size=64 * 1024) as form:
         values = {}
         upload = None
         for key, value in form.multi_items():
@@ -84,6 +89,19 @@ async def search_locations(
     geocoder: Annotated[Geocoder, Depends(get_geocoder)],
 ):
     return await geocoder.search(data.query)
+
+
+@router.get("/api/v1/location-capabilities", response_model=LocationCapabilities)
+def location_capabilities(geocoder: Annotated[Geocoder, Depends(get_geocoder)]):
+    return LocationCapabilities(autocomplete=geocoder.autocomplete_supported)
+
+
+@router.post("/api/v1/location-reverse", response_model=LocationSearchResult | None)
+async def reverse_location(
+    data: LocationReverseRequest,
+    geocoder: Annotated[Geocoder, Depends(get_geocoder)],
+):
+    return await geocoder.reverse(data.latitude, data.longitude)
 
 
 @router.get("/api/v1/complaints", response_model=list[ComplaintRead])

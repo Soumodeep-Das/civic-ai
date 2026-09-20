@@ -121,6 +121,8 @@ export default function App() {
       location_label: location.label,
       location_precision: location.precision,
       location_details: location.details.trim() || undefined,
+      location_source: location.source,
+      location_accuracy_m: location.accuracyMeters,
     });
     if (image) input.image = image;
 
