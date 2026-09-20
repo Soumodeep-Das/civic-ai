@@ -1,6 +1,6 @@
 # Current State
 
-## Issue #3 implemented; device location verification remains limited
+## Issue #3 implemented and locally verified
 
 Branch: feat/complaint-images-location.
 
@@ -22,7 +22,7 @@ Local availability was rechecked after the frontend development process stopped 
 
 Real browser: uploaded synthetic PNG, submitted without location, displayed image, submitted text after an actual location timeout, reloaded and confirmed both records remained. PostgreSQL confirmed the image reference and nullable coordinates. Browser console was clear.
 
-Successful device location capture remains blocked on this device by the current Windows user's global location consent, which is set to deny even though browser permission was granted. The Windows Location Service is running and desktop-app access is allowed. Automated tests cover success, denial, timeout, unavailable API and late callbacks. Live diagnosis after the timeout fix is recorded in `DEVELOPMENT_LOG.md`.
+Successful device location capture is now verified in the live browser. A complaint with optional photo and captured location was submitted; the UI shows it as location-provided, the API returns both coordinates, and the user independently confirmed the values in pgAdmin. Automated tests cover success, denial, timeout, unavailable API and late callbacks. An observed Windows registry consent value remained `Deny` even after capture succeeded, so it is not treated as authoritative for this desktop-browser flow; the browser API result is the operational check.
 
 ## References
 
