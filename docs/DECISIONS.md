@@ -47,9 +47,9 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 ## D007 Issue 1 runtime and dependency management
 
 - Date: 2026-09-19
-- Status: accepted; runtime verification pending
+- Status: accepted; runtime verified 2026-09-20
 - Decision: Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, Psycopg 3, Alembic and pytest. Use setuptools/pyproject.toml and pip editable installation with a test extra.
-- Consequence: No uv requirement. Supported dependency ranges are declared; a resolved pinned environment remains pending because package downloads are blocked.
+- Consequence: No uv requirement. Supported dependency ranges are declared and locally installed; a resolved lock file remains pending. Current non-blocking dependency deprecations are tracked in `DEVELOPMENT_LOG.md`.
 
 ## D008 Anonymous first complaint API
 
@@ -61,7 +61,7 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 ## D009 PostgreSQL migrations and test isolation
 
 - Date: 2026-09-19
-- Status: accepted; execution pending
+- Status: accepted; execution verified 2026-09-20
 - Decision: Alembic owns schema changes. Tests use real PostgreSQL, not SQLite. Require a separate database ending in _test, create a uniquely named schema, apply migrations, roll back each API test, and drop only that schema after the suite.
 - Consequence: Test role needs CREATE SCHEMA permission; missing configuration fails instead of skipping. No normal developer database is modified by tests. Database constraints defend text, coordinates and status in addition to HTTP validation.
 

@@ -1,6 +1,6 @@
 # API Contract
 
-Issue #1 source is implemented; runtime verification is pending.
+Issue #1 is implemented and locally verified against PostgreSQL.
 
 | Method | Path | Success |
 |---|---|---|

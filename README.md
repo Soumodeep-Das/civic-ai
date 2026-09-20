@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-Issue #1 adds an anonymous FastAPI/PostgreSQL complaint API, migration and tests. Source is written; runtime verification is pending because this workspace blocks package downloads and PostgreSQL startup. No frontend, accounts, images, maps, ML or priority engine is implemented.
+Issue #1 provides a locally verified anonymous FastAPI/PostgreSQL complaint API, migration and 27-test suite. Issue #2 is beginning with a minimal React complaint form and stored-complaint list. Accounts, images, maps, ML and priority logic are not implemented.
 
 ## Setup on Windows
 
@@ -49,14 +49,14 @@ Health and database-unavailable tests need dependencies but no live PostgreSQL:
 .\.venv\Scripts\python.exe -m pytest backend/tests/test_api.py -k "health or unavailable"
 ```
 
-Dependency ranges are in pyproject.toml; no resolved lock file is claimed because package installation is blocked here. Record a tested pinned environment after successful resolution.
+Dependency ranges are in pyproject.toml; no resolved lock file is claimed yet. The current non-blocking dependency deprecation warnings are recorded in `docs/DEVELOPMENT_LOG.md`.
 
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
 - backend/migrations: Alembic environment and migration 0001.
 - backend/tests: API, migration consistency and database constraint tests.
-- docs: project context and [progress checklist](docs/CURRENT_STATE.md).
+- docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.
 - frontend, ml, research, data and tests: reserved for later milestones.
 

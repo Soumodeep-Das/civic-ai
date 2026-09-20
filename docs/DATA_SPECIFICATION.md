@@ -4,7 +4,7 @@
 
 This is a proposed canonical record, not an existing database schema or dataset. Fields are grouped to prevent application state, human labels, model inputs, and predictions from being conflated.
 
-Issue #1 implements only complaint_id, description, latitude, longitude, status, created_at and updated_at in source/migration 0001. Other fields below remain future proposals. PostgreSQL uses UUID, TEXT, DOUBLE PRECISION coordinates, constrained VARCHAR status and TIMESTAMP WITH TIME ZONE. Only submitted is supported. Runtime migration verification is pending.
+Issue #1 implements only complaint_id, description, latitude, longitude, status, created_at and updated_at in source/migration 0001. Other fields below remain future proposals. PostgreSQL uses UUID, TEXT, DOUBLE PRECISION coordinates, constrained VARCHAR status and TIMESTAMP WITH TIME ZONE. Only submitted is supported. Migration 0001 and complaint persistence are locally verified.
 
 ## Canonical complaint record
 
