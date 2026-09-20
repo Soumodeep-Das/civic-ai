@@ -72,6 +72,16 @@ npm run build
 
 Frontend dependencies are captured in `frontend/package-lock.json`.
 
+### If the frontend reports 404 or “Queue unavailable”
+
+First confirm that the backend is running at http://127.0.0.1:8000/health. Then stop the frontend development server with `Ctrl+C` and start it again from the `frontend` directory:
+
+```powershell
+npm run dev
+```
+
+The development proxy is loaded when Vite starts. Restarting is required after a stale development process or proxy-configuration change. A healthy proxy returns complaint JSON from http://127.0.0.1:5173/api/v1/complaints rather than the frontend HTML page.
+
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.

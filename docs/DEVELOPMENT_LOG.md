@@ -38,3 +38,16 @@ User direction narrowed all implementation to the MVP in `MVP_SCOPE.md`. Issue #
 The initial Vitest run could not start its default fork worker in the managed workspace. Configuring a single worker-thread pool made the test process compatible with the environment; this changes test execution only, not product behavior.
 
 The MVP checkpoint was committed locally as `f4ad009` on `feat/frontend-complaint-flow`. Remote fetch succeeds, but push exits with code 128 because this terminal has no usable GitHub authentication. No force push or history rewrite was attempted; the browser-visible public repository is unchanged.
+
+## 2026-09-20 — MVP workflow 404 recheck
+
+The user reported a 404 while submitting a complaint. Direct checks showed the FastAPI health and complaint-list endpoints returning 200 with PostgreSQL data, while the existing Vite process returned the frontend HTML page for `/api/v1/complaints` instead of proxying it. This affected both list and submit requests.
+
+A clean restart of the Vite development server restored the configured proxy. Verification after restart:
+
+- `GET http://127.0.0.1:5173/api/v1/complaints` returned 200 JSON.
+- `GET http://127.0.0.1:5173/health` returned `200 {"status":"ok"}`.
+- Browser submission created complaint reference prefix `0fb72197`.
+- The submitted text `Workflow recheck: blocked storm drain near the market` appeared immediately in the queue, which increased from two to three stored complaints.
+
+No backend, database or product-code defect was found, so Issue #1 behavior was not altered. README troubleshooting now records the frontend restart procedure.
