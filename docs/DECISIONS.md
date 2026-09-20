@@ -1,5 +1,14 @@
 # Decision Log
 
+## D015 Autocomplete search and detailed pin refinement (2026-09-20, accepted)
+
+- Replace the one-shot-only citizen experience with debounced suggestions when the configured provider explicitly supports autocomplete. Keep a visible explicit-search fallback and never send typeahead traffic to public Nominatim.
+- Select a backend MapTiler adapter for autocomplete and reverse geocoding. Keep its API key in ignored server environment configuration; expose only provider-neutral CivicAI contracts and capabilities to the browser.
+- Use MapLibre with OpenFreeMap's Liberty street style by default. Remove directional pin buttons; use desktop click, marker drag and touch map interaction. Reverse-geocode the final moved pin before confirmation.
+- Add nullable selection-source and device-accuracy metadata through migration 0004. Preserve all existing rows and keep these fields outside the current classification experiment.
+
+Consequences: the full autocomplete experience needs a user-supplied MapTiler key and restart; without one, the safe explicit-search fallback remains available. MapTiler receives search text/coordinates and OpenFreeMap serves map tiles. Neither free public service is treated as a production SLA.
+
 ## D014 Issue #4 accessible issue-location selection (2026-09-20, accepted)
 
 - Treat location as the issue location, which may differ from the reporter's current position.
