@@ -49,6 +49,16 @@ Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/com
 
 Schema creation uses Alembic, never automatic startup table creation. All complaint endpoints are anonymous; use local demonstration data until access control is added.
 
+### Start the complete local MVP with one command
+
+After completing the backend and frontend setup once, run this from the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
+```
+
+The helper checks the backend and frontend first, starts only the service that is missing, waits for both ports, and verifies that the Vite API proxy returns JSON. Services are started as hidden local processes so closing this PowerShell window does not immediately stop the site. Runtime output is written to the ignored `logs` directory. Re-run the same command whenever http://127.0.0.1:5173 cannot be reached.
+
 ## Tests
 
 ```powershell
@@ -88,7 +98,13 @@ Frontend dependencies are captured in `frontend/package-lock.json`.
 
 ### If the frontend reports 404 or “Queue unavailable”
 
-First confirm that the backend is running at http://127.0.0.1:8000/health. Then stop the frontend development server with `Ctrl+C` and start it again from the `frontend` directory:
+Run the repository startup helper first:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
+```
+
+For a frontend that is already running but serving a stale proxy configuration, stop that frontend process and start it again from the `frontend` directory:
 
 ```powershell
 npm run dev
@@ -102,6 +118,7 @@ The development proxy is loaded when Vite starts. Restarting is required after a
 - backend/migrations: Alembic environment and migration 0001.
 - backend/tests: API, migration consistency and database constraint tests.
 - frontend/src: React complaint form, recent-complaint list, API client, styles and interaction tests.
+- scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
 - docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.
 - ml, research and data: reserved for later milestones.

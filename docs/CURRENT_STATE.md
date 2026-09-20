@@ -17,6 +17,8 @@ Branch: feat/complaint-images-location.
 
 Development migration is at 0002 (head). Four pre-existing complaints survived migration. Backend suite: 42 passing tests. Frontend suite: 15 passing tests. Production frontend build passes. Three pre-existing dependency deprecations remain non-blocking.
 
+Local availability was rechecked after the frontend development process stopped and produced a browser “site can't be reached” error. The backend remained healthy. `scripts/start-dev.ps1` now checks and starts the missing local services and verifies the Vite complaint API proxy before reporting readiness. The site and proxied complaint list were reachable again after using it.
+
 Real browser: uploaded synthetic PNG, submitted without location, displayed image, submitted text after an actual location timeout, reloaded and confirmed both records remained. PostgreSQL confirmed the image reference and nullable coordinates. Browser console was clear.
 
 Successful device location capture and a visible browser permission-denial prompt could not be verified on this device; automated tests cover success, denial, timeout, unavailable API and late callbacks. This is an outstanding manual verification item.
