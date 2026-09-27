@@ -1,12 +1,26 @@
 # Decision Log
 
+## D021 Audited OpenCity snapshot remains a curation source (2026-09-27, accepted)
+
+- Freeze the completed local IChangeMyCity snapshot by raw and metadata SHA-256; keep its source labels separate, CivicAI labels null and splits unassigned.
+- Treat exact subcategory rules as versioned proposals with explicit `accepted`, `ambiguous`, `needs_review` and `rejected` states. Automated mapping never substitutes for record-level human review or approval.
+- Keep raw text, coordinates, addresses and review queues outside Git. Store only aggregate audit evidence, hashes, code and documentation. Possible phone/email patterns require human privacy decisions before a derived release.
+- Do not start training: severe proposed-class imbalance, Bengaluru-only scope, duplicate/template groups, ambiguous labels, no reliable `other` mapping and no Indian paired image source remain blocking research-design risks.
+
+## D020 Indian civic data requirement (2026-09-27, user-directed)
+
+- Train and evaluate CivicAI using civic incidents from India, with source/subset provenance verified. Foreign civic samples and translations of foreign incidents are excluded.
+- The earlier 100-record Zurich discovery sample is retained only as ignored local exploration history; no model consumed it. Its acquisition code was discarded before commit.
+- `prepare` rejects any source absent from the reviewed Indian source registry. Country acceptance does not grant label, privacy or training approval.
+- OpenCity's Janaagraha/IChangeMyCity 2019–2022 log is accepted for local Indian text curation based on publisher provenance and stated CC BY-SA terms. It is not accepted as all-India representative, paired multimodal data, or independently verified labels.
+
 ## D019 Dataset preparation proposals and acquisition gate (2026-09-27)
 
 - Preserve genuine text/image incident alignment; no generated descriptions or arbitrary same-class pairing in the primary modality comparison.
 - Keep source categories, routing and resolution fields out of description inputs where they leak the target or future outcome.
 - Connect related events and duplicate content before deterministic component assignment. Quarantine conflicting labels, report class/source/component support, and use paired eligibility by default.
 - Treat hash-based 70/15/15 assignments as proposals with potentially uneven support. Final sample size, near-duplicate review and split suitability remain acceptance gates; do not tune seed using test performance.
-- Acquire no unsuitable dataset merely to unblock training. Source assessment has not established a suitable eight-category paired collection. Issue #6 remains in progress.
+- Acquire no unsuitable dataset merely to unblock training. OpenCity now supplies a possessed Indian text curation source, but no suitable eight-category paired collection or approved model-ready release exists. Issue #6 remains in progress.
 
 ## D018 Versioned research taxonomy and manifest gate (2026-09-27, accepted)
 

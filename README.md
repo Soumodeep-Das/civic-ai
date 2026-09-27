@@ -4,11 +4,11 @@ MCA project: AI-Based Urban Civic Complaint Classification and Prioritization Sy
 
 The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Accounts, video, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
-Issue #5 establishes the research-data contract before model development. It freezes `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
+Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
 ## Issue #4: accessible issue-location selection
 
-Issue #6 is in progress: [dataset assessment and preparation](docs/ISSUE_006_DATA_PREPARATION.md) adds verified local-data ingestion and deterministic split proposals. A suitable paired research dataset has not yet been acquired; ML training has not started. Commands are in [research/README.md](research/README.md).
+Issue #6 is in progress: [India-only dataset audit and preparation](docs/ISSUE_006_DATA_PREPARATION.md) adds checksum-pinned OpenCity/IChangeMyCity acquisition, deterministic source auditing and leakage-aware split proposals. The local source has 16,071 Bengaluru text complaints but no images or approved CivicAI labels. A suitable paired Indian research dataset has not been acquired and ML training has not started. Commands are in [research/README.md](research/README.md).
 
 Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
 
@@ -139,7 +139,7 @@ The development proxy is loaded when Vite starts. Restarting is required after a
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
 - docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.
-- research: taxonomy, annotation/data documentation and manifest validation; no approved dataset or results yet.
+- research: proposed taxonomy, Indian-source acquisition/audit, annotation/data documentation and manifest/preparation validation; no approved training dataset or results yet.
 - ml and data: reserved for later approved acquisition and experiment milestones.
 
 [Public repository](https://github.com/Soumodeep-Das/civic-ai). Verified Issue #4 history is published on `main`; never rewrite shared history without explicit authorization.

@@ -52,6 +52,8 @@ Training/evaluation code and online inference are separate concerns. Experiments
 
 Issue #5 adds the pre-training data boundary under `research/`. Restricted text and image files remain outside Git; a JSONL manifest references them with source/provenance metadata, taxonomy and annotation state, group identity, frozen split and SHA-256 hashes. The standalone validator rejects schema drift, unsafe paths and exact group/content leakage before later experiment code reads a dataset. A successful manifest check establishes internal consistency only—not license, consent, representativeness or label correctness.
 
+Issue #6 adds an India-only source boundary. `opencity.py` performs bounded, checksum-pinned acquisition into an ignored immutable snapshot; `audit.py` emits aggregate diagnostics and privacy-conscious review references; `prepare.py` admits only explicitly reviewed Indian source identifiers and builds leakage-aware split proposals. Source labels remain separate from CivicAI annotations throughout. `COMPLETE`/`INCOMPLETE` markers prevent interrupted acquisition or preparation directories from being treated as releases. None of these gates authorizes training by itself.
+
 ## MVP vertical slice
 
 Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.

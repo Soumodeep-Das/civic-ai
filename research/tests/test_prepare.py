@@ -8,6 +8,19 @@ from research.civicai_research.prepare import main, prepare
 from research.civicai_research.manifest import validate_manifest
 
 
+@pytest.fixture(autouse=True)
+def synthetic_provenance(monkeypatch):
+    from research.civicai_research.prepare import SOURCE_COUNTRIES
+    monkeypatch.setitem(SOURCE_COUNTRIES, "synthetic-test", "IN")
+
+
+@pytest.mark.parametrize("source", ["zurich-open311", "unknown-source"])
+def test_foreign_or_unreviewed_provenance_rejected(tmp_path, source):
+    row = record(tmp_path, 1, source_name=source)
+    with pytest.raises(ValueError, match="Indian provenance required"):
+        prepare(manifest(tmp_path, [row]), tmp_path, tmp_path / "out")
+
+
 def record(root, number, *, text=None, **overrides):
     content = (text or f"Synthetic fixture {number}").encode()
     name = f"text-{number}.txt"

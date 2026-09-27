@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-09-27 — Issue #6 Indian source acquisition and audit checkpoint
+
+Completed a checksum-pinned local acquisition of the OpenCity/Janaagraha IChangeMyCity Bengaluru complaints resource. The ignored snapshot contains 16,071/16,071 records with no importer omissions, strict Windows-1252-to-UTF-8 text conversion, original publisher artifacts, separate source labels and no images. The raw CSV SHA-256 is `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. An interrupted integrity pass was resumed without redownloading; every referenced text file/hash passed before the snapshot was marked complete.
+
+Added deterministic auditing for missingness, text quality, script evidence, mixed date formats, coordinates, category/ward distributions, exact/normalized/template duplicates and privacy-pattern screening. Added explicit proposed mapping states rather than silently treating publisher routing labels as CivicAI truth. Audit v5 reports 7,843 accepted mapping proposals, 2,255 ambiguous, 5,955 needing review and 18 rejected; accepted-proposal class support ranges from 3,350 garbage/waste to 56 water leakage. Compact mapping, suspicious/language and duplicate review artifacts contain references rather than raw complaint text. All records remain pending and unassigned, and `training_approved` remains false.
+
+A bounded official-source search found KMC complaint forms/workflow but no verified downloadable complaint-level Kolkata/West Bengal dataset with stable version and clear terms. No claim of nonexistence is made. Foreign observations are excluded. No Indian paired text-image source is possessed, no model was trained and no metric was generated.
+
+The acquisition/audit tests cover strict decoding, host/license/schema changes, interrupted verification, tamper refusal, invalid mapping state, deterministic privacy-conscious review output and immutable audit directories. Final regression passed all 127 Python tests (79 backend and 48 research) with the same three dependency deprecations. TypeScript compilation and production build passed. A concurrent Vitest run timed out while starting its worker before loading tests; the conclusive isolated single-worker run passed all 24 frontend tests. Diff whitespace validation passed. No application behavior, dependency or database migration changed.
+
 ## 2026-09-27 — Issue #6 preparation checkpoint; acquisition still open
 
 Reviewed official NYC311 field changes, RDD2022 authors, TACO authors, the AWS IChangeMyCity registry, CESAMARD authors and scikit-learn evaluation guidance. Recorded source-specific suitability gaps in `ISSUE_006_DATA_PREPARATION.md`. No suitable paired eight-category source was approved or acquired. Category-derived text, generated descriptions and arbitrary same-category text/image pairing are excluded from the primary experiment. Source/category confounding must be audited.

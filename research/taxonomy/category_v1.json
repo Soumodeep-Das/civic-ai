@@ -1,5 +1,6 @@
 {
   "taxonomy_version": "civicai-category-v1",
+  "status": "proposed_pending_human_approval",
   "task": "single-label urban civic complaint classification",
   "categories": [
     {

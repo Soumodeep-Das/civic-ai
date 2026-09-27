@@ -53,7 +53,7 @@ Coordinates, free text, images, and reporter identifiers may contain personal or
 
 ## Taxonomy rules
 
-The working categories are frozen for the first feasibility pass as `civicai-category-v1` in `research/taxonomy/category_v1.json`: `road_damage`, `garbage_waste`, `streetlight`, `waterlogging`, `broken_footpath`, `drainage_sewerage`, `water_leakage` and `other`. `research/ANNOTATION_GUIDELINES_V1.md` defines positive/negative boundaries, multi-issue handling, the restricted meaning of `other`, modality conflicts, exclusions and adjudication. A definition change creates a new taxonomy version and may require explicit relabeling; version 1 labels are never silently reinterpreted.
+The working categories are proposed for the first feasibility pass as `civicai-category-v1` in `research/taxonomy/category_v1.json`: `road_damage`, `garbage_waste`, `streetlight`, `waterlogging`, `broken_footpath`, `drainage_sewerage`, `water_leakage` and `other`. Its status is `proposed_pending_human_approval`. `research/ANNOTATION_GUIDELINES_V1.md` defines positive/negative boundaries, multi-issue handling, the restricted meaning of `other`, modality conflicts, exclusions and adjudication. A definition change creates a new taxonomy version and may require explicit relabeling; version 1 labels are never silently reinterpreted.
 
 Severity and priority require separate rubrics. Priority must not be backfilled from category through a fixed lookup and then presented as independently annotated evidence.
 
@@ -75,7 +75,7 @@ Issue #5 uses a strict JSONL manifest. Each record stores identity and source te
 
 ## Unresolved data decisions
 
-Issue #6 preparation verifies referenced contents and builds transitive event/hash/normalized-text/decoded-pixel components. Proposals record independent component support as well as sample counts; those are distinct. Split assignment is deterministic with 70/15/15 target probabilities and no stratification guarantee. Output remains unapproved until source, privacy, annotation, near-duplicate and class-support review. See `ISSUE_006_DATA_PREPARATION.md`.
+Issue #6 preparation verifies referenced contents and builds transitive event/hash/normalized-text/decoded-pixel components. The acquired OpenCity snapshot remains a raw text curation source: 16,071 pending/unassigned records, no images and no gold CivicAI labels. Proposed mappings preserve source labels and expose decision state; their counts are not annotation results. Split proposals record independent component support as well as sample counts; those are distinct. Assignment is deterministic with 70/15/15 target probabilities and no stratification guarantee. Output remains unapproved until source, privacy, annotation, near-duplicate and class-support review. See `ISSUE_006_DATA_PREPARATION.md`.
 
 - Which sources are available and licensed for this taxonomy?
 - Will each record have aligned text and image, or will modalities be partially missing?

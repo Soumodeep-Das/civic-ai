@@ -1,0 +1,31 @@
+{
+  "mapping_version": "icmyc-to-civicai-proposal-v1",
+  "status": "proposed",
+  "source_name": "opencity-icmyc-india",
+  "taxonomy_version": "civicai-category-v1",
+  "default_status": "needs_review",
+  "rules": [
+    {"source_subcategory": "Fixing/Reparing Potholes", "proposed_category": "road_damage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies pothole repair."},
+    {"source_subcategory": "Repair of Potholes on Roads", "proposed_category": "road_damage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies road potholes."},
+    {"source_subcategory": "2B- Repair Broken Footpath", "proposed_category": "broken_footpath", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies a broken footpath."},
+    {"source_subcategory": "Repair Of Existing Footpaths", "proposed_category": "broken_footpath", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies footpath repair."},
+    {"source_subcategory": "Report A Broken Footpath", "proposed_category": "broken_footpath", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies a broken footpath."},
+    {"source_subcategory": "Flooding/Waterlogging Of Roads And Footpaths", "proposed_category": "waterlogging", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies waterlogging."},
+    {"source_subcategory": "Maintenance/Repair Of Streetlights", "proposed_category": "streetlight", "status": "accepted", "confidence": "high", "rationale": "Source label identifies an existing streetlight fault or repair."},
+    {"source_subcategory": "Clearance Of Garbage Dump Or Black Spot", "proposed_category": "garbage_waste", "status": "accepted", "confidence": "high", "rationale": "Source label identifies accumulated garbage requiring clearance."},
+    {"source_subcategory": "Garbage Dumping In Vacant Lot/Land", "proposed_category": "garbage_waste", "status": "accepted", "confidence": "high", "rationale": "Source label identifies solid-waste dumping."},
+    {"source_subcategory": "Collection Of Door-to-door Garbage", "proposed_category": "garbage_waste", "status": "ambiguous", "confidence": "medium", "rationale": "May describe a missed collection or a request for service; complaint text needs review."},
+    {"source_subcategory": "Maintenance And Repair Of Manholes", "proposed_category": "drainage_sewerage", "status": "accepted", "confidence": "high", "rationale": "Source label identifies public manhole repair."},
+    {"source_subcategory": "Maintenance And Repair Of Sewage Lines", "proposed_category": "drainage_sewerage", "status": "accepted", "confidence": "high", "rationale": "Source label identifies sewerage infrastructure repair."},
+    {"source_subcategory": "Maintenance And Repair Of Storm Water Drains", "proposed_category": "drainage_sewerage", "status": "accepted", "confidence": "high", "rationale": "Source label identifies storm-drain repair."},
+    {"source_subcategory": "Removal Of Sewer Pipe Blockages and Overflows", "proposed_category": "drainage_sewerage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies sewer blockage or overflow."},
+    {"source_subcategory": "Sewarage Or Storm Water Overflow", "proposed_category": "drainage_sewerage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies sewerage or storm-water overflow."},
+    {"source_subcategory": "Stop Water Leakage", "proposed_category": "water_leakage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies water leakage."},
+    {"source_subcategory": "Reduce water leakage and wastage", "proposed_category": "water_leakage", "status": "accepted", "confidence": "high", "rationale": "Source label explicitly identifies water leakage or wastage; text review must distinguish policy requests."},
+    {"source_subcategory": "Installation Of New Streetlights", "proposed_category": "streetlight", "status": "ambiguous", "confidence": "low", "rationale": "New infrastructure requests differ from faults in the proposed CivicAI definition."},
+    {"source_subcategory": "Tarring Or Asphalting Of Existing Road", "proposed_category": "road_damage", "status": "ambiguous", "confidence": "low", "rationale": "May be road damage or a general improvement request."},
+    {"source_subcategory": "Build new footpaths and repair broken footpaths", "proposed_category": "broken_footpath", "status": "ambiguous", "confidence": "low", "rationale": "Mixed construction and repair concepts cannot be accepted from the source label alone."},
+    {"source_subcategory": "Others", "proposed_category": null, "status": "needs_review", "confidence": "none", "rationale": "Broad source label supplies no reliable CivicAI class."},
+    {"source_subcategory": "NULL", "proposed_category": null, "status": "rejected", "confidence": "none", "rationale": "Missing source label cannot support supervised mapping."}
+  ]
+}

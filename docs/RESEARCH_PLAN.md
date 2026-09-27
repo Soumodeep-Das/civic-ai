@@ -2,6 +2,8 @@
 
 ## Aim
 
+User requirement: all civic task training and evaluation examples must come from Indian incidents. Verify country at source/subset level. Geographic and language coverage within India must be reported; a single-city dataset cannot establish all-India performance. Foreign civic datasets remain methodological references only. Never manufacture Indian relevance by translating foreign descriptions.
+
 The minor-project study will evaluate how input modality affects classification of urban civic complaints. It must report only results produced by documented, reproducible experiments on traceable data.
 
 ## Research questions
@@ -34,9 +36,9 @@ A later major-project study may ask whether learned spatial, temporal, severity,
 
 ## Experimental controls
 
-Issue #6 adds file-verified split proposals, but dataset acquisition remains unresolved. The primary modality comparison requires genuine paired records; label-derived text and arbitrary same-category pairings are ineligible. Source-specific visual style is a confound to audit. No model training or final evaluation split has been produced.
+Issue #6 adds file-verified split proposals and has acquired/audited one Bengaluru text source. It is not an approved training release: all labels remain pending, mappings are proposals, privacy/duplicates require review, accepted-proposal support is highly imbalanced, and Bengaluru cannot establish all-India performance. The primary modality comparison still requires genuine paired Indian records; label-derived text and arbitrary same-category pairings are ineligible. Source-specific visual style is a confound to audit. No model training or final evaluation split has been produced.
 
-Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before dataset acquisition. No candidate source is approved yet. The taxonomy is a feasibility baseline and must be versioned rather than edited in place if real-source review requires changed boundaries.
+Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before training. Its current machine-readable status is `proposed_pending_human_approval`; it must be versioned rather than silently edited if source review changes boundaries.
 
 - Freeze a versioned label taxonomy and inclusion criteria before the final experiments.
 - Create one group-aware or source-aware split where needed to prevent near-duplicate or location leakage.

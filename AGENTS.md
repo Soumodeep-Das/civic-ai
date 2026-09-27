@@ -3,6 +3,7 @@
 - Read `docs/CURRENT_STATE.md` first, then consult the relevant files under `docs/`; they are the detailed source of truth.
 - Preserve the distinction between complaint classification (what the issue is) and prioritization (how urgently it should be handled).
 - Do not fabricate citations, datasets, licenses, labels, metrics, experimental results, statistical claims, or novelty claims.
+- User direction: train and evaluate CivicAI on Indian civic issues. Verify Indian provenance per source/subset; foreign civic examples are excluded from training and evaluation. Do not substitute translated foreign complaints for Indian observations.
 - Keep changes small and milestone-driven. Inspect existing work, implement only the requested scope, test it, and update affected documentation.
 - For every feature, research relevant edge cases online and comparable applications, prefer primary sources, record findings and scoped decisions, and test meaningful failure/recovery paths. Follow docs/DEVELOPMENT_WORKFLOW.md.
 - Show visible progress. Update documentation, commit and push each coherent task incrementally; explicitly report verification or publishing blockers (see docs/DEVELOPMENT_WORKFLOW.md).

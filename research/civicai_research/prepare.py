@@ -7,7 +7,6 @@ import hashlib
 import json
 from pathlib import Path
 import platform
-import tempfile
 import unicodedata
 
 from PIL import Image, ImageOps, __version__ as pillow_version
@@ -16,6 +15,8 @@ from .manifest import load_taxonomy, validate_manifest, _file_hash
 
 
 ALGORITHM = "connected-components-sha256-70-15-15-v1"
+# Provenance acceptance only; this is not label/rights/training approval.
+SOURCE_COUNTRIES = {"opencity-icmyc-india": "IN"}
 
 
 def canonical(value):
@@ -41,6 +42,8 @@ def prepare(manifest: Path, data_root: Path, output: Path, *, seed: int = 42, pa
         raise ValueError("Invalid manifest: " + "; ".join(validation.errors))
     records = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines() if line.strip()]
     records.sort(key=lambda row: row["record_id"])
+    if any(SOURCE_COUNTRIES.get(row["source_name"]) != "IN" for row in records):
+        raise ValueError("Indian provenance required: unreviewed or foreign source cannot enter a split proposal")
     if any(row["split"] != "unassigned" for row in records):
         raise ValueError("Already assigned records cannot be resplit; preserve the frozen evaluation set")
     if len({row["dataset_version"] for row in records}) != 1:
@@ -156,16 +159,17 @@ def prepare(manifest: Path, data_root: Path, output: Path, *, seed: int = 42, pa
                             "near duplicates and related events", "class/source balance and sample adequacy"],
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="civicai-prepare-", dir=output.parent) as temporary:
-        staging = Path(temporary) / "release"
-        staging.mkdir()
-        candidate = staging / "manifest.jsonl"
-        candidate.write_text(payload, encoding="utf-8", newline="\n")
-        final_check = validate_manifest(candidate, data_root=root)
-        if not final_check.valid:
-            raise ValueError("Prepared manifest invalid: " + "; ".join(final_check.errors))
-        (staging / "report.json").write_text(canonical(report) + "\n", encoding="utf-8")
-        staging.rename(output)
+    output.mkdir()
+    incomplete = output / "INCOMPLETE"
+    incomplete.write_text("Preparation has not completed; do not use this directory.\n", encoding="utf-8")
+    candidate = output / "manifest.jsonl"
+    candidate.write_text(payload, encoding="utf-8", newline="\n")
+    final_check = validate_manifest(candidate, data_root=root)
+    if not final_check.valid:
+        raise ValueError("Prepared manifest invalid: " + "; ".join(final_check.errors))
+    (output / "report.json").write_text(canonical(report) + "\n", encoding="utf-8")
+    incomplete.unlink()
+    (output / "COMPLETE").write_text("Validated preparation proposal.\n", encoding="utf-8")
     return report
 
 

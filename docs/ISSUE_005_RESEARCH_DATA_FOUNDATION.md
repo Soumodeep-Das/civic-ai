@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create the smallest defensible foundation for the later text, image and multimodal classification experiments. This issue freezes category taxonomy version 1, defines human annotation rules, records source/provenance requirements, and validates dataset manifests before any model can consume them.
+Create the smallest defensible foundation for the later text, image and multimodal classification experiments. This issue versions proposed category taxonomy 1, defines human annotation rules, records source/provenance requirements, and validates dataset manifests before any model can consume them. Dataset audit and human review must approve or version the proposal before experimental use.
 
 This issue does **not** acquire a dataset, label real records, train a model, expose ML inference, or report metrics.
 
