@@ -77,6 +77,8 @@ Issue #5 uses a strict JSONL manifest. Each record stores identity and source te
 
 Issue #6 preparation verifies referenced contents and builds transitive event/hash/normalized-text/decoded-pixel components. The acquired OpenCity snapshot remains a raw text curation source: 16,071 pending/unassigned records, no images and no gold CivicAI labels. Proposed mappings preserve source labels and expose decision state; their counts are not annotation results. Split proposals record independent component support as well as sample counts; those are distinct. Assignment is deterministic with 70/15/15 target probabilities and no stratification guarantee. Output remains unapproved until source, privacy, annotation, near-duplicate and class-support review. See `ISSUE_006_DATA_PREPARATION.md`.
 
+Issue #7 Stage A review records keep reviewer pseudonym, timezone timestamp, taxonomy/mapping version, decision, rationale and decision-specific outcomes separate from immutable source context. Conflicting independent decisions require adjudication. Generated previews and reviewer files stay outside Git. A later curated manifest must preserve the original record/source identity, original source category/subcategory through its review artifact, human label basis, redaction state and approved duplicate/event group.
+
 - Which sources are available and licensed for this taxonomy?
 - Will each record have aligned text and image, or will modalities be partially missing?
 - What is the unit of grouping for leakage-safe splits?

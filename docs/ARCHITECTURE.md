@@ -54,6 +54,8 @@ Issue #5 adds the pre-training data boundary under `research/`. Restricted text 
 
 Issue #6 adds an India-only source boundary. `opencity.py` performs bounded, checksum-pinned acquisition into an ignored immutable snapshot; `audit.py` emits aggregate diagnostics and privacy-conscious review references; `prepare.py` admits only explicitly reviewed Indian source identifiers and builds leakage-aware split proposals. Source labels remain separate from CivicAI annotations throughout. `COMPLETE`/`INCOMPLETE` markers prevent interrupted acquisition or preparation directories from being treated as releases. None of these gates authorizes training by itself.
 
+Issue #7 Stage A adds an offline review boundary. `review.py` generates checksum-bound local CSV forms, validates partial independent submissions, merges matching decisions and quarantines conflicts for adjudication. `curate.py` contains deterministic derived-text redaction and a fail-closed readiness report; it does not yet publish a curated dataset. Review artifacts remain under ignored data directories. Only a later Stage B may convert validated human decisions into a new versioned derivative.
+
 ## MVP vertical slice
 
 Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.

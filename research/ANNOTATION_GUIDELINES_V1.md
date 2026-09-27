@@ -48,3 +48,11 @@ Assigned train/validation/test splits require `annotated`. Pending, disputed and
 For a meaningful subset, two annotators should work independently before seeing each other's label. Disagreements are resolved by a documented reviewer using the same taxonomy, with the final reason retained. Agreement statistics and sample sizes may be reported only after they are actually computed.
 
 Changes to a definition create a new taxonomy version. Do not rewrite old labels in place; preserve the original manifest and document any migration or relabeling.
+
+## Issue #7 review metadata
+
+Stage A review uses pseudonymous reviewer codes, timezone-aware timestamps, taxonomy version and source-mapping version. Automated proposals and redacted previews are context only. A human decision must include an allowed decision state and, where required, rationale, category, exclusion reason, language observation, redaction plan or duplicate group.
+
+Reviewers work independently when overlap is assigned. Duplicate submissions by the same reviewer for the same item are invalid. Semantically different decisions remain conflicts until a separately identified adjudicator records a final allowed state and rationale. One review is reported as one review; agreement statistics are not calculated unless actual independent overlap and a predeclared procedure exist.
+
+Mapping-level approval applies only when sampled examples support consistent subgroup semantics. Mixed subgroups use record-level review. The `other` class requires defensible positive examples outside the seven named classes; it is never a fallback for unclear or excluded content.

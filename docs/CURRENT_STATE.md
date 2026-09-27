@@ -1,5 +1,13 @@
 # Current State
 
+## Issue #7 Stage A implemented — awaiting human review
+
+Issue #7 remains pre-training. The ignored local package `data/interim/issue7-review-v5` is reproducibly bound to the verified OpenCity snapshot, audit v5, proposed taxonomy/mapping, review schema and generator code. It contains blank offline forms for 8 taxonomy items, 231 original category/subcategory mapping groups, 201 distinct phone/email privacy flags, 1,406 priority record reviews, 400 duplicate/template groups, one license decision and one final dataset-approval gate. No human decisions are present and `training_approved` remains false.
+
+Review tooling validates pseudonymous reviewer metadata, timezone timestamps, allowed states, immutable context and decision-specific fields. It supports partial/resumable independent submissions, rejects duplicate reviewer decisions, preserves disagreements, and generates a separate adjudication form. Deterministic redaction operates only on derived text; complex identifiers require explicit spans. A fail-closed readiness report cannot approve training while required reviews, conflicts or methodology gates remain unresolved. Stage B and all model work are stopped pending real human input.
+
+Final Python regression passes all 135 tests (79 backend and 56 research) with the same three recorded dependency deprecations. The generated package accepts a blank template as zero completed decisions, has no duplicate item IDs, and the raw CSV hash still matches Issue #6. Frontend code and dependencies did not change, so the previously verified 24-test/build checkpoint was not rerun. Exact reviewer commands and limitations are in `ISSUE_007_HUMAN_REVIEW.md`. No frontend, backend, API, database, raw snapshot, taxonomy decision, label, split or model result changed.
+
 ## Issue #6 in progress — Indian source acquired and audited
 
 The application remains at the verified Issue #4 behavior; this checkpoint changes only research code and documentation. A verified OpenCity/IChangeMyCity Bengaluru text snapshot is now stored locally outside Git: 16,071 records, raw SHA-256 `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`, zero images, no omissions. The importer retains original bytes and publisher metadata, uses strict Windows-1252 decoding where required, preserves source labels separately, leaves all CivicAI labels null and all splits unassigned, and completes only after manifest-referenced file hashes pass.

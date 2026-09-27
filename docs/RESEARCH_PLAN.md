@@ -40,6 +40,8 @@ Issue #6 adds file-verified split proposals and has acquired/audited one Bengalu
 
 Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before training. Its current machine-readable status is `proposed_pending_human_approval`; it must be versioned rather than silently edited if source review changes boundaries.
 
+Issue #7 Stage A supplies offline, checksum-bound human review forms and conflict/adjudication validation. It creates no annotations itself. Taxonomy, mapping, privacy, record quality/language, duplicate grouping, license and final dataset approval remain independent gates. Split selection and modeling remain blocked until actual Stage B curation resolves them.
+
 - Freeze a versioned label taxonomy and inclusion criteria before the final experiments.
 - Create one group-aware or source-aware split where needed to prevent near-duplicate or location leakage.
 - Keep the final test split untouched during model and hyperparameter selection.

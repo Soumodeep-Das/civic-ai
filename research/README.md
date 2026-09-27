@@ -26,6 +26,16 @@ Audit a completed snapshot into a new immutable ignored directory:
 
 The audit reports missingness, simple text-quality/language-script/privacy signals, source distributions, coordinate/time coverage, duplicate risks and explicit proposed-mapping states. It emits review references, not raw text, and never approves training.
 
+## Issue #7 Stage A human review
+
+Generate the offline, ignored review package from the verified snapshot and audit:
+
+```powershell
+.\.venv\Scripts\python.exe -m research.civicai_research.review create --snapshot data/raw/icmyc-india-v2 --audit data/processed/icmyc-audit-v5 --output data/interim/issue7-review-v5 --examples-per-group 3
+```
+
+The generated package contains blank CSV forms, checksums and reviewer instructions. It preserves provenance, escapes spreadsheet-leading source text, supports partial independent submissions, validates immutable context and decision-specific requirements, detects duplicate/conflicting reviews and produces an adjudication handoff. See `docs/ISSUE_007_HUMAN_REVIEW.md` and `research/review/README.md` for exact commands. No review decision or complaint preview is committed.
+
 ## Manifest validation
 
 From the repository root:
@@ -73,4 +83,7 @@ Tests (choose a fresh temporary directory if a prior run owns the example path):
 - `civicai_research/opencity.py`: bounded, checksum-pinned Indian source acquisition.
 - `civicai_research/audit.py`: deterministic source audit and privacy-conscious review queues.
 - `mappings/icmyc_v1.json`: proposed source-label mapping states; not gold labels.
+- `review/review_schema_v1.json`: allowed human decision states and outcome fields.
+- `civicai_research/review.py`: offline package generation, submission validation, merging and conflict/adjudication checks.
+- `civicai_research/curate.py`: deterministic redaction and fail-closed Stage B readiness skeleton.
 - `tests/`: automated validator tests.

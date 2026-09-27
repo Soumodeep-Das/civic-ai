@@ -33,3 +33,7 @@ The reproducible `icmyc-audit-v5` audit found 7,843 high-confidence mapping prop
 - Determine a retention and redaction procedure before accepting a model-ready derivative.
 
 No model metrics, annotator agreement, final class counts or train/test assignments are available at this stage. Bengaluru-only coverage does not establish Kolkata, West Bengal or all-India performance.
+
+## Issue #7 review state
+
+Stage A generated `issue7-review-v5` locally with blank taxonomy, mapping, privacy, priority-record, duplicate, license and final approval forms. The package is checksum-bound to this snapshot and remains ignored. It contains no human decision, approved label, curated class count or agreement result. Any Stage B derivative must cite validated reviewer/adjudication artifacts and preserve source identity, original labels, redaction state and duplicate group.

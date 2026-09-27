@@ -51,6 +51,7 @@ tmp/
 data/raw/**
 data/interim/**
 data/processed/**
+data/review/**
 data/external/**
 !data/**/.gitkeep
 models/

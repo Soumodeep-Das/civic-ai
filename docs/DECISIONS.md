@@ -1,5 +1,13 @@
 # Decision Log
 
+## D022 Issue #7 offline human-review gate (2026-09-27, accepted for Stage A)
+
+- Use versioned local CSV forms plus machine validation instead of a new annotation web application. Raw complaint text, previews, submissions and merged decisions remain ignored; Git stores only schemas, code, hashes and aggregate documentation.
+- Keep automated mapping proposals and previews separate from human decisions. Require pseudonymous reviewer ID, timezone timestamp, allowed state and decision-specific evidence. Support partial independent work and preserve disagreements for explicit adjudication.
+- Treat taxonomy, mapping, privacy, record quality/language, duplicate grouping, license review and final dataset approval as separate gates. No single automated result or mapping proposal can set `training_approved` true.
+- Escape formula-leading spreadsheet fields and instruct reviewers to use Protected View. This reduces but does not eliminate CSV/spreadsheet interpretation risk.
+- Stage A stops after producing and validating review infrastructure. Stage B begins only with real reviewer submissions and may pause again if mapping review requires an expanded record-level queue.
+
 ## D021 Audited OpenCity snapshot remains a curation source (2026-09-27, accepted)
 
 - Freeze the completed local IChangeMyCity snapshot by raw and metadata SHA-256; keep its source labels separate, CivicAI labels null and splits unassigned.

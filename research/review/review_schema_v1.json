@@ -1,0 +1,35 @@
+{
+  "schema_version": "issue7-review-v1",
+  "taxonomy_version": "civicai-category-v1",
+  "mapping_version": "icmyc-to-civicai-proposal-v1",
+  "review_types": {
+    "taxonomy": {
+      "decisions": ["approve", "propose_revision", "remove", "needs_discussion"],
+      "outcome_fields": ["recommended_name", "recommended_definition"]
+    },
+    "mapping": {
+      "decisions": ["approve_mapping", "reject_mapping", "ambiguous", "record_level_review", "exclude_source_subgroup", "propose_revision"],
+      "outcome_fields": ["approved_category"]
+    },
+    "privacy": {
+      "decisions": ["no_action", "redact", "exclude", "additional_review"],
+      "outcome_fields": ["redaction_types", "redaction_spans"]
+    },
+    "record": {
+      "decisions": ["label", "exclude", "needs_adjudication", "defer"],
+      "outcome_fields": ["approved_category", "exclusion_reason", "language_observation"]
+    },
+    "duplicate": {
+      "decisions": ["keep_together", "separate_incidents", "exclude_duplicates", "needs_adjudication"],
+      "outcome_fields": ["approved_group_id"]
+    },
+    "license": {
+      "decisions": ["approved_local_only", "approved_redistribution", "needs_review", "rejected"],
+      "outcome_fields": []
+    },
+    "dataset_approval": {
+      "decisions": ["approve_for_text_baseline", "not_approved"],
+      "outcome_fields": []
+    }
+  }
+}

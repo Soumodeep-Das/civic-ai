@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-09-27 — Issue #7 Stage A human-review infrastructure
+
+Verified clean synchronized `main` at `fd0add0`; the Issue #6 snapshot/audit were reused without downloading or regenerating them. Added a versioned offline review schema, checksum-bound package generator, blank reviewer-friendly CSV forms, submission validation, independent-review merging, duplicate-review detection, explicit conflict/adjudication output, deterministic non-destructive redaction primitives and a fail-closed curation-readiness report. OWASP CSV Injection guidance informed quoting, formula-leading-field escaping and the Protected View warning; the documentation states that no spreadsheet mitigation is universal.
+
+Generated ignored package `data/interim/issue7-review-v5`: taxonomy 8, mapping 231, privacy 201, priority record 1,406, duplicate/template 400, license 1 and dataset approval 1. A focused test exposed and fixed a collision between normalized-duplicate and template-duplicate item IDs by including detection kind in the identity. All decision fields are blank and training approval is false. The source snapshot remained immutable. Final regression passed all 135 Python tests (79 backend and 56 research) with the same three dependency deprecations; diff whitespace checks passed. Frontend code/dependencies did not change, so its existing 24-test/build checkpoint was not rerun. No product, database, model, label, taxonomy approval, split or research metric changed.
+
 ## 2026-09-27 — Issue #6 Indian source acquisition and audit checkpoint
 
 Completed a checksum-pinned local acquisition of the OpenCity/Janaagraha IChangeMyCity Bengaluru complaints resource. The ignored snapshot contains 16,071/16,071 records with no importer omissions, strict Windows-1252-to-UTF-8 text conversion, original publisher artifacts, separate source labels and no images. The raw CSV SHA-256 is `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. An interrupted integrity pass was resumed without redownloading; every referenced text file/hash passed before the snapshot was marked complete.

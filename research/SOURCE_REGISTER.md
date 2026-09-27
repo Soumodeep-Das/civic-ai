@@ -17,3 +17,5 @@ Issue #6 assessment is recorded in `docs/ISSUE_006_DATA_PREPARATION.md`. The Ope
 | Original controlled collection | Possible aligned text-image records | Not started | Requires approved consent/basis, privacy notice, retention, redaction, annotation capacity and class-support plan. |
 
 A source becomes approved only through a completed datasheet, retained terms/license evidence, a documented taxonomy mapping and a reproducible frozen extraction. Public accessibility alone is not treated as permission for every research use.
+
+Issue #7 Stage A adds a blank license review and human mapping review for the OpenCity source. Their existence does not change source approval: exact license version/redistribution implications and every source-group mapping remain unresolved until validated human decisions are supplied.
