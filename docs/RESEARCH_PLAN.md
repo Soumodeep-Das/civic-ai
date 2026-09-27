@@ -34,6 +34,8 @@ A later major-project study may ask whether learned spatial, temporal, severity,
 
 ## Experimental controls
 
+Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before dataset acquisition. No candidate source is approved yet. The taxonomy is a feasibility baseline and must be versioned rather than edited in place if real-source review requires changed boundaries.
+
 - Freeze a versioned label taxonomy and inclusion criteria before the final experiments.
 - Create one group-aware or source-aware split where needed to prevent near-duplicate or location leakage.
 - Keep the final test split untouched during model and hyperparameter selection.

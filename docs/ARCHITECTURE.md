@@ -50,6 +50,8 @@ Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local 
 
 Training/evaluation code and online inference are separate concerns. Experiments will create versioned model artifacts and reports; the application will eventually call a narrow inference interface. Models must not be trained inside an API request.
 
+Issue #5 adds the pre-training data boundary under `research/`. Restricted text and image files remain outside Git; a JSONL manifest references them with source/provenance metadata, taxonomy and annotation state, group identity, frozen split and SHA-256 hashes. The standalone validator rejects schema drift, unsafe paths and exact group/content leakage before later experiment code reads a dataset. A successful manifest check establishes internal consistency only—not license, consent, representativeness or label correctness.
+
 ## MVP vertical slice
 
 Issue #1 established the tested backend persistence flow and Issue #2 completed the smallest browser-to-database product. Issues #3 and #4 add bounded image evidence and accurate issue-location capture without introducing accounts, prioritization, department routing or ML. The original MVP boundary and acceptance criteria remain documented in `MVP_SCOPE.md`.

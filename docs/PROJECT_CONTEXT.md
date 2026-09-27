@@ -25,7 +25,7 @@ The first software milestone will be a narrow vertical slice:
 
 `citizen complaint form -> FastAPI endpoint -> PostgreSQL persistence -> administrative complaint list`
 
-Authentication, file storage, mapping, status workflows, and ML inference will be added only through separately reviewed milestones. Application implementation has not started.
+The locally verified application now implements anonymous complaint persistence, bounded JPEG/PNG evidence, accurate searched/device location and map refinement. Authentication, status workflows and ML inference remain separate milestones. Issue #5 begins the research track with taxonomy, annotation and dataset-manifest controls; it does not yet provide a dataset or model.
 
 ## Initial complaint categories
 

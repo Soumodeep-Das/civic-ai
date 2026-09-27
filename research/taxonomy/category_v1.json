@@ -1,0 +1,62 @@
+{
+  "taxonomy_version": "civicai-category-v1",
+  "task": "single-label urban civic complaint classification",
+  "categories": [
+    {
+      "id": "road_damage",
+      "name": "Pothole or road damage",
+      "definition": "Damage to the public road carriageway or its surface.",
+      "include": ["potholes", "broken or collapsed road surface", "dangerous road cracks"],
+      "exclude": ["footpath damage", "standing water with no stated road damage", "open drains or manholes"]
+    },
+    {
+      "id": "garbage_waste",
+      "name": "Garbage or waste",
+      "definition": "Uncollected, dumped, overflowing or improperly handled solid waste in a public place.",
+      "include": ["garbage dumps", "overflowing public bins", "uncollected roadside waste"],
+      "exclude": ["sewage overflow", "blocked drains without solid-waste dumping", "private indoor waste"]
+    },
+    {
+      "id": "streetlight",
+      "name": "Streetlight",
+      "definition": "A fault affecting public street or pathway lighting equipment.",
+      "include": ["streetlight not working", "flickering public lamp", "damaged streetlight pole or fixture"],
+      "exclude": ["private building electricity", "traffic signals", "public-toilet electricity"]
+    },
+    {
+      "id": "waterlogging",
+      "name": "Waterlogging",
+      "definition": "Standing or accumulated water obstructing a public road, footpath or open public space.",
+      "include": ["rainwater accumulated on a road", "flooded public passage", "persistent standing water"],
+      "exclude": ["visible sewage overflow", "an explicitly broken water pipe", "a drain defect that is the primary reported issue"]
+    },
+    {
+      "id": "broken_footpath",
+      "name": "Broken footpath",
+      "definition": "Damage or missing elements on a public pedestrian footpath or pavement.",
+      "include": ["broken paving slabs", "collapsed footpath", "dangerous missing pavement section"],
+      "exclude": ["road carriageway potholes", "temporary private obstruction", "streetlight faults"]
+    },
+    {
+      "id": "drainage_sewerage",
+      "name": "Drainage or sewerage",
+      "definition": "A defect, blockage, opening or overflow involving public drains, manholes or sewerage.",
+      "include": ["blocked public drain", "open or broken manhole", "sewage or storm-drain overflow"],
+      "exclude": ["standing rainwater with no drain defect identified", "clean-water pipe leakage", "solid waste not involving a drain"]
+    },
+    {
+      "id": "water_leakage",
+      "name": "Water leakage",
+      "definition": "Unintended escape of clean or supply water from public water infrastructure.",
+      "include": ["burst public water pipe", "leaking public supply line", "leaking public hydrant"],
+      "exclude": ["rainwater", "sewage", "private indoor plumbing"]
+    },
+    {
+      "id": "other",
+      "name": "Other eligible civic issue",
+      "definition": "An in-scope non-emergency urban civic issue that does not fit the seven named categories.",
+      "include": ["eligible municipal public-space issue outside taxonomy v1"],
+      "exclude": ["emergencies", "non-civic requests", "records too unclear to establish an eligible issue"]
+    }
+  ]
+}

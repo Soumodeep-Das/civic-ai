@@ -53,7 +53,7 @@ Coordinates, free text, images, and reporter identifiers may contain personal or
 
 ## Taxonomy rules
 
-The working categories are listed in `PROJECT_CONTEXT.md`. Before annotation, create a versioned guideline with positive and negative examples, boundary cases, handling for multiple issues, the definition of `other`, and an adjudication process. A category change creates a new taxonomy version and may require relabeling.
+The working categories are frozen for the first feasibility pass as `civicai-category-v1` in `research/taxonomy/category_v1.json`: `road_damage`, `garbage_waste`, `streetlight`, `waterlogging`, `broken_footpath`, `drainage_sewerage`, `water_leakage` and `other`. `research/ANNOTATION_GUIDELINES_V1.md` defines positive/negative boundaries, multi-issue handling, the restricted meaning of `other`, modality conflicts, exclusions and adjudication. A definition change creates a new taxonomy version and may require explicit relabeling; version 1 labels are never silently reinterpreted.
 
 Severity and priority require separate rubrics. Priority must not be backfilled from category through a fixed lookup and then presented as independently annotated evidence.
 
@@ -70,6 +70,8 @@ Severity and priority require separate rubrics. Priority must not be backfilled 
 ## Storage and versioning
 
 Raw data is immutable and access controlled. Derived data should be reproducible from raw inputs plus versioned transformation code. Git stores schemas, manifests, small non-sensitive samples, checksums, and documentation—not unrestricted raw media or large model-ready datasets.
+
+Issue #5 uses a strict JSONL manifest. Each record stores identity and source terms/basis, dataset and taxonomy versions, annotation state/label/provenance, a leakage group, split, and text/image availability plus safe relative references and SHA-256 hashes. `unassigned` is allowed during curation; only `annotated` records may enter train, validation or test. Excluded records require a reason and never receive a category. The validator can check only internal consistency and exact hashes; near-duplicate detection and source approval remain separate gates.
 
 ## Unresolved data decisions
 

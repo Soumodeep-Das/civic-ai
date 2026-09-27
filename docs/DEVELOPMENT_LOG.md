@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-09-27 — Issue #5 research data foundation
+
+Started the ML/research track at its defensible boundary rather than training on unverified data. Reviewed the official Indian Swachhata category/workflow material, NYC311 data evolution, Datasheets for Datasets, the NIST AI RMF Playbook and scikit-learn group-aware split guidance. Recorded exactly what is adopted and what remains unapproved in `ISSUE_005_RESEARCH_DATA_FOUNDATION.md` and the research source register.
+
+Added `civicai-category-v1` with eight machine-readable categories and explicit boundaries; human rules for multi-issue complaints, `other`, emergencies, modality conflicts, privacy quarantine and adjudication; a dataset datasheet template; and a strict JSONL manifest contract. The dependency-free validator reports counts and rejects schema drift, inconsistent annotation states, unsafe paths, invalid checksums, duplicate record/source identities, group leakage and exact text/image hash leakage. Optional data-root verification checks referenced files and hashes without downloading anything.
+
+The first focused pytest run encountered the already-known inaccessible Windows default temp directory: one non-`tmp_path` test passed and eight fixtures could not set up. Rerunning with a workspace-local `--basetemp` passed all 9 research tests. The eight-record synthetic contract manifest then validated with all categories present, all records unassigned, and zero errors/warnings. These are illustrative contract records, not observations or research results.
+
+Final regression passed all 88 Python tests (79 existing backend tests plus 9 research tests), all 24 frontend tests, TypeScript compilation and the production build. The first frontend attempt timed out while starting a Vitest worker before loading any test; the conclusive single-worker run passed all tests. Python output contains the same three recorded dependency deprecations plus the known non-blocking pytest cache-permission warning. No Issue #4 application behavior or database migration changed.
+
 ## 2026-09-21 — Issue #4 full workflow accepted locally
 
 Completed the final real-browser demonstration using only synthetic test content. The citizen flow accepted a required PNG, searched Baranagar with MapTiler autocomplete, selected a result, rendered the Leaflet/OpenStreetMap map, adjusted the pin, reverse-geocoded it, recorded nearby details, required explicit location confirmation and submitted the complaint. The live queue increased from eight to nine and displayed complaint prefix `ecd45acb` with its photo, confirmed address and details.

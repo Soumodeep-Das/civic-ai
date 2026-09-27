@@ -1,5 +1,12 @@
 # Decision Log
 
+## D018 Versioned research taxonomy and manifest gate (2026-09-27, accepted)
+
+- Decision: freeze the eight working category identifiers as `civicai-category-v1`; require versioned annotation guidance and a strict provenance manifest before any training code consumes research data.
+- Decision: keep restricted text/images outside Git and reference them with safe relative paths and SHA-256 hashes. Preserve `group_id` across related records and reject groups or exact modality hashes that cross assigned splits.
+- Decision: allow curation states `pending`, `annotated`, `needs_adjudication` and `excluded`; only annotated records may enter train/validation/test. Category remains separate from severity, priority, department and application workflow status.
+- Consequence: Issue #5 creates no dataset or ML result. Source licensing/consent, near-duplicate detection, agreement measurement, final split generation and minimum class support remain approval gates for later issues.
+
 ## D017 Configurable local backend port (2026-09-21, accepted)
 
 - Decision: `BACKEND_PORT` controls both the local FastAPI launcher and Vite development proxy. It defaults to 8000 and must be an integer from 1 through 65535.

@@ -27,5 +27,5 @@ test = ["pytest>=8,<10"]
 where = ["backend/src"]
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
+testpaths = ["backend/tests", "research/tests"]
 addopts = "-ra"

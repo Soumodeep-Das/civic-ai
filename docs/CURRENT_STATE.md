@@ -1,8 +1,14 @@
 # Current State
 
-## Issue #4 implemented and locally verified
+## Issue #5 research data foundation implemented and locally verified
 
-Branch: feat/accessible-location-picker.
+Branch: main.
+
+Issue #5 freezes the working eight-category taxonomy as `civicai-category-v1` and adds versioned annotation guidelines, a dataset datasheet template, a candidate-source register and a strict JSONL manifest validator. The validator checks schema and annotation-state consistency, safe relative file references, SHA-256 form, unique record/source identities, group separation, and exact text/image checksum leakage across assigned splits. Optional file verification checks existence and hashes against an explicit restricted-data root.
+
+The committed manifest example contains eight explicitly synthetic contract records—one per category—and is not research data. No source is approved, no real record is labeled, no dataset is downloaded, and no model, metric or research result is claimed. The focused research suite passes 9 tests and the sample validator reports eight valid unassigned records with no warnings or errors. Scope, sources, acceptance criteria and limitations are recorded in `ISSUE_005_RESEARCH_DATA_FOUNDATION.md` and `research/README.md`.
+
+## Issue #4 implemented and locally verified
 
 Issue #4 acceptance criteria and provider constraints are recorded in `ISSUE_004_LOCATION_SELECTION.md`. The implementation adds accessible issue-place search, current-location reuse, optional map refinement and truthful location precision. The citizen frontend requires a photo and confirmed location while the API/database remain compatible with existing optional records.
 
