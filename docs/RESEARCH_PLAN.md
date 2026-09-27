@@ -34,6 +34,8 @@ A later major-project study may ask whether learned spatial, temporal, severity,
 
 ## Experimental controls
 
+Issue #6 adds file-verified split proposals, but dataset acquisition remains unresolved. The primary modality comparison requires genuine paired records; label-derived text and arbitrary same-category pairings are ineligible. Source-specific visual style is a confound to audit. No model training or final evaluation split has been produced.
+
 Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before dataset acquisition. No candidate source is approved yet. The taxonomy is a feasibility baseline and must be versioned rather than edited in place if real-source review requires changed boundaries.
 
 - Freeze a versioned label taxonomy and inclusion criteria before the final experiments.

@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-09-27 — Issue #6 preparation checkpoint; acquisition still open
+
+Reviewed official NYC311 field changes, RDD2022 authors, TACO authors, the AWS IChangeMyCity registry, CESAMARD authors and scikit-learn evaluation guidance. Recorded source-specific suitability gaps in `ISSUE_006_DATA_PREPARATION.md`. No suitable paired eight-category source was approved or acquired. Category-derived text, generated descriptions and arbitrary same-category text/image pairing are excluded from the primary experiment. Source/category confounding must be audited.
+
+Implemented local manifest ingestion with file integrity/content checks, immutable output publication, deterministic transitive event/duplicate components, conflicting-label quarantine, paired eligibility and support reports. Reports include code/data/taxonomy hashes and runtime versions. All outputs remain review proposals. Added regression coverage for malformed Issue #5 enum/category values that previously raised an unhandled TypeError.
+
+Verification: 112 Python tests passed (79 backend plus 33 research), including reproducibility, row-order invariance, transitive duplicates, decoded-pixel duplicates, missing modalities, conflicting/disputed labels, pending/excluded records, corruption/missing files, immutable releases, mixed dataset versions and command-line output validation. Tests use synthetic fixtures only. Three known dependency deprecations remain; pytest cache was disabled and a fresh workspace temporary directory used. Diff whitespace checks passed. No frontend/API/database changes; no frontend rerun, model training, actual acquisition or final research split is claimed. Issue #6 remains in progress pending the real-data route.
+
 ## 2026-09-27 — Issue #5 research data foundation
 
 Started the ML/research track at its defensible boundary rather than training on unverified data. Reviewed the official Indian Swachhata category/workflow material, NYC311 data evolution, Datasheets for Datasets, the NIST AI RMF Playbook and scikit-learn group-aware split guidance. Recorded exactly what is adopted and what remains unapproved in `ISSUE_005_RESEARCH_DATA_FOUNDATION.md` and the research source register.

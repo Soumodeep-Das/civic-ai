@@ -54,6 +54,8 @@ Issue #5 adds the pre-training data boundary under `research/`. Restricted text 
 
 ## MVP vertical slice
 
+Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.
+
 Issue #1 established the tested backend persistence flow and Issue #2 completed the smallest browser-to-database product. Issues #3 and #4 add bounded image evidence and accurate issue-location capture without introducing accounts, prioritization, department routing or ML. The original MVP boundary and acceptance criteria remain documented in `MVP_SCOPE.md`.
 
 ## Cross-cutting requirements

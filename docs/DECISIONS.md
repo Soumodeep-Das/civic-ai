@@ -1,5 +1,13 @@
 # Decision Log
 
+## D019 Dataset preparation proposals and acquisition gate (2026-09-27)
+
+- Preserve genuine text/image incident alignment; no generated descriptions or arbitrary same-class pairing in the primary modality comparison.
+- Keep source categories, routing and resolution fields out of description inputs where they leak the target or future outcome.
+- Connect related events and duplicate content before deterministic component assignment. Quarantine conflicting labels, report class/source/component support, and use paired eligibility by default.
+- Treat hash-based 70/15/15 assignments as proposals with potentially uneven support. Final sample size, near-duplicate review and split suitability remain acceptance gates; do not tune seed using test performance.
+- Acquire no unsuitable dataset merely to unblock training. Source assessment has not established a suitable eight-category paired collection. Issue #6 remains in progress.
+
 ## D018 Versioned research taxonomy and manifest gate (2026-09-27, accepted)
 
 - Decision: freeze the eight working category identifiers as `civicai-category-v1`; require versioned annotation guidance and a strict provenance manifest before any training code consumes research data.

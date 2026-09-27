@@ -149,10 +149,10 @@ def _validate_record(
     if record.get("taxonomy_version") != taxonomy_version:
         report.errors.append(f"line {line}: taxonomy_version must be {taxonomy_version!r}")
     status = record.get("annotation_status")
-    if status not in ANNOTATION_STATES:
+    if not isinstance(status, str) or status not in ANNOTATION_STATES:
         report.errors.append(f"line {line}: annotation_status must be one of {sorted(ANNOTATION_STATES)}")
     split = record.get("split")
-    if split not in SPLITS:
+    if not isinstance(split, str) or split not in SPLITS:
         report.errors.append(f"line {line}: split must be one of {sorted(SPLITS)}")
     else:
         report.splits[split] += 1
@@ -164,7 +164,7 @@ def _validate_record(
         report.categories[category] += 1
 
     if status == "annotated":
-        if category not in categories:
+        if not isinstance(category, str) or category not in categories:
             report.errors.append(f"line {line}: annotated records require a valid category_label")
         if annotator_id is None:
             report.errors.append(f"line {line}: annotated records require annotator_id")
@@ -252,8 +252,10 @@ def validate_manifest(
                 report.errors.append(f"line {line_number}: each JSONL value must be an object")
                 continue
             report.records += 1
+            error_count = len(report.errors)
             _validate_record(record, line_number, taxonomy_version, categories, report)
-            parsed.append((line_number, record))
+            if len(report.errors) == error_count:
+                parsed.append((line_number, record))
 
     if report.records == 0:
         report.errors.append("manifest contains no records")

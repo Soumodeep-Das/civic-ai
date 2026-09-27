@@ -2,6 +2,8 @@
 
 No source is approved for model training yet.
 
+Issue #6 assessment is recorded in `docs/ISSUE_006_DATA_PREPARATION.md`. NYC311 category/detail fields must not be presented as independent citizen text. RDD2022 and TACO are auxiliary image candidates only; no paired eight-category source was established. IChangeMyCity's AWS distribution is deprecated. CESAMARD targets review complaint/sentiment/emotion rather than our civic categories. No dataset was acquired in this checkpoint.
+
 | Candidate | Intended role | Current status | Blocking questions |
 |---|---|---|---|
 | Local CivicAI development complaints | Software demonstrations only | Excluded from research by default | These are synthetic/manual QA records, not a representative or consented dataset. |

@@ -1,5 +1,13 @@
 # Current State
 
+## Issue #6 in progress — preparation implemented, acquisition unresolved
+
+The source assessment and remaining acceptance gates are in `ISSUE_006_DATA_PREPARATION.md`. No inspected source has yet been accepted for the eight-category paired study; no real dataset has been downloaded or split. Research preparation now verifies file hashes/content, groups event/exact/normalized duplicates transitively, holds conflicting labels unassigned, and produces deterministic split proposals plus class/source/component support reports. Paired eligibility is the default. Existing outputs and assigned inputs cannot be overwritten/resplit. All proposals explicitly require human/source review before training. The Issue #5 validator now reports malformed enum/category types instead of crashing.
+
+The application remains at the verified Issue #4 behavior. Issue #6 is not complete until a suitable dataset is acquired, reviewed and frozen.
+
+Checkpoint verification: 112 Python tests passed (79 backend and 33 research), including command-line preparation and validation of its generated manifest. The same three dependency deprecation warnings remain. Frontend code and dependencies were not changed; frontend tests were not rerun for this offline research change.
+
 ## Issue #5 research data foundation implemented and locally verified
 
 Branch: main.

@@ -8,6 +8,8 @@ Issue #5 establishes the research-data contract before model development. It fre
 
 ## Issue #4: accessible issue-location selection
 
+Issue #6 is in progress: [dataset assessment and preparation](docs/ISSUE_006_DATA_PREPARATION.md) adds verified local-data ingestion and deterministic split proposals. A suitable paired research dataset has not yet been acquired; ML training has not started. Commands are in [research/README.md](research/README.md).
+
 Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
 
 The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.
