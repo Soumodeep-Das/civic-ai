@@ -12,6 +12,8 @@ Issue #6 is in progress: [India-only dataset audit and preparation](docs/ISSUE_0
 
 Issue #7 Stage A is implemented: [offline human review](docs/ISSUE_007_HUMAN_REVIEW.md) generates ignored, checksum-bound CSV forms for taxonomy, mapping, privacy, record, duplicate, license and final approval decisions. No decision is prefilled, Stage B is waiting for real reviewers, and training remains prohibited.
 
+Issue #8 adds the [municipal operations vertical slice](docs/ISSUE_008_MUNICIPAL_OPERATIONS.md): controlled lifecycle, immutable history, optimistic concurrency, a paginated/searchable/filterable operator queue, evidence/location detail and real operational counts. Open `/admin` after starting the local services. Administrative routes are **not authenticated** and must not be exposed publicly.
+
 Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
 
 The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.

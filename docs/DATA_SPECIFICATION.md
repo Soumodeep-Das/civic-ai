@@ -10,6 +10,8 @@ Migration 0003 adds nullable location_label VARCHAR(300), location_precision VAR
 
 Migration 0004 adds nullable location_source VARCHAR(20) and location_accuracy_m DOUBLE PRECISION. Source is controlled to `search`, `device` or `map`. Accuracy must be finite, between 0 and 100,000 metres, and is valid only for a device source. Source/accuracy context requires coordinates, label and precision. Existing rows remain null and valid.
 
+Migration 0005 expands application status to `submitted`, `under_review`, `in_progress`, `resolved` or `rejected`; creates immutable `complaint_status_events`; backfills a `created` event for each existing complaint at its original `created_at`; and adds indexes for admin listing/history. Workflow status remains operational state, never an ML label.
+
 ## Canonical complaint record
 
 | Group | Field | Type or form | Purpose |
@@ -25,6 +27,12 @@ Migration 0004 adds nullable location_source VARCHAR(20) and location_accuracy_m
 | Application | `location_accuracy_m` | nullable decimal | Accuracy when available |
 | Application | `status` | controlled value | Workflow state, not an ML label |
 | Application | `created_at`, `updated_at` | UTC timestamp | Record lifecycle |
+| Audit | `event_id` | UUID | Immutable lifecycle-event identity |
+| Audit | `previous_status`, `new_status` | nullable/required controlled status | Transition evidence |
+| Audit | `event_type` | created/status_changed | Event meaning |
+| Audit | `operator_note` | nullable string, max 1,000 | Internal operational context; never citizen-visible by default |
+| Audit | `actor_id` | nullable UUID | Future authenticated actor; currently null |
+| Audit | `occurred_at` | UTC timestamp | Immutable event time |
 | Application | `reporter_id` | nullable identifier | Account link; excluded from research by default |
 | Annotation | `category_label` | controlled value | Human reference label for classification |
 | Annotation | `severity_label` | nullable controlled value | Human assessment under a written rubric |

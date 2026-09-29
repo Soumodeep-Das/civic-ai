@@ -6,7 +6,7 @@ Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds o
 
 Multipart fields: description (required trimmed nonempty text), latitude (optional number -90..90), longitude (optional number -180..180), image (optional JPEG/PNG file), location_label (optional nonempty string, 300 characters), location_precision (optional `exact`, `approximate` or `broad`), location_details (optional nonempty string, 500 characters), location_source (optional `search`, `device` or `map`) and location_accuracy_m (optional finite number 0..100000). Omit unavailable coordinates. If any location-context field is sent, both coordinates plus label and precision are required. Accuracy is accepted only with source `device`. Coordinate-only legacy clients remain valid. Duplicate, unknown and server-owned fields are rejected. Do not set the Content-Type header manually in browser code; FormData supplies the boundary.
 
-POST returns 201 with complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at. image_ref is null without an image, otherwise a relative /api/v1/complaint-images/<generated-name> URL. Status remains submitted; UUID and UTC timestamps remain server-owned.
+POST returns 201 with complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at. image_ref is null without an image, otherwise a relative /api/v1/complaint-images/<generated-name> URL. New complaints start as `submitted`; UUID and UTC timestamps remain server-owned.
 
 The citizen Issue #4 frontend requires a photo and confirmed location. The API intentionally keeps both optional for existing records, compatibility and non-browser clients; frontend policy must not be described as a database invariant.
 
@@ -30,9 +30,39 @@ The Nominatim fallback is country-restricted through configuration, limited to o
 - GET /health returns 200 {"status":"ok"} as liveness only.
 - /docs and /openapi.json describe the multipart endpoint.
 
+## Municipal operations
+
+These routes are currently **unauthenticated** and local-prototype only.
+
+`GET /api/v1/admin/complaints` returns `{items,page,page_size,total,total_pages}`. Query parameters:
+
+- `page` (default 1, minimum 1) and `page_size` (default 20, range 1–100);
+- `status`: `submitted`, `under_review`, `in_progress`, `resolved` or `rejected`;
+- `created_from`, `created_to`: inclusive timezone-aware timestamps; from must not exceed to;
+- `has_location`, `has_photo`: booleans;
+- `q`: at most 200 characters; blank means no search. Exact UUID plus literal escaped substring matching applies.
+
+Results are deterministic newest-first by creation timestamp then UUID. A page beyond the result returns an empty `items` array with truthful totals.
+
+`GET /api/v1/admin/complaints/{complaint_id}` returns the complaint plus chronological `history`. `GET /api/v1/admin/complaints/{complaint_id}/history` returns history alone. Events contain event/complaint IDs, event type, previous/new status, optional internal operator note, nullable actor ID and UTC occurrence time.
+
+`PATCH /api/v1/admin/complaints/{complaint_id}/status` accepts:
+
+```json
+{
+  "new_status": "under_review",
+  "expected_updated_at": "2026-09-29T15:30:00Z",
+  "operator_note": "Site inspection requested"
+}
+```
+
+`expected_updated_at` must include a timezone. Note is optional trimmed text of 1–1,000 characters. Same-state requests return the unchanged complaint without adding history. Invalid transitions and stale screens return 409 with `invalid_status_transition` or `stale_complaint_update`. Missing/invalid IDs retain 404/422 behavior.
+
+`GET /api/v1/admin/dashboard` returns real stored totals for all complaints, each status, submissions in the last seven days, photo presence and location presence. It contains no ML or SLA metrics.
+
 ## Errors and limits
 
-Errors use code/message, with details for field-validation errors. Invalid fields/images return 422, oversized uploads 413, wrong request media type 415, missing resources 404, and database unavailability 503.
+Errors use code/message, with details for field-validation errors. Invalid fields/images return 422, oversized uploads 413, wrong request media type 415, missing resources 404, lifecycle/concurrency conflicts 409, and database unavailability 503.
 
 Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 

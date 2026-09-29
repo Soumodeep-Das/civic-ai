@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_serializer, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_serializer, field_validator, model_validator
 
 from civicai.domain import ComplaintStatus, LocationPrecision, LocationSource
 
@@ -62,6 +62,65 @@ class ComplaintRead(BaseModel):
     @field_serializer("created_at", "updated_at")
     def serialize_utc(self, value: datetime) -> str:
         return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+OperatorNote = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]
+
+
+class ComplaintStatusUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    new_status: ComplaintStatus
+    expected_updated_at: datetime
+    operator_note: OperatorNote | None = None
+
+    @field_validator("expected_updated_at")
+    @classmethod
+    def require_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("expected_updated_at must include a timezone")
+        return value
+
+
+class ComplaintStatusEventRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    event_id: UUID
+    complaint_id: UUID
+    event_type: Literal["created", "status_changed"]
+    previous_status: ComplaintStatus | None
+    new_status: ComplaintStatus
+    operator_note: str | None
+    actor_id: UUID | None
+    occurred_at: datetime
+
+    @field_serializer("occurred_at")
+    def serialize_utc(self, value: datetime) -> str:
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class AdminComplaintDetail(ComplaintRead):
+    history: list[ComplaintStatusEventRead]
+
+
+class AdminComplaintPage(BaseModel):
+    items: list[ComplaintRead]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
+class DashboardStatistics(BaseModel):
+    total: int
+    submitted: int
+    under_review: int
+    in_progress: int
+    resolved: int
+    rejected: int
+    submitted_last_7_days: int
+    with_photo: int
+    with_location: int
 
 
 class LocationSearchRequest(BaseModel):

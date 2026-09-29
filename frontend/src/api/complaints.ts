@@ -9,9 +9,53 @@ export type Complaint = {
   location_details: string | null;
   location_source: LocationSource | null;
   location_accuracy_m: number | null;
-  status: "submitted";
+  status: ComplaintStatus;
   created_at: string;
   updated_at: string;
+};
+
+export type ComplaintStatus = "submitted" | "under_review" | "in_progress" | "resolved" | "rejected";
+
+export type ComplaintStatusEvent = {
+  event_id: string;
+  complaint_id: string;
+  event_type: "created" | "status_changed";
+  previous_status: ComplaintStatus | null;
+  new_status: ComplaintStatus;
+  operator_note: string | null;
+  actor_id: string | null;
+  occurred_at: string;
+};
+
+export type AdminComplaintDetail = Complaint & { history: ComplaintStatusEvent[] };
+
+export type AdminComplaintPage = {
+  items: Complaint[];
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
+};
+
+export type DashboardStatistics = {
+  total: number;
+  submitted: number;
+  under_review: number;
+  in_progress: number;
+  resolved: number;
+  rejected: number;
+  submitted_last_7_days: number;
+  with_photo: number;
+  with_location: number;
+};
+
+export type AdminComplaintFilters = {
+  page?: number;
+  pageSize?: number;
+  status?: ComplaintStatus | "";
+  query?: string;
+  hasPhoto?: boolean;
+  hasLocation?: boolean;
 };
 
 export type LocationPrecision = "exact" | "approximate" | "broad";
@@ -126,4 +170,38 @@ export function reverseLocation(latitude: number, longitude: number): Promise<Lo
 
 export function imageUrl(reference: string): string {
   return apiBaseUrl + reference;
+}
+
+export function getDashboardStatistics(): Promise<DashboardStatistics> {
+  return request<DashboardStatistics>("/api/v1/admin/dashboard");
+}
+
+export function listAdminComplaints(filters: AdminComplaintFilters = {}): Promise<AdminComplaintPage> {
+  const parameters = new URLSearchParams();
+  parameters.set("page", String(filters.page ?? 1));
+  parameters.set("page_size", String(filters.pageSize ?? 10));
+  if (filters.status) parameters.set("status", filters.status);
+  if (filters.query?.trim()) parameters.set("q", filters.query.trim());
+  if (filters.hasPhoto !== undefined) parameters.set("has_photo", String(filters.hasPhoto));
+  if (filters.hasLocation !== undefined) parameters.set("has_location", String(filters.hasLocation));
+  return request<AdminComplaintPage>(`/api/v1/admin/complaints?${parameters}`);
+}
+
+export function getAdminComplaint(complaintId: string): Promise<AdminComplaintDetail> {
+  return request<AdminComplaintDetail>(`/api/v1/admin/complaints/${encodeURIComponent(complaintId)}`);
+}
+
+export function updateComplaintStatus(
+  complaintId: string,
+  input: { newStatus: ComplaintStatus; expectedUpdatedAt: string; operatorNote?: string },
+): Promise<Complaint> {
+  return request<Complaint>(`/api/v1/admin/complaints/${encodeURIComponent(complaintId)}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      new_status: input.newStatus,
+      expected_updated_at: input.expectedUpdatedAt,
+      operator_note: input.operatorNote?.trim() || null,
+    }),
+  });
 }

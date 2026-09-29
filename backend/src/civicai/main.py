@@ -7,7 +7,7 @@ from sqlalchemy.exc import OperationalError
 
 from civicai.config import database_url, geocoding_settings
 from civicai.database import build_engine
-from civicai.domain import ComplaintNotFound
+from civicai.domain import ComplaintNotFound, InvalidStatusTransition, StaleComplaintUpdate
 from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
 from civicai.routes import router
 from civicai.uploads import upload_directory
@@ -55,6 +55,20 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
     @app.exception_handler(ComplaintNotFound)
     async def missing(request: Request, exc: ComplaintNotFound):
         return JSONResponse(status_code=404, content={"code": "complaint_not_found", "message": "Complaint not found"})
+
+    @app.exception_handler(InvalidStatusTransition)
+    async def invalid_transition(request: Request, exc: InvalidStatusTransition):
+        return JSONResponse(status_code=409, content={
+            "code": "invalid_status_transition",
+            "message": f"A complaint cannot move from {exc.current.value} to {exc.requested.value}.",
+        })
+
+    @app.exception_handler(StaleComplaintUpdate)
+    async def stale_update(request: Request, exc: StaleComplaintUpdate):
+        return JSONResponse(status_code=409, content={
+            "code": "stale_complaint_update",
+            "message": "This complaint changed after you opened it. Reload before updating its status.",
+        })
 
     @app.exception_handler(RequestValidationError)
     async def invalid(request: Request, exc: RequestValidationError):

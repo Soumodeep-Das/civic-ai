@@ -1,5 +1,17 @@
 # Decision Log
 
+## D023 Issue #8 municipal lifecycle and audit boundary (2026-09-29, accepted)
+
+- Use controlled states `submitted`, `under_review`, `in_progress`, `resolved` and `rejected`; allow resolved/rejected complaints to return to review. Same-state updates are idempotent. Do not model duplicate as a status; defer a separate relation/group compatible with future human/ML duplicate evidence.
+- Append immutable creation/status-change events. Keep notes internal and actor nullable until real authentication exists. Never overwrite original citizen evidence/location.
+- Require `expected_updated_at` for status mutation and use atomic compare-and-set to reject stale screens. This is bounded optimistic concurrency, not event sourcing.
+- Keep one-based server pagination with 20 default/100 maximum and deterministic newest-first ordering. Use PostgreSQL with escaped substring search at current scale; no Elasticsearch/PostGIS/search extension yet.
+- Calculate only real lifecycle/evidence/location totals. Add no ML category, priority, routing or confidence values until those contracts exist.
+- Keep municipal endpoints visibly unauthenticated for the local prototype. Public exposure is prohibited until real identity/roles exist; a cosmetic login is not security.
+- Keep Issue #7 Stage B paused and the verified research snapshot untouched.
+
+Consequences: migration 0005 backfills history for existing complaints; citizen status remains truthful; authentication, assignment, public updates, appeals, duplicate relations and overview clustering remain deferred.
+
 ## D022 Issue #7 offline human-review gate (2026-09-27, accepted for Stage A)
 
 - Use versioned local CSV forms plus machine validation instead of a new annotation web application. Raw complaint text, previews, submissions and merged decisions remain ignored; Git stores only schemas, code, hashes and aggregate documentation.

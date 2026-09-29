@@ -2,6 +2,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { Complaint, ComplaintInput, createComplaint, listComplaints, imageUrl } from "./api/complaints";
 import LocationPicker, { LocationSelection } from "./LocationPicker";
+import AdminApp from "./admin/AdminApp";
 
 type FormFields = { description: string };
 type FormErrors = { description?: string; image?: string; location?: string };
@@ -10,7 +11,7 @@ function validate(fields: FormFields): FormErrors {
   return fields.description.trim() ? {} : { description: "Tell us what needs attention." };
 }
 
-function readableDate(value: string): string {
+export function readableDate(value: string): string {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
@@ -23,7 +24,7 @@ function ComplaintCard({ complaint }: { complaint: Complaint }) {
   return (
     <article className="complaint-card">
       <div className="card-meta">
-        <span className="status-pill"><span aria-hidden="true" />{complaint.status}</span>
+        <span className={`status-pill status-${complaint.status}`}><span aria-hidden="true" />{complaint.status.replace("_", " ")}</span>
         <time dateTime={complaint.created_at}>{readableDate(complaint.created_at)}</time>
       </div>
       <p>{complaint.description}</p>
@@ -43,7 +44,7 @@ function ComplaintCard({ complaint }: { complaint: Complaint }) {
   );
 }
 
-export default function App() {
+function CitizenApp() {
   const [fields, setFields] = useState<FormFields>(initialFields);
   const [errors, setErrors] = useState<FormErrors>({});
   const [image, setImage] = useState<File | undefined>();
@@ -150,7 +151,7 @@ export default function App() {
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>Civic<span>AI</span></span>
         </a>
-        <span className="header-label">Community complaint desk</span>
+        <span className="header-label">Community complaint desk · <a href="/admin">Municipal view</a></span>
       </header>
 
       <section className="hero" id="top">
@@ -237,4 +238,8 @@ export default function App() {
       <footer><span>CivicAI · MCA project prototype</span><span>Anonymous local demonstration</span></footer>
     </main>
   );
+}
+
+export default function App() {
+  return window.location.pathname.startsWith("/admin") ? <AdminApp /> : <CitizenApp />;
 }

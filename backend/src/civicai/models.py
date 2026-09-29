@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Double, String, Text, Uuid, func, text
+from sqlalchemy import CheckConstraint, DateTime, Double, ForeignKey, Index, String, Text, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from civicai.database import Base
@@ -49,7 +49,10 @@ class Complaint(Base):
             "location_label IS NOT NULL AND location_precision IS NOT NULL)",
             name="ck_complaints_location_context",
         ),
-        CheckConstraint("status = 'submitted'", name="ck_complaints_status"),
+        CheckConstraint(
+            "status IN ('submitted', 'under_review', 'in_progress', 'resolved', 'rejected')",
+            name="ck_complaints_status",
+        ),
     )
 
     complaint_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
@@ -67,3 +70,46 @@ class Complaint(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+class ComplaintStatusEvent(Base):
+    __tablename__ = "complaint_status_events"
+    __table_args__ = (
+        CheckConstraint("event_type IN ('created', 'status_changed')", name="ck_complaint_events_type"),
+        CheckConstraint(
+            "previous_status IS NULL OR previous_status IN "
+            "('submitted', 'under_review', 'in_progress', 'resolved', 'rejected')",
+            name="ck_complaint_events_previous_status",
+        ),
+        CheckConstraint(
+            "new_status IN ('submitted', 'under_review', 'in_progress', 'resolved', 'rejected')",
+            name="ck_complaint_events_new_status",
+        ),
+        CheckConstraint(
+            "operator_note IS NULL OR (length(operator_note) <= 1000 AND operator_note ~ '[^[:space:]]')",
+            name="ck_complaint_events_note",
+        ),
+    )
+
+    event_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    complaint_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("complaints.complaint_id", ondelete="RESTRICT"), nullable=False
+    )
+    event_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    previous_status: Mapped[str | None] = mapped_column(String(20))
+    new_status: Mapped[str] = mapped_column(String(20), nullable=False)
+    operator_note: Mapped[str | None] = mapped_column(String(1000))
+    actor_id: Mapped[UUID | None] = mapped_column(Uuid)
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp()
+    )
+
+
+Index("ix_complaints_created_id_desc", Complaint.created_at.desc(), Complaint.complaint_id.desc())
+Index("ix_complaints_status_created_desc", Complaint.status, Complaint.created_at.desc())
+Index(
+    "ix_complaint_events_complaint_time",
+    ComplaintStatusEvent.complaint_id,
+    ComplaintStatusEvent.occurred_at,
+    ComplaintStatusEvent.event_id,
+)

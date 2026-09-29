@@ -6,7 +6,8 @@ import "leaflet/dist/leaflet.css";
 type Coordinates = { latitude: number; longitude: number };
 
 type Props = Coordinates & {
-  onChange: (coordinates: Coordinates) => void;
+  onChange?: (coordinates: Coordinates) => void;
+  readOnly?: boolean;
 };
 
 const tileUrl = import.meta.env.VITE_MAP_TILE_URL?.trim() || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -18,7 +19,7 @@ const issuePin = L.divIcon({
   iconSize: [28, 36],
 });
 
-export default function LocationMap({ latitude, longitude, onChange }: Props) {
+export default function LocationMap({ latitude, longitude, onChange, readOnly = false }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
@@ -41,7 +42,7 @@ export default function LocationMap({ latitude, longitude, onChange }: Props) {
       maxZoom: 19,
     }).addTo(map);
     const marker = L.marker([latitude, longitude], {
-      draggable: true,
+      draggable: !readOnly,
       icon: issuePin,
       keyboard: true,
       title: "Selected issue location",
@@ -49,12 +50,14 @@ export default function LocationMap({ latitude, longitude, onChange }: Props) {
 
     marker.on("dragend", () => {
       const point = marker.getLatLng();
-      onChangeRef.current({ latitude: point.lat, longitude: point.lng });
+      onChangeRef.current?.({ latitude: point.lat, longitude: point.lng });
     });
-    map.on("click", (event: LeafletMouseEvent) => {
-      marker.setLatLng(event.latlng);
-      onChangeRef.current({ latitude: event.latlng.lat, longitude: event.latlng.lng });
-    });
+    if (!readOnly) {
+      map.on("click", (event: LeafletMouseEvent) => {
+        marker.setLatLng(event.latlng);
+        onChangeRef.current?.({ latitude: event.latlng.lat, longitude: event.latlng.lng });
+      });
+    }
     tiles.on("tileerror", () => {
       setMapError("The map could not load completely. Your selected location is still available.");
     });
@@ -67,7 +70,7 @@ export default function LocationMap({ latitude, longitude, onChange }: Props) {
       markerRef.current = null;
       mapRef.current = null;
     };
-  }, []);
+  }, [readOnly]);
 
   useEffect(() => {
     markerRef.current?.setLatLng([latitude, longitude]);
@@ -77,7 +80,8 @@ export default function LocationMap({ latitude, longitude, onChange }: Props) {
   return (
     <div className="map-adjuster">
       <div ref={container} className="location-map" aria-label="Map showing the selected issue location" />
-      <p className="field-help">On a computer, left-click the exact spot or drag the marker. On a phone, drag and zoom the map, then drag the marker to the issue.</p>
+      {!readOnly && <p className="field-help">On a computer, left-click the exact spot or drag the marker. On a phone, drag and zoom the map, then drag the marker to the issue.</p>}
+      {readOnly && <p className="field-help">Read-only map of the citizen-submitted issue location.</p>}
       {mapError && <p className="field-error" role="status">{mapError}</p>}
       <p className="map-attribution">Interactive map rendered with Leaflet. OpenStreetMap attribution appears inside the map.</p>
     </div>

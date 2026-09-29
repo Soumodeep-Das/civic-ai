@@ -1,5 +1,17 @@
 # Current State
 
+## Issue #8 municipal operations implemented and live-verified
+
+Migration 0005 is at development PostgreSQL head. CivicAI supports `submitted`, `under_review`, `in_progress`, `resolved` and `rejected` through documented transitions; same-state requests are idempotent and stale `updated_at` values fail with 409. Every existing/new complaint has append-only history beginning with `created`; PostgreSQL rejects history update/delete. Operator notes are internal, limited to 1,000 characters and have no fabricated actor.
+
+The municipal routes `/admin`, `/admin/complaints` and `/admin/complaints/:id` provide real operational totals, server pagination (20 default/100 maximum), status/date/location/photo filters, escaped text/UUID search, evidence inspection, a read-only submitted-location map, status changes and history. The citizen queue shows friendly current statuses and never receives internal notes. Dashboard values are application counts—not ML results. Administrative APIs remain unauthenticated and are a public-deployment blocker.
+
+Live verification used existing synthetic development complaint `ecd45acb-63d3-42bd-b295-c758ac17694b`: stored photo, location and map rendered; Submitted → Under review persisted with an Issue #8 note; history, combined search/status filtering, reload and citizen-visible status matched; browser console was clear. Direct PostgreSQL inspection confirmed the state, two events and note. Research data was not used or changed.
+
+Final regression passes 153 Python tests (97 backend, 56 research) with the same three dependency deprecations, plus 24 citizen and 9 municipal frontend tests. TypeScript compilation and production build pass. The two frontend files were run independently after the known Windows Vitest worker-start timeout recurred in a combined run. The raw OpenCity checksum remains unchanged. Git publication status is recorded in the completion report/development log.
+
+Issue #7 Stage B is intentionally paused pending real human reviewers. No taxonomy approval, research label, split, model or prediction exists.
+
 ## Issue #7 Stage A implemented — awaiting human review
 
 Issue #7 remains pre-training. The ignored local package `data/interim/issue7-review-v5` is reproducibly bound to the verified OpenCity snapshot, audit v5, proposed taxonomy/mapping, review schema and generator code. It contains blank offline forms for 8 taxonomy items, 231 original category/subcategory mapping groups, 201 distinct phone/email privacy flags, 1,406 priority record reviews, 400 duplicate/template groups, one license decision and one final dataset-approval gate. No human decisions are present and `training_approved` remains false.

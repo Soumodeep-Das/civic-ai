@@ -1,5 +1,17 @@
 # Development Log
 
+## 2026-09-29 — Issue #8 municipal operations
+
+Researched official MoHUA Swachhata platform/engineer/state-admin material and Government of India CPGRAMS/2024 handling guidance. Adopted controlled workflow, truthful tracking, evidence/location detail, operational summaries, reasoned internal notes and reopening to review. Deferred feedback/appeal, staff identity, assignments, wards, SLAs and category/priority displays because CivicAI lacks the required identity/data/security contracts.
+
+Added migration 0005, five-state transition rules, immutable history, note validation, atomic stale-update protection, paginated/filterable/escaped-search admin APIs and real aggregates. Added municipal React routes/screens, read-only evidence map, image/map/empty/error fallbacks, citizen-friendly statuses and an explicit unauthenticated warning. No ML/research code or data changed.
+
+Focused checkpoint: 96 backend tests passed before the final immutability test; citizen frontend passed 24/24 and municipal frontend 9/9; TypeScript and production build passed. One combined Vitest attempt passed the municipal file but its second worker timed out before loading the citizen file; both files then passed independently. Global `npm` is broken because its roaming `npm-cli.js` is missing, so local project executables were used.
+
+Development PostgreSQL reached `0005 (head)`. Live browser verification loaded nine stored complaints/real totals, displayed synthetic complaint `ecd45acb-63d3-42bd-b295-c758ac17694b` with photo/location/read-only map, persisted Submitted → Under review plus an internal Issue #8 note, displayed history, filtered by text/status, preserved the change across navigation and showed Under review in the citizen queue. Browser console was clear. Research remained separate and untouched.
+
+Final regression passed 153 Python tests (97 backend, 56 research) with the same three dependency warnings, all 33 frontend tests in isolated conclusive runs, TypeScript and the production build. Direct PostgreSQL inspection confirmed two events and the stored note. The immutable OpenCity raw checksum remained `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`; whitespace diff checks passed apart from informational CRLF notices.
+
 ## 2026-09-27 — Issue #7 Stage A human-review infrastructure
 
 Verified clean synchronized `main` at `fd0add0`; the Issue #6 snapshot/audit were reused without downloading or regenerating them. Added a versioned offline review schema, checksum-bound package generator, blank reviewer-friendly CSV forms, submission validation, independent-review merging, duplicate-review detection, explicit conflict/adjudication output, deterministic non-destructive redaction primitives and a fail-closed curation-readiness report. OWASP CSV Injection guidance informed quoting, formula-leading-field escaping and the Protected View warning; the documentation states that no spreadsheet mitigation is universal.

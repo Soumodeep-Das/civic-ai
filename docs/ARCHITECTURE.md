@@ -32,15 +32,21 @@ Issue #2 implements a single-page React and TypeScript interface for anonymous c
 
 Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from map adjustment. The lazy-loaded Leaflet renderer consumes normalized coordinates and never calls the geocoder directly. Desktop click, marker drag and touch interaction converge on the same location state, and every coordinate change invalidates prior confirmation. Raster rendering was selected after the WebGL vector canvas stayed blank in the actual in-app browser despite loading its style and attribution.
 
+Issue #8 keeps one React application with citizen (`/`) and municipal (`/admin`, `/admin/complaints`, `/admin/complaints/:id`) routes. The detail map reuses the lazy Leaflet component in read-only mode, preserving submitted location evidence. Components leave room for later AI sections but render no prediction placeholders or fake values.
+
 ### Backend
 
 A FastAPI service will expose API endpoints, validate input, apply complaint workflow rules, and coordinate persistence and later inference. Domain logic should remain separate from HTTP handlers and database-specific code.
 
 Issue #4 adds provider-neutral search, reverse-geocoding and capability endpoints. Provider response parsing, throttling and caching stay outside route handlers. A Nominatim-compatible adapter supplies policy-limited explicit search; a server-configured MapTiler adapter supplies autocomplete and reverse geocoding. The browser receives only CivicAI's normalized contracts and never receives the MapTiler key. Both are local-demo dependencies, not promised production SLAs.
 
+Issue #8 adds a small domain state machine and municipal query/update services. Routes validate transport parameters; service code owns pagination, escaped search, real aggregates, transition rules and compare-and-set status updates. Repeating the current state is idempotent; stale `updated_at` fails with a sanitized conflict.
+
 ### Database
 
 PostgreSQL will store complaint records and workflow state. Geospatial extensions are not required for the first vertical slice; PostGIS may be evaluated later if context-aware location queries justify it.
+
+Migration 0005 expands the status constraint and creates append-only `complaint_status_events`. Existing rows receive creation events at their original timestamps. A database trigger rejects event update/delete; indexes support newest-first pagination, status filtering and per-complaint history. No municipal endpoint edits original citizen evidence/location.
 
 ### Media storage
 

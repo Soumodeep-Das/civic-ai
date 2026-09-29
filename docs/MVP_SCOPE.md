@@ -1,5 +1,7 @@
 # MVP Scope
 
+Issue #8 is a post-MVP milestone. The citizen workflow below remains compatible; municipal operations are separately scoped in `ISSUE_008_MUNICIPAL_OPERATIONS.md` and do not redefine the original MVP as an ML system.
+
 Issue #3 expands the accepted basic complaint MVP with optional photo evidence and browser location.
 
 1. Enter a required description.
@@ -16,4 +18,4 @@ Tests and frontend build pass; migration preserves existing records. Verify text
 
 ## Deferred
 
-Video, accounts, authentication, maps/address lookup, classification, priority, severity, department routing, analytics, notifications, deployment and research experiments. These require later issues and must not start automatically.
+Video, accounts, authentication, classification, priority, severity, department routing, notifications, deployment and research experiments. Issue #4 subsequently implemented bounded map/address selection, and Issue #8 implemented real operational lifecycle/dashboard statistics. ML analytics and fabricated performance claims remain prohibited.
