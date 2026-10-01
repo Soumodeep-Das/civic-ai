@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Double, ForeignKey, Index, String, Text, Uuid, func, text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Double, ForeignKey, Index, String, Text, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from civicai.database import Base
@@ -72,6 +72,49 @@ class Complaint(Base):
     )
 
 
+class MunicipalUser(Base):
+    __tablename__ = "municipal_users"
+    __table_args__ = (
+        CheckConstraint(
+            "role IN ('municipal_operator', 'municipal_admin')",
+            name="ck_municipal_users_role",
+        ),
+        CheckConstraint("username = lower(username)", name="ck_municipal_users_username_lower"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(String(32), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class MunicipalSession(Base):
+    __tablename__ = "municipal_sessions"
+
+    session_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="CASCADE"), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    csrf_token: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SecurityAuditEvent(Base):
+    __tablename__ = "security_audit_events"
+
+    event_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    event_type: Mapped[str] = mapped_column(String(40), nullable=False)
+    actor_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    subject_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp())
+
+
 class ComplaintStatusEvent(Base):
     __tablename__ = "complaint_status_events"
     __table_args__ = (
@@ -99,7 +142,9 @@ class ComplaintStatusEvent(Base):
     previous_status: Mapped[str | None] = mapped_column(String(20))
     new_status: Mapped[str] = mapped_column(String(20), nullable=False)
     operator_note: Mapped[str | None] = mapped_column(String(1000))
-    actor_id: Mapped[UUID | None] = mapped_column(Uuid)
+    actor_id: Mapped[UUID | None] = mapped_column(
+        Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT")
+    )
     occurred_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp()
     )
@@ -113,3 +158,6 @@ Index(
     ComplaintStatusEvent.occurred_at,
     ComplaintStatusEvent.event_id,
 )
+Index("ix_municipal_sessions_token_hash", MunicipalSession.token_hash, unique=True)
+Index("ix_municipal_sessions_expires_at", MunicipalSession.expires_at)
+Index("ix_security_audit_time", SecurityAuditEvent.occurred_at, SecurityAuditEvent.event_id)

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_serializer, field_validator, model_validator
 
-from civicai.domain import ComplaintStatus, LocationPrecision, LocationSource
+from civicai.domain import ComplaintStatus, LocationPrecision, LocationSource, MunicipalRole
 
 Description = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 LocationLabel = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)]
@@ -121,6 +121,65 @@ class DashboardStatistics(BaseModel):
     submitted_last_7_days: int
     with_photo: int
     with_location: int
+
+
+Username = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, to_lower=True, min_length=3, max_length=64, pattern=r"^[a-z0-9._-]+$"),
+]
+Password = Annotated[str, StringConstraints(min_length=12, max_length=128)]
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    username: Username
+    password: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+
+
+class MunicipalUserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    user_id: UUID
+    username: str
+    role: MunicipalRole
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    last_login_at: datetime | None
+
+    @field_serializer("created_at", "updated_at", "last_login_at")
+    def serialize_user_time(self, value: datetime | None) -> str | None:
+        if value is None:
+            return None
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class AuthSessionRead(BaseModel):
+    user: MunicipalUserRead
+    csrf_token: str
+    expires_at: datetime
+
+    @field_serializer("expires_at")
+    def serialize_expiry(self, value: datetime) -> str:
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class MunicipalUserCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    username: Username
+    password: Password
+    role: MunicipalRole = MunicipalRole.OPERATOR
+
+
+class MunicipalUserUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    role: MunicipalRole | None = None
+    is_active: bool | None = None
+
+    @model_validator(mode="after")
+    def require_change(self):
+        if self.role is None and self.is_active is None:
+            raise ValueError("At least one account change is required")
+        return self
 
 
 class LocationSearchRequest(BaseModel):

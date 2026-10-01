@@ -1,5 +1,16 @@
 # Decision Log
 
+## D024 Issue #9 municipal authentication boundary (2026-10-01, accepted)
+
+- Use one first-party authentication model: opaque PostgreSQL-backed sessions in an HttpOnly, SameSite=Strict cookie. Store only the session-token SHA-256 digest; use eight-hour absolute expiry and database revocation. Avoid browser localStorage bearer tokens.
+- Hash municipal passwords with Argon2id through `argon2-cffi` using OWASP's minimum profile (`m=19456 KiB`, `t=2`, `p=1`). Require 12–128 characters for this academic prototype; do not implement custom hashing or public registration.
+- Keep exactly two municipal roles: `municipal_operator` for complaint operations and `municipal_admin` for those operations plus minimal account administration. Backend dependencies are authoritative; frontend visibility is only a usability reflection.
+- Mitigate cookie-authenticated mutations with a random session-bound CSRF token in an `X-CSRF-Token` header, SameSite=Strict and exact Origin validation when supplied. Keep CORS disabled for the supported same-origin topology; any future separate origin requires an explicit reviewed allowlist.
+- Use an in-process bounded per-IP and per-normalized-username login throttle for the single-instance prototype. A multi-instance production deployment must move throttling to shared infrastructure or a reverse proxy.
+- Link new complaint status events to authenticated municipal users through a nullable foreign key. Preserve every historical null; do not fabricate actors.
+
+Consequences: D023's unauthenticated municipal-route limitation is superseded. The citizen portal remains anonymous. Bootstrap is interactive with no shipped credentials, disabled users lose active sessions, final-admin/self-protection rules apply, and password reset/MFA/SSO remain outside this issue.
+
 ## D023 Issue #8 municipal lifecycle and audit boundary (2026-09-29, accepted)
 
 - Use controlled states `submitted`, `under_review`, `in_progress`, `resolved` and `rejected`; allow resolved/rejected complaints to return to review. Same-state updates are idempotent. Do not model duplicate as a status; defer a separate relation/group compatible with future human/ML duplicate evidence.

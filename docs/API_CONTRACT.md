@@ -32,7 +32,7 @@ The Nominatim fallback is country-restricted through configuration, limited to o
 
 ## Municipal operations
 
-These routes are currently **unauthenticated** and local-prototype only.
+Every `/api/v1/admin/*` route requires a valid active municipal session. Complaint operations accept `municipal_operator` and `municipal_admin`; account routes require `municipal_admin`. Missing, expired, revoked or disabled-user sessions return 401. Insufficient role returns 403. The backend is authoritative regardless of visible frontend controls.
 
 `GET /api/v1/admin/complaints` returns `{items,page,page_size,total,total_pages}`. Query parameters:
 
@@ -58,7 +58,20 @@ Results are deterministic newest-first by creation timestamp then UUID. A page b
 
 `expected_updated_at` must include a timezone. Note is optional trimmed text of 1–1,000 characters. Same-state requests return the unchanged complaint without adding history. Invalid transitions and stale screens return 409 with `invalid_status_transition` or `stale_complaint_update`. Missing/invalid IDs retain 404/422 behavior.
 
+Status mutations require `X-CSRF-Token` from the current auth response. New history events contain the authenticated actor UUID. Existing pre-authentication events remain null. History and operator notes are never included by citizen list/detail responses.
+
 `GET /api/v1/admin/dashboard` returns real stored totals for all complaints, each status, submissions in the last seven days, photo presence and location presence. It contains no ML or SLA metrics.
+
+## Municipal authentication and accounts
+
+- `POST /api/v1/auth/login` accepts `{username,password}`. Valid active credentials set the opaque HttpOnly session cookie and return `{user,csrf_token,expires_at}`. Unknown username, wrong password and disabled account share generic 401 wording. Repeated failures are throttled per normalized username and client IP with generic 429.
+- `GET /api/v1/auth/me` verifies the database session and current active user, then returns the same public session shape. It is the frontend startup/refresh authority.
+- `POST /api/v1/auth/logout` requires the session-bound `X-CSRF-Token`, revokes the database session, deletes the cookie and returns 204.
+- `GET /api/v1/admin/users` lists safe account fields for administrators only.
+- `POST /api/v1/admin/users` creates an operator or administrator from `{username,password,role}` and requires CSRF. Usernames normalize to lowercase and allow 3–64 letters, digits, dots, underscores or hyphens. Passwords require 12–128 characters and are returned only as Argon2id hashes internally—never through the API.
+- `PATCH /api/v1/admin/users/{user_id}` accepts at least one of `role` or `is_active`; it requires administrator plus CSRF. Self-disable, self-demotion and removal of the final active administrator return 409. Disabling revokes that user's live sessions.
+
+The cookie is host-only, path `/`, HttpOnly and SameSite=Strict. It is Secure when `AUTH_COOKIE_SECURE=true`; production startup requires that setting. The default absolute lifetime is eight hours (configurable from 1–24). CivicAI intentionally exposes no credentialed cross-origin CORS policy; local Vite requests are same-origin through its proxy. Auth/admin responses use `Cache-Control: no-store`; API responses also include nosniff, frame-denial and no-referrer headers.
 
 ## Errors and limits
 
@@ -66,4 +79,4 @@ Errors use code/message, with details for field-validation errors. Invalid field
 
 Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 
-All endpoints, including images, are anonymous for local demonstrations. Do not expose this service publicly or submit private evidence until access controls and operational storage policy are designed.
+Citizen complaint creation/list/detail and complaint-image retrieval remain anonymous for the current local demonstration. Municipal operations and account data are authenticated. Do not expose evidence publicly or submit private evidence until a production citizen/evidence access policy is designed.

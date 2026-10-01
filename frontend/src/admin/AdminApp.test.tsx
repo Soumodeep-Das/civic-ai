@@ -34,6 +34,11 @@ const createdEvent = {
   occurred_at: complaint.created_at,
 };
 
+const authSession = {
+  user: { user_id: "a1248a87-580b-4b37-849a-55c380499998", username: "ward.operator", role: "municipal_operator", is_active: true, created_at: "2026-09-30T08:00:00Z", updated_at: "2026-09-30T08:00:00Z", last_login_at: "2026-09-30T08:01:00Z" },
+  csrf_token: "test-csrf-token", expires_at: "2026-09-30T16:00:00Z",
+};
+
 function json(body: unknown, status = 200) {
   return Promise.resolve(new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } }));
 }
@@ -43,6 +48,7 @@ function installAdminApi(options: { empty?: boolean; fail?: boolean } = {}) {
   let history: Array<Record<string, unknown>> = [createdEvent];
   return vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
     const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (options.fail) return Promise.reject(new TypeError("offline"));
     if (url.endsWith("/api/v1/admin/dashboard")) return json({
       total: options.empty ? 0 : 1, submitted: options.empty ? 0 : 1, under_review: 0,
@@ -75,13 +81,12 @@ beforeEach(() => {
 
 afterEach(() => window.history.replaceState({}, "", "/"));
 
-test("loads real dashboard statistics and security limitation", async () => {
+test("loads real dashboard statistics in an authenticated shell", async () => {
   installAdminApi();
   render(<App />);
-  expect(screen.getByText("Loading real complaint statistics…")).toBeInTheDocument();
   expect(await screen.findByText("Total complaints")).toBeInTheDocument();
   expect(screen.getAllByText("1").length).toBeGreaterThan(0);
-  expect(screen.getByText(/do not yet have authentication/)).toBeInTheDocument();
+  expect(screen.getByText("ward.operator")).toBeInTheDocument();
   expect(screen.getByText(/not AI categories/)).toBeInTheDocument();
 });
 
@@ -155,6 +160,7 @@ test("records a controlled status update and refreshes history", async () => {
 test("handles missing image and missing map without breaking detail", async () => {
   const noLocation = { ...complaint, image_ref: null, latitude: null, longitude: null, location_label: null, location_precision: null, location_details: null, location_source: null };
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    if (String(input).endsWith("/api/v1/auth/me")) return json(authSession);
     if (String(input).endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...noLocation, history: [createdEvent] });
     return Promise.reject(new Error("Unexpected request"));
   });
@@ -173,4 +179,83 @@ test("handles an image load failure", async () => {
   await user.click(image);
   image.dispatchEvent(new Event("error"));
   expect(await screen.findByText("Photo evidence could not be loaded.")).toBeInTheDocument();
+});
+
+test("blocks an unauthenticated admin route and signs in safely", async () => {
+  let authenticated = false;
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return authenticated ? json(authSession) : json({ message: "Authentication required." }, 401);
+    if (url.endsWith("/api/v1/auth/login") && init?.method === "POST") { authenticated = true; return json(authSession); }
+    if (url.endsWith("/api/v1/admin/dashboard")) return json({ total: 0, submitted: 0, under_review: 0, in_progress: 0, resolved: 0, rejected: 0, submitted_last_7_days: 0, with_photo: 0, with_location: 0 });
+    return Promise.reject(new Error(`Unexpected request ${url}`));
+  });
+  const user = userEvent.setup();
+  window.history.replaceState({}, "", "/admin"); render(<App />);
+  expect(await screen.findByRole("heading", { name: "Municipal sign in" })).toBeInTheDocument();
+  await user.type(screen.getByLabelText("Username"), "ward.operator");
+  await user.type(screen.getByLabelText("Password"), "demo-password-value");
+  await user.click(screen.getByRole("button", { name: "Sign in" }));
+  expect(await screen.findByRole("heading", { name: "Operations dashboard" })).toBeInTheDocument();
+});
+
+test("shows a generic login error", async () => {
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    if (String(input).endsWith("/api/v1/auth/me")) return json({ message: "Authentication required." }, 401);
+    if (String(input).endsWith("/api/v1/auth/login")) return json({ message: "Invalid username or password." }, 401);
+    return Promise.reject(new Error("Unexpected request"));
+  });
+  const user = userEvent.setup(); render(<App />); await screen.findByText("Municipal sign in");
+  await user.type(screen.getByLabelText("Username"), "unknown.user");
+  await user.type(screen.getByLabelText("Password"), "wrong-password");
+  await user.click(screen.getByRole("button", { name: "Sign in" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Invalid username or password.");
+});
+
+test("logout invalidates frontend state and sends the CSRF token", async () => {
+  const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(authSession);
+    if (url.endsWith("/api/v1/admin/dashboard")) return json({ total: 0, submitted: 0, under_review: 0, in_progress: 0, resolved: 0, rejected: 0, submitted_last_7_days: 0, with_photo: 0, with_location: 0 });
+    if (url.endsWith("/api/v1/auth/logout")) return Promise.resolve(new Response(null, { status: 204 }));
+    return Promise.reject(new Error("Unexpected request"));
+  });
+  const user = userEvent.setup(); render(<App />); await screen.findByText("ward.operator");
+  await user.click(screen.getByRole("button", { name: "Sign out" }));
+  expect(await screen.findByText("Municipal sign in")).toBeInTheDocument();
+  const call = fetchMock.mock.calls.find(([value]) => String(value).endsWith("/api/v1/auth/logout"));
+  expect(new Headers(call?.[1]?.headers).get("X-CSRF-Token")).toBe("test-csrf-token");
+});
+
+test("operator cannot open administrator account controls", async () => {
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => String(input).endsWith("/api/v1/auth/me") ? json(authSession) : Promise.reject(new Error("Unexpected request")));
+  window.history.replaceState({}, "", "/admin/users"); render(<App />);
+  expect(await screen.findByRole("alert")).toHaveTextContent("Administrator permission is required.");
+  expect(screen.queryByText("Accounts")).not.toBeInTheDocument();
+});
+
+test("an expired session during protected loading returns to login", async () => {
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(authSession);
+    if (url.endsWith("/api/v1/admin/dashboard")) return json({ message: "Authentication required." }, 401);
+    return Promise.reject(new Error(`Unexpected request ${url}`));
+  });
+  window.history.replaceState({}, "", "/admin"); render(<App />);
+  expect(await screen.findByRole("heading", { name: "Municipal sign in" })).toBeInTheDocument();
+  expect(window.location.pathname).toBe("/admin/login");
+});
+
+test("administrator sees and manages municipal accounts", async () => {
+  const adminSession = { ...authSession, user: { ...authSession.user, role: "municipal_admin" } };
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(adminSession);
+    if (url.endsWith("/api/v1/admin/users")) return json([adminSession.user]);
+    return Promise.reject(new Error(`Unexpected request ${url}`));
+  });
+  window.history.replaceState({}, "", "/admin/users"); render(<App />);
+  expect(await screen.findByRole("heading", { name: "Municipal accounts" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Create account" })).toBeInTheDocument();
+  expect(screen.getByText("Accounts")).toBeInTheDocument();
 });

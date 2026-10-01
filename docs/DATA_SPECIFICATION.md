@@ -79,6 +79,12 @@ Severity and priority require separate rubrics. Priority must not be backfilled 
 
 Raw data is immutable and access controlled. Derived data should be reproducible from raw inputs plus versioned transformation code. Git stores schemas, manifests, small non-sensitive samples, checksums, and documentation—not unrestricted raw media or large model-ready datasets.
 
+## Municipal identity data
+
+Migration `0006` adds minimal operational identity data, not citizen identity. `municipal_users` stores UUID, normalized unique username, Argon2id hash, controlled role, active state and timestamps. `municipal_sessions` stores a UUID, user foreign key, SHA-256 token digest, session-bound CSRF secret, absolute expiry and revocation timestamps; raw authentication tokens are never stored. `security_audit_events` records only event type, actor/subject UUIDs and time. Passwords, raw session tokens and CSRF values are never returned in account schemas or audit events.
+
+`complaint_status_events.actor_id` is now a nullable foreign key to municipal users. Historical Issue #8 nulls remain truthful; new authenticated status changes record the actor UUID. Citizen complaint schemas do not expose history or operator notes.
+
 Issue #5 uses a strict JSONL manifest. Each record stores identity and source terms/basis, dataset and taxonomy versions, annotation state/label/provenance, a leakage group, split, and text/image availability plus safe relative references and SHA-256 hashes. `unassigned` is allowed during curation; only `annotated` records may enter train, validation or test. Excluded records require a reason and never receive a category. The validator can check only internal consistency and exact hashes; near-duplicate detection and source approval remain separate gates.
 
 ## Unresolved data decisions

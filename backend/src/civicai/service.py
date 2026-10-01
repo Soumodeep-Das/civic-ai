@@ -117,7 +117,7 @@ def list_admin_complaints(
 
 
 def update_complaint_status(
-    session: Session, complaint_id: UUID, data: ComplaintStatusUpdate
+    session: Session, complaint_id: UUID, data: ComplaintStatusUpdate, actor_id: UUID
 ) -> Complaint:
     complaint = get_complaint(session, complaint_id)
     current = ComplaintStatus(complaint.status)
@@ -147,7 +147,7 @@ def update_complaint_status(
         previous_status=current,
         new_status=data.new_status,
         operator_note=data.operator_note,
-        actor_id=None,
+        actor_id=actor_id,
     ))
     session.commit()
     session.refresh(updated)

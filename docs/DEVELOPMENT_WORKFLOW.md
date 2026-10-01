@@ -46,6 +46,8 @@ Update documentation in the same change when behavior, architecture, data fields
 
 Add the smallest justified dependency, pin or lock it through the chosen package manager, and record any operational or licensing consequence. Configuration comes from environment variables with a committed example file containing no secrets. Database changes use migrations once tooling is chosen.
 
+For a fresh municipal environment, apply Alembic first and run `python -m civicai.bootstrap_admin` interactively. Never place a bootstrap password in a shell argument, tracked script, `.env`, screenshot or development log. Local HTTP uses `AUTH_COOKIE_SECURE=false`; production must set `APP_ENV=production` and `AUTH_COOKIE_SECURE=true`. Keep citizen and municipal data contracts separate when extending either surface.
+
 ## Research experiment workflow
 
 1. Write the question, dataset version, split, metrics, baseline, and acceptance criteria before the final run.

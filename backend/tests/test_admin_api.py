@@ -64,7 +64,8 @@ def test_valid_lifecycle_and_history(client):
         "submitted", "under_review", "in_progress", "resolved", "under_review"
     ]
     assert history[-1]["operator_note"] == "Reopened after verification"
-    assert all(event["actor_id"] is None for event in history)
+    assert history[0]["actor_id"] is None
+    assert all(event["actor_id"] is not None for event in history[1:])
 
 
 @pytest.mark.parametrize("target", ["in_progress", "resolved"])

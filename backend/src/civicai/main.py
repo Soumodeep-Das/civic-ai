@@ -5,7 +5,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from civicai.config import database_url, geocoding_settings
+from civicai.auth import LoginThrottle
+from civicai.config import auth_settings, database_url, geocoding_settings
 from civicai.database import build_engine
 from civicai.domain import ComplaintNotFound, InvalidStatusTransition, StaleComplaintUpdate
 from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
@@ -19,6 +20,8 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
     async def lifespan(app: FastAPI):
         app.state.engine = build_engine(url or database_url())
         app.state.upload_directory = upload_directory()
+        app.state.auth_settings = auth_settings()
+        app.state.login_throttle = LoginThrottle()
         settings = geocoding_settings()
         if geocoder is not None:
             app.state.geocoder = geocoder
@@ -40,6 +43,16 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
 
     app = FastAPI(title="CivicAI", version="0.1.0", lifespan=lifespan)
     app.include_router(router)
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        if request.url.path.startswith(("/api/v1/auth", "/api/v1/admin")):
+            response.headers["Cache-Control"] = "no-store"
+        return response
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException):

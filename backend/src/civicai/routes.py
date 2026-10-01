@@ -1,23 +1,30 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, HTTPException, Query
+from fastapi import APIRouter, Depends, Request, Response, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from civicai import service
+from civicai.auth import (
+    DUMMY_PASSWORD_HASH, AdminAuth, CsrfAuth, OperatorAuth, create_login_session,
+    create_user, record_audit, utc_now, verify_password, update_user,
+)
 from civicai.database import get_session
 from civicai.geocoding import Geocoder
 from civicai.schemas import (
     AdminComplaintDetail, AdminComplaintPage, ComplaintCreate, ComplaintRead,
     ComplaintStatusEventRead, ComplaintStatusUpdate, DashboardStatistics,
     LocationCapabilities, LocationReverseRequest, LocationSearchRequest, LocationSearchResult,
+    AuthSessionRead, LoginRequest, MunicipalUserCreate, MunicipalUserRead, MunicipalUserUpdate,
 )
 from civicai.domain import ComplaintStatus
+from civicai.models import MunicipalSession, MunicipalUser
 from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
 
 router = APIRouter(tags=["complaints"])
@@ -26,6 +33,43 @@ DatabaseSession = Annotated[Session, Depends(get_session)]
 
 def get_geocoder(request: Request) -> Geocoder:
     return request.app.state.geocoder
+
+
+@router.post("/api/v1/auth/login", response_model=AuthSessionRead, tags=["municipal authentication"])
+def login(data: LoginRequest, request: Request, response: Response, session: DatabaseSession):
+    username_key = f"username:{data.username}"
+    client_host = request.client.host if request.client else "unknown"
+    ip_key = f"ip:{client_host}"
+    request.app.state.login_throttle.check(username_key, ip_key)
+    user = session.scalar(select(MunicipalUser).where(MunicipalUser.username == data.username))
+    password_valid = verify_password(user.password_hash if user else DUMMY_PASSWORD_HASH, data.password)
+    if user is None or not password_valid or not user.is_active:
+        request.app.state.login_throttle.record_failure(username_key, ip_key)
+        raise HTTPException(401, "Invalid username or password.")
+    request.app.state.login_throttle.clear_username(username_key)
+    raw_token, auth_session = create_login_session(session, user, request.app.state.auth_settings)
+    settings = request.app.state.auth_settings
+    response.set_cookie(
+        settings.cookie_name, raw_token, max_age=settings.session_hours * 3600,
+        expires=auth_session.expires_at.astimezone(timezone.utc), path="/", secure=settings.cookie_secure,
+        httponly=True, samesite="strict",
+    )
+    return AuthSessionRead(user=user, csrf_token=auth_session.csrf_token, expires_at=auth_session.expires_at)
+
+
+@router.get("/api/v1/auth/me", response_model=AuthSessionRead, tags=["municipal authentication"])
+def session_state(auth: OperatorAuth):
+    return AuthSessionRead(user=auth.user, csrf_token=auth.session.csrf_token, expires_at=auth.session.expires_at)
+
+
+@router.post("/api/v1/auth/logout", status_code=204, tags=["municipal authentication"])
+def logout(request: Request, response: Response, auth: CsrfAuth, session: DatabaseSession):
+    auth.session.revoked_at = utc_now()
+    record_audit(session, "logout", actor_id=auth.user.user_id, subject_id=auth.user.user_id)
+    session.commit()
+    response.delete_cookie(request.app.state.auth_settings.cookie_name, path="/", httponly=True, samesite="strict")
+    response.status_code = 204
+    return None
 
 
 @router.post("/api/v1/complaints", response_model=ComplaintRead, status_code=201,
@@ -120,6 +164,7 @@ def get_one(complaint_id: UUID, session: DatabaseSession):
 @router.get("/api/v1/admin/complaints", response_model=AdminComplaintPage, tags=["municipal operations"])
 def admin_list(
     session: DatabaseSession,
+    _auth: OperatorAuth,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
     status: ComplaintStatus | None = None,
@@ -151,7 +196,7 @@ def admin_list(
     response_model=AdminComplaintDetail,
     tags=["municipal operations"],
 )
-def admin_get(complaint_id: UUID, session: DatabaseSession):
+def admin_get(complaint_id: UUID, session: DatabaseSession, _auth: OperatorAuth):
     complaint, history = service.get_admin_complaint(session, complaint_id)
     return AdminComplaintDetail(**ComplaintRead.model_validate(complaint).model_dump(), history=history)
 
@@ -161,7 +206,7 @@ def admin_get(complaint_id: UUID, session: DatabaseSession):
     response_model=list[ComplaintStatusEventRead],
     tags=["municipal operations"],
 )
-def admin_history(complaint_id: UUID, session: DatabaseSession):
+def admin_history(complaint_id: UUID, session: DatabaseSession, _auth: OperatorAuth):
     return service.list_status_history(session, complaint_id)
 
 
@@ -171,16 +216,44 @@ def admin_history(complaint_id: UUID, session: DatabaseSession):
     tags=["municipal operations"],
 )
 def admin_update_status(
-    complaint_id: UUID, data: ComplaintStatusUpdate, session: DatabaseSession
+    complaint_id: UUID, data: ComplaintStatusUpdate, session: DatabaseSession, auth: CsrfAuth
 ):
-    return service.update_complaint_status(session, complaint_id, data)
+    return service.update_complaint_status(session, complaint_id, data, auth.user.user_id)
 
 
 @router.get(
     "/api/v1/admin/dashboard", response_model=DashboardStatistics, tags=["municipal operations"]
 )
-def admin_dashboard(session: DatabaseSession):
+def admin_dashboard(session: DatabaseSession, _auth: OperatorAuth):
     return service.dashboard_statistics(session)
+
+
+@router.get("/api/v1/admin/users", response_model=list[MunicipalUserRead], tags=["municipal accounts"])
+def admin_users(session: DatabaseSession, _auth: AdminAuth):
+    return list(session.scalars(select(MunicipalUser).order_by(MunicipalUser.username)))
+
+
+@router.post("/api/v1/admin/users", response_model=MunicipalUserRead, status_code=201, tags=["municipal accounts"])
+def admin_create_user(data: MunicipalUserCreate, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    user = create_user(session, data)
+    record_audit(session, "account_created", actor_id=auth.user.user_id, subject_id=user.user_id)
+    session.commit()
+    session.refresh(user)
+    return user
+
+
+@router.patch("/api/v1/admin/users/{user_id}", response_model=MunicipalUserRead, tags=["municipal accounts"])
+def admin_update_user(
+    user_id: UUID, data: MunicipalUserUpdate, session: DatabaseSession, auth: CsrfAuth
+):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    target = session.get(MunicipalUser, user_id)
+    if target is None:
+        raise HTTPException(404, "Municipal account not found.")
+    return update_user(session, target, data, auth.user)
 
 
 @router.get("/api/v1/complaint-images/{filename}")

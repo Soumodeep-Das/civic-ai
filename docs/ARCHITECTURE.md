@@ -62,6 +62,10 @@ Issue #6 adds an India-only source boundary. `opencity.py` performs bounded, che
 
 Issue #7 Stage A adds an offline review boundary. `review.py` generates checksum-bound local CSV forms, validates partial independent submissions, merges matching decisions and quarantines conflicts for adjudication. `curate.py` contains deterministic derived-text redaction and a fail-closed readiness report; it does not yet publish a curated dataset. Review artifacts remain under ignored data directories. Only a later Stage B may convert validated human decisions into a new versioned derivative.
 
+Issue #9 adds a security boundary around the Issue #8 municipal surface. `municipal_users`, `municipal_sessions` and `security_audit_events` remain separate from anonymous citizen complaints. The browser receives an opaque HttpOnly cookie; PostgreSQL stores only its SHA-256 digest plus expiry, revocation and a session-bound CSRF secret. Authentication dependencies load the current active user on every protected request, so disable and role changes take effect without trusting frontend state. Operator and administrator authorization is enforced in FastAPI; `/admin/users` is administrator-only. Complaint history retains a nullable municipal-user foreign key so pre-authentication history is not rewritten.
+
+The frontend calls `/api/v1/auth/me` on every municipal startup or refresh. It keeps the returned CSRF token only in React memory, sends it on authenticated mutations, and shows login after 401 or expiry. It never stores bearer credentials in localStorage. Citizen and administrative response schemas remain distinct: citizen responses omit immutable history and internal operator notes.
+
 ## MVP vertical slice
 
 Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.

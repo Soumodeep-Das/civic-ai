@@ -98,12 +98,13 @@ export class ApiError extends Error {
 const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim() ?? "";
 const apiBaseUrl = configuredBaseUrl.replace(/\/$/, "");
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+export async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
 
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
       ...options,
+      credentials: "same-origin",
       headers: {
         Accept: "application/json",
         ...options?.headers,
@@ -124,6 +125,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new ApiError(body?.message ?? "The complaint service returned an unexpected error.", response.status);
   }
 
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -194,10 +196,11 @@ export function getAdminComplaint(complaintId: string): Promise<AdminComplaintDe
 export function updateComplaintStatus(
   complaintId: string,
   input: { newStatus: ComplaintStatus; expectedUpdatedAt: string; operatorNote?: string },
+  csrfToken: string,
 ): Promise<Complaint> {
   return request<Complaint>(`/api/v1/admin/complaints/${encodeURIComponent(complaintId)}/status`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
     body: JSON.stringify({
       new_status: input.newStatus,
       expected_updated_at: input.expectedUpdatedAt,

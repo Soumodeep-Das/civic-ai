@@ -30,6 +30,11 @@ class LocationSource(StrEnum):
     MAP = "map"
 
 
+class MunicipalRole(StrEnum):
+    OPERATOR = "municipal_operator"
+    ADMIN = "municipal_admin"
+
+
 class ComplaintNotFound(Exception):
     """No complaint exists with the requested identifier."""
 

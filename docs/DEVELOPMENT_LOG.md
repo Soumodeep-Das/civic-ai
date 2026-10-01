@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-10-01 — Issue #9 municipal authentication and RBAC completed
+
+Added migration `0006`, minimal municipal users/roles, Argon2id hashing, PostgreSQL opaque sessions, session-bound CSRF, generic/throttled login, real logout, account safeguards, security audit events and nullable complaint-history actor foreign keys. Added `/admin/login`, authenticated startup/refresh, role-aware navigation, sign-out and administrator account management. Citizen submission remains anonymous and citizen schemas remain separate from internal history/notes.
+
+Security decisions follow OWASP password storage/session/CSRF/authentication/REST guidance and MDN cookie behavior; exact sources and tradeoffs are in `ISSUE_009_AUTH_RBAC.md`. The supported browser topology remains same-origin with no CORS middleware. Production startup requires Secure cookies. The bootstrap command is interactive and refuses an existing active administrator.
+
+Automated verification passed 166 Python tests (110 backend, 56 unchanged research), 39 frontend tests (24 citizen, 15 municipal), TypeScript compilation and production build. The combined frontend launch hit the known Windows worker-start timeout after the citizen file passed; the municipal file then passed independently. Development PostgreSQL reached `0006`. Browser/PostgreSQL verification used only `issue9.demo.*` identities and one synthetic complaint; all required auth/RBAC/account/status/logout/anonymous checks passed and browser logs were clean. Browser testing found a real `Asia/Calcutta` cookie-expiry formatting defect; UTC normalization and a `+05:30` regression test fixed it. Both synthetic accounts were disabled and their sessions revoked after verification, leaving bootstrap available for the owner. The raw OpenCity checksum remained `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Issue #7 Stage B remains paused.
+
 ## 2026-09-29 — Issue #8 municipal operations
 
 Researched official MoHUA Swachhata platform/engineer/state-admin material and Government of India CPGRAMS/2024 handling guidance. Adopted controlled workflow, truthful tracking, evidence/location detail, operational summaries, reasoned internal notes and reopening to review. Deferred feedback/appeal, staff identity, assignments, wards, SLAs and category/priority displays because CivicAI lacks the required identity/data/security contracts.
