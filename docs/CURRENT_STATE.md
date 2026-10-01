@@ -1,5 +1,13 @@
 # Current State
 
+## Issue #10 product UX hardening implemented and live-verified
+
+The anonymous citizen and authenticated municipal experiences now share a small token-based visual system, mobile-first reflow, strong focus treatment, skip links, semantic landmarks, route titles and truthful 404/error/empty/loading/success states. Citizen reporting has a four-step single-page hierarchy, photo preview, linked focusable error summary, accidental-unsent-draft warning and complete acknowledgement. The mobile municipal queue uses complaint cards rather than forcing the desktop table sideways; navigation is compact and keyboard-operable. Significant rejection/account changes use an accessible confirmation dialog. Existing complaint, evidence, lifecycle, authentication, RBAC and CSRF behavior is unchanged.
+
+Municipal code is now route-lazy, reducing the local production initial JS entry from 259.24 kB (79.01 kB gzip) to 246.02 kB (76.31 kB gzip), with a 30.07 kB lazy admin chunk; the 150.70 kB lazy map chunk remains separate. Evidence images use native lazy loading, reserved dimensions and graceful failure copy. No dependency, backend endpoint or migration was added.
+
+Verification passes 166 Python tests (110 backend, 56 unchanged research), 27 citizen tests and 20 municipal tests. TypeScript compilation and production build pass. Real Chromium checks covered effective widths from approximately 356 to 1,600 px plus narrow landscape with no citizen/admin horizontal page overflow. A synthetic photo/location complaint persisted, appeared in the responsive municipal queue and advanced to Under review with audited history. The temporary audit administrator was disabled and sessions revoked. The immutable OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`; Issue #7 Stage B remains paused.
+
 ## Issue #9 municipal authentication and RBAC implemented and live-verified
 
 Migration `0006` is at development PostgreSQL head. Municipal operations now use PostgreSQL-backed opaque sessions with an HttpOnly, SameSite=Strict cookie, eight-hour absolute expiry, session-bound CSRF tokens for authenticated mutations, exact-Origin checks when an Origin is supplied, and Argon2id password hashes. There is no bearer token or password in browser storage and no application signing secret: random session tokens are stored only as SHA-256 digests. Production mode refuses `AUTH_COOKIE_SECURE=false`; CivicAI adds no CORS middleware because the supported browser topology is same-origin.

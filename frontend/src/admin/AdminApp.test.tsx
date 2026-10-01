@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import App from "../App";
@@ -43,7 +43,7 @@ function json(body: unknown, status = 200) {
   return Promise.resolve(new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } }));
 }
 
-function installAdminApi(options: { empty?: boolean; fail?: boolean } = {}) {
+function installAdminApi(options: { empty?: boolean; fail?: boolean; conflict?: boolean } = {}) {
   let current = { ...complaint };
   let history: Array<Record<string, unknown>> = [createdEvent];
   return vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
@@ -57,6 +57,7 @@ function installAdminApi(options: { empty?: boolean; fail?: boolean } = {}) {
       with_location: options.empty ? 0 : 1,
     });
     if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}/status`) && init?.method === "PATCH") {
+      if (options.conflict) return json({ detail: "Complaint changed." }, 409);
       current = { ...current, status: "under_review", updated_at: "2026-09-29T09:00:00Z" };
       history = [...history, {
         ...createdEvent, event_id: "5b9fceec-262e-4fd8-a6bd-69f0c904cbbd",
@@ -93,7 +94,7 @@ test("loads real dashboard statistics in an authenticated shell", async () => {
 test("shows an empty dashboard", async () => {
   installAdminApi({ empty: true });
   render(<App />);
-  expect(await screen.findByText("No complaints have been submitted yet.")).toBeInTheDocument();
+  expect(await screen.findByText("No complaints yet")).toBeInTheDocument();
 });
 
 test("loads complaint table and sends accessible filters", async () => {
@@ -101,11 +102,11 @@ test("loads complaint table and sends accessible filters", async () => {
   const user = userEvent.setup();
   window.history.replaceState({}, "", "/admin/complaints");
   render(<App />);
-  expect(await screen.findByText(complaint.description)).toBeInTheDocument();
+  expect(await screen.findAllByText(complaint.description)).toHaveLength(2);
   await user.type(screen.getByLabelText("Search"), "school gate");
   await user.selectOptions(screen.getByLabelText("Status"), "submitted");
   await user.selectOptions(screen.getByLabelText("Photo"), "yes");
-  await user.click(screen.getByRole("button", { name: "Search" }));
+  await user.click(screen.getByRole("button", { name: "Apply filters" }));
   await waitFor(() => expect(fetchMock.mock.calls.some(([value]) => {
     const url = String(value);
     return url.includes("q=school+gate") && url.includes("status=submitted") && url.includes("has_photo=true");
@@ -115,9 +116,13 @@ test("loads complaint table and sends accessible filters", async () => {
 
 test("shows zero-result filters", async () => {
   installAdminApi({ empty: true });
+  const user = userEvent.setup();
   window.history.replaceState({}, "", "/admin/complaints");
   render(<App />);
-  expect(await screen.findByText("No complaints match these filters.")).toBeInTheDocument();
+  await screen.findByText("No complaints yet");
+  await user.type(screen.getByLabelText("Search"), "missing complaint");
+  await user.click(screen.getByRole("button", { name: "Apply filters" }));
+  expect(await screen.findByText("No complaints match these filters")).toBeInTheDocument();
 });
 
 test("shows API failure with retry", async () => {
@@ -137,6 +142,8 @@ test("detail shows evidence, read-only map and status history", async () => {
   expect(await screen.findByText("Mock read-only map")).toBeInTheDocument();
   expect(screen.getByText("Complaint submitted")).toBeInTheDocument();
   expect(screen.getByText("Technical coordinates")).toBeInTheDocument();
+  expect(screen.getByAltText("Citizen-submitted complaint evidence")).toHaveAttribute("loading", "lazy");
+  expect(screen.getByAltText("Citizen-submitted complaint evidence")).toHaveAttribute("width", "960");
 });
 
 test("records a controlled status update and refreshes history", async () => {
@@ -177,7 +184,7 @@ test("handles an image load failure", async () => {
   render(<App />);
   const image = await screen.findByAltText("Citizen-submitted complaint evidence");
   await user.click(image);
-  image.dispatchEvent(new Event("error"));
+  act(() => image.dispatchEvent(new Event("error")));
   expect(await screen.findByText("Photo evidence could not be loaded.")).toBeInTheDocument();
 });
 
@@ -230,7 +237,7 @@ test("logout invalidates frontend state and sends the CSRF token", async () => {
 test("operator cannot open administrator account controls", async () => {
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => String(input).endsWith("/api/v1/auth/me") ? json(authSession) : Promise.reject(new Error("Unexpected request")));
   window.history.replaceState({}, "", "/admin/users"); render(<App />);
-  expect(await screen.findByRole("alert")).toHaveTextContent("Administrator permission is required.");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Administrator permission required");
   expect(screen.queryByText("Accounts")).not.toBeInTheDocument();
 });
 
@@ -243,6 +250,7 @@ test("an expired session during protected loading returns to login", async () =>
   });
   window.history.replaceState({}, "", "/admin"); render(<App />);
   expect(await screen.findByRole("heading", { name: "Municipal sign in" })).toBeInTheDocument();
+  expect(screen.getByText("Your municipal session ended. Sign in again to continue.")).toBeInTheDocument();
   expect(window.location.pathname).toBe("/admin/login");
 });
 
@@ -258,4 +266,61 @@ test("administrator sees and manages municipal accounts", async () => {
   expect(await screen.findByRole("heading", { name: "Municipal accounts" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Create account" })).toBeInTheDocument();
   expect(screen.getByText("Accounts")).toBeInTheDocument();
+});
+
+test("mobile navigation exposes state and closes with Escape", async () => {
+  installAdminApi();
+  const user = userEvent.setup();
+  render(<App />);
+  const menu = await screen.findByRole("button", { name: /Menu/ });
+  expect(menu).toHaveAttribute("aria-expanded", "false");
+  await user.click(menu);
+  expect(menu).toHaveAttribute("aria-expanded", "true");
+  await user.keyboard("{Escape}");
+  expect(menu).toHaveAttribute("aria-expanded", "false");
+  expect(menu).toHaveFocus();
+});
+
+test("renders mobile complaint cards alongside the desktop table", async () => {
+  installAdminApi();
+  window.history.replaceState({}, "", "/admin/complaints");
+  render(<App />);
+  expect(await screen.findByRole("region", { name: "Complaint results" })).toBeInTheDocument();
+  expect(screen.getAllByText(complaint.description)).toHaveLength(2);
+});
+
+test("asks for confirmation before rejecting a complaint", async () => {
+  installAdminApi();
+  const user = userEvent.setup();
+  window.history.replaceState({}, "", `/admin/complaints/${complaint.complaint_id}`);
+  render(<App />);
+  await screen.findByText("Complaint submitted");
+  await user.selectOptions(screen.getByLabelText("Next status"), "rejected");
+  await user.click(screen.getByRole("button", { name: "Record status change" }));
+  expect(screen.getByRole("dialog", { name: "Reject this complaint?" })).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Cancel" }));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+test("explains a stale update and preserves the operator note", async () => {
+  installAdminApi({ conflict: true });
+  const user = userEvent.setup();
+  window.history.replaceState({}, "", `/admin/complaints/${complaint.complaint_id}`);
+  render(<App />);
+  await screen.findByText("Complaint submitted");
+  await user.selectOptions(screen.getByLabelText("Next status"), "under_review");
+  const note = screen.getByLabelText(/Internal operator note/);
+  await user.type(note, "Keep this inspection note");
+  await user.click(screen.getByRole("button", { name: "Record status change" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("This complaint changed since you opened it");
+  expect(note).toHaveValue("Keep this inspection note");
+  expect(screen.getByRole("button", { name: "Reload latest details" })).toBeInTheDocument();
+});
+
+test("renders an admin not-found page instead of silently opening the dashboard", async () => {
+  installAdminApi();
+  window.history.replaceState({}, "", "/admin/not-a-real-page");
+  render(<App />);
+  expect(await screen.findByRole("heading", { name: "That municipal page does not exist" })).toBeInTheDocument();
+  await waitFor(() => expect(document.title).toBe("Page not found | CivicAI Operations"));
 });

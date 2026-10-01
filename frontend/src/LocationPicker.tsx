@@ -234,6 +234,8 @@ export default function LocationPicker({ value, error, disabled, onChange }: Pro
             aria-expanded={results.length > 0}
             aria-controls="location-suggestions"
             aria-activedescendant={activeResult >= 0 ? `location-result-${activeResult}` : undefined}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "location-search-help location-error" : "location-search-help"}
             value={query}
             onChange={(event) => {
               searchRequest.current += 1;
@@ -251,7 +253,7 @@ export default function LocationPicker({ value, error, disabled, onChange }: Pro
             {searching ? "Searching…" : "Search"}
           </button>
         </div>
-        <p className="search-mode">{autocomplete ? "Suggestions update while you type." : "Press Search to look up this place."}</p>
+        <p className="search-mode" id="location-search-help">{autocomplete ? "Suggestions update while you type." : "Press Search to look up this place."}</p>
       </div>
 
       {results.length > 0 && (
@@ -279,7 +281,7 @@ export default function LocationPicker({ value, error, disabled, onChange }: Pro
         {locating ? "Finding location…" : "Use my current location"}
       </button>
 
-      <p className="field-help location-status" aria-live="polite">{searchMessage || "Search for the issue location or use your current position if you are there now."}</p>
+      <p className="field-help location-status" role="status" aria-live="polite">{searchMessage || "Search for the issue location or use your current position if you are there now."}</p>
 
       {value && (
         <div className={`selected-location${value.confirmed ? " confirmed" : ""}`}>
@@ -315,7 +317,7 @@ export default function LocationPicker({ value, error, disabled, onChange }: Pro
         </div>
       )}
 
-      {error && <p className="field-error" id="location-error" role="alert">{error}</p>}
+      {error && <p className="field-error" id="location-error"><span className="sr-only">Error: </span>{error}</p>}
     </div>
   );
 }

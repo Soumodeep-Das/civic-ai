@@ -52,6 +52,7 @@ type ApiOptions = {
   searchFailure?: boolean;
   reverseFailure?: boolean;
   submitFailure?: boolean;
+  submitResponse?: Promise<Response>;
   listFailures?: number;
 };
 
@@ -72,6 +73,7 @@ function installApi(options: ApiOptions = {}) {
     }
     if (url.endsWith("/api/v1/complaints") && init?.method === "POST") {
       if (options.submitFailure) return Promise.reject(new TypeError("network failure"));
+      if (options.submitResponse) return options.submitResponse;
       return jsonResponse(complaint, 201);
     }
     if (url.endsWith("/api/v1/complaints")) {
@@ -131,9 +133,9 @@ test("requires description photo and confirmed location before sending", async (
   render(<App />);
   await screen.findByText("No complaints yet");
   await user.click(screen.getByRole("button", { name: "Submit complaint" }));
-  expect(screen.getByText("Tell us what needs attention.")).toBeInTheDocument();
-  expect(screen.getByText("Attach a JPEG or PNG photo of the issue.")).toBeInTheDocument();
-  expect(screen.getByText("Search for or capture the issue location, then confirm it.")).toBeInTheDocument();
+  expect(screen.getAllByText("Tell us what needs attention.")).toHaveLength(2);
+  expect(screen.getAllByText("Attach a JPEG or PNG photo of the issue.")).toHaveLength(2);
+  expect(screen.getAllByText("Choose the issue location and confirm the selected point.")).toHaveLength(2);
   expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/api/v1/complaints"))).toHaveLength(1);
 });
 
@@ -379,4 +381,43 @@ test.each([
   const file = new File([new Uint8Array(Number(size))], String(name), { type: String(type) });
   await user.upload(screen.getByLabelText("Attach a photo"), file);
   expect(screen.getByRole("alert")).toHaveTextContent(String(message));
+});
+
+test("moves focus to an error summary with links to invalid fields", async () => {
+  installApi();
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByText("No complaints yet");
+  await user.click(screen.getByRole("button", { name: "Submit complaint" }));
+  const summary = screen.getByRole("alert", { name: "There is a problem" });
+  await waitFor(() => expect(summary).toHaveFocus());
+  expect(screen.getByRole("link", { name: "Tell us what needs attention." })).toHaveAttribute("href", "#description");
+  expect(screen.getByLabelText(/What is happening/)).toHaveAttribute("aria-describedby", "description-error");
+});
+
+test("renders a helpful citizen not-found page for unknown routes", async () => {
+  window.history.replaceState({}, "", "/not-a-real-page");
+  render(<App />);
+  expect(await screen.findByRole("heading", { name: "We could not find that page" })).toBeInTheDocument();
+  expect(document.title).toBe("Page not found | CivicAI");
+  window.history.replaceState({}, "", "/");
+});
+
+test("prevents duplicate submission while the first request is pending", async () => {
+  let resolveSubmit!: (response: Response) => void;
+  const pending = new Promise<Response>((resolve) => { resolveSubmit = resolve; });
+  const fetchMock = installApi({ submitResponse: pending });
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByText("No complaints yet");
+  await user.type(screen.getByLabelText(/What is happening/), complaint.description);
+  await attachPhoto(user);
+  await confirmCurrentLocation(user);
+  const submit = screen.getByRole("button", { name: "Submit complaint" });
+  await user.click(submit);
+  expect(screen.getByRole("button", { name: "Submitting complaint…" })).toBeDisabled();
+  submit.click();
+  expect(fetchMock.mock.calls.filter(([url, init]) => String(url).endsWith("/api/v1/complaints") && init?.method === "POST")).toHaveLength(1);
+  await act(async () => resolveSubmit(await jsonResponse(complaint, 201)));
+  expect(await screen.findByRole("heading", { name: "Complaint submitted" })).toBeInTheDocument();
 });

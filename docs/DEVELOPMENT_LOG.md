@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-10-02 — Issue #10 professional UX hardening completed
+
+Audited every citizen and municipal route in the live Chromium application before redesign, including narrow reflow, keyboard behavior, validation, image/map behavior, session/account states, failures and unknown routes. Reviewed GIGW 3.0, WCAG 2.2, GOV.UK, USWDS and web.dev guidance and recorded the bounded findings/adopted principles in `ISSUE_010_PRODUCT_UX_HARDENING.md`.
+
+Added a token-based responsive visual foundation, citizen task sections, photo preview, accessible linked error summary, unsent-draft warning, richer acknowledgement, semantic statuses, skip links, document titles and citizen/admin 404 pages. Added a compact keyboard-operable municipal menu, narrow-screen complaint cards, filter-state feedback, clearer empty/failure/session/conflict states, accessible confirmations for consequential actions, lazy/reserved evidence media and route-level lazy loading of the admin workspace. No dependency, backend contract, database migration or research artifact changed.
+
+Verification passed 27 citizen and 20 municipal tests, TypeScript compilation, production build, and all 166 Python tests with the same three dependency deprecations. The initial local JS entry decreased from 259.24 kB/79.01 kB gzip to 246.02 kB/76.31 kB gzip, with a new 30.07 kB/7.86 kB gzip lazy admin chunk and unchanged lazy map chunk. Real-browser checks covered effective widths from roughly 356–1,600 px plus narrow landscape without horizontal page overflow. Synthetic complaint `731ddc82-b3d4-4ffa-82b7-5ee381d30273` proved citizen photo/location submission, responsive admin discovery, evidence/map display and an audited Submitted → Under review change. Logout passed; the temporary Issue #10 administrator was disabled and sessions revoked. The OpenCity raw checksum remained `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac` and Issue #7 Stage B remains paused.
+
+Publication remained pending: the Codex sandbox could not create the repository's `.git/index.lock` because of an OS deny ACL, and the sandboxed credential helper could not authorize a side-effect-free alternate-object push. GitHub `main` remained at synchronized baseline `6ce0f17`; no remote history changed. The completed working tree therefore requires the owner's normal PowerShell Git identity for add/commit/push.
+
 ## 2026-10-01 — Issue #9 municipal authentication and RBAC completed
 
 Added migration `0006`, minimal municipal users/roles, Argon2id hashing, PostgreSQL opaque sessions, session-bound CSRF, generic/throttled login, real logout, account safeguards, security audit events and nullable complaint-history actor foreign keys. Added `/admin/login`, authenticated startup/refresh, role-aware navigation, sign-out and administrator account management. Citizen submission remains anonymous and citizen schemas remain separate from internal history/notes.

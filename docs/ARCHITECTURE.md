@@ -66,6 +66,10 @@ Issue #9 adds a security boundary around the Issue #8 municipal surface. `munici
 
 The frontend calls `/api/v1/auth/me` on every municipal startup or refresh. It keeps the returned CSRF token only in React memory, sends it on authenticated mutations, and shows login after 401 or expiry. It never stores bearer credentials in localStorage. Citizen and administrative response schemas remain distinct: citizen responses omit immutable history and internal operator notes.
 
+Issue #10 keeps that boundary and adds a presentation architecture rather than a service layer. The root route eagerly loads only the citizen shell; `AdminApp` is a route-level lazy chunk, while `LocationMap` remains a separate lazy chunk. Shared `StatusBadge` and `ConfirmDialog` primitives plus CSS tokens standardize semantics and interactions without a component framework. Native routes remain intentionally small: exact citizen/admin matches render their views and unknown paths render contextual 404 recovery pages.
+
+Responsive behavior is content-driven. Citizen work is single-column first and becomes a bounded split workspace on wide screens. Municipal results have two representations over the same API data: an accessible desktop table and task-focused mobile cards selected by CSS at the layout breakpoint. This avoids duplicating fetch/state logic while preventing page-level horizontal scrolling. Textual place evidence is authoritative when map tiles fail. Evidence images reserve dimensions and load lazily; original stored bytes are never transformed by the frontend.
+
 ## MVP vertical slice
 
 Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.

@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issue #9 adds municipal accounts and protects the operations workspace without introducing citizen accounts. Video, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issue #9 adds municipal accounts and protects the operations workspace without introducing citizen accounts. Issue #10 hardens both experiences for responsive, accessible public-service use; see the [UX audit and verification report](docs/ISSUE_010_PRODUCT_UX_HARDENING.md). Video, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
 Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
@@ -13,6 +13,8 @@ Issue #6 is in progress: [India-only dataset audit and preparation](docs/ISSUE_0
 Issue #7 Stage A is implemented: [offline human review](docs/ISSUE_007_HUMAN_REVIEW.md) generates ignored, checksum-bound CSV forms for taxonomy, mapping, privacy, record, duplicate, license and final approval decisions. No decision is prefilled, Stage B is waiting for real reviewers, and training remains prohibited.
 
 Issue #8 adds the [municipal operations vertical slice](docs/ISSUE_008_MUNICIPAL_OPERATIONS.md): controlled lifecycle, immutable history, optimistic concurrency, a paginated/searchable/filterable operator queue, evidence/location detail and real operational counts. Issue #9 adds [real municipal authentication and RBAC](docs/ISSUE_009_AUTH_RBAC.md). Open `/admin`; unauthenticated users see `/admin/login`. Operators manage complaints and administrators additionally manage municipal accounts.
+
+The citizen form and municipal workspace reflow from small phones through large desktops. Narrow municipal screens use complaint cards and a compact keyboard-operable menu; wider screens use the data table and full navigation. Every route has a meaningful title and unknown citizen/admin routes have contextual recovery pages. Accessibility work follows selected GIGW/WCAG patterns but is not a formal conformance claim.
 
 ## Municipal authentication
 

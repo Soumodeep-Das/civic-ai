@@ -38,6 +38,8 @@ AI output must not be treated as evidence for citations, security, correctness, 
 
 Exact commands will be documented after scaffolding selects the tools. A change is not considered verified if tests were skipped silently.
 
+For citizen/admin frontend changes, inspect the affected route in a real browser as well as component tests. Check a narrow reflow width, a wide layout, keyboard focus/order, loading/empty/error/success states, console output and page-level horizontal overflow. Use the existing mobile-card/table and compact/full-navigation patterns instead of adding route-specific responsive workarounds. Report local bundle or lab measurements as local evidence only; do not infer field performance or accessibility certification.
+
 ## Documentation expectations
 
 Update documentation in the same change when behavior, architecture, data fields, API contracts, research methods, or decisions change. Add accepted architecture or research decisions to `DECISIONS.md`. Keep `CURRENT_STATE.md` factual and remove stale next steps.

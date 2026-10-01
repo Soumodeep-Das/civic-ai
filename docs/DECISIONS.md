@@ -1,5 +1,16 @@
 # Decision Log
 
+## D025 Issue #10 public-service UX boundary (2026-10-02, accepted)
+
+- Retain one-page citizen reporting and existing application contracts. Improve hierarchy, feedback, error recovery and responsiveness without adding a wizard, UI framework, backend migration or security relaxation.
+- Use a compact CSS token/component vocabulary and mobile-first content breakpoints. Present municipal results as cards on narrow screens and the existing data table at wider widths; never make whole-page horizontal scrolling the normal phone interaction.
+- Follow selected GIGW 3.0, WCAG 2.2, GOV.UK and USWDS patterns without claiming certification: semantic landmarks, skip links, route titles, visible focus, linked error summary plus inline errors, accessible dynamic status and text-plus-colour state labels.
+- Warn before abandoning a meaningful unsent citizen draft, but never persist photo bytes or precise location in browser storage. Keep successful submission acknowledgement authoritative and avoid unearned service-time promises.
+- Confirm only consequential operations: complaint rejection, municipal role changes and account disable. Dialogs must manage/trap/restore focus and support safe Escape cancellation.
+- Lazy-load the municipal route and maps, lazy-load/reserve evidence media and use system fonts. Record local bundle evidence honestly; do not infer field Core Web Vitals.
+
+Consequences: citizen visitors no longer download municipal code in the initial route, phone operators use a compact queue/navigation, and unknown routes recover clearly. Original evidence and all Issue #1–#9 backend/auth/research boundaries remain intact. PWA/offline, multilingual content, field performance monitoring and formal accessibility certification remain outside this issue.
+
 ## D024 Issue #9 municipal authentication boundary (2026-10-01, accepted)
 
 - Use one first-party authentication model: opaque PostgreSQL-backed sessions in an HttpOnly, SameSite=Strict cookie. Store only the session-token SHA-256 digest; use eight-hour absolute expiry and database revocation. Avoid browser localStorage bearer tokens.
