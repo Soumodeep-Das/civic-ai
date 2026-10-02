@@ -21,6 +21,8 @@ const complaint = {
   status: "submitted",
   created_at: "2026-09-29T08:00:00Z",
   updated_at: "2026-09-29T08:00:00Z",
+  department: null,
+  assignee: null,
 };
 
 const createdEvent = {
@@ -56,6 +58,8 @@ function installAdminApi(options: { empty?: boolean; fail?: boolean; conflict?: 
       submitted_last_7_days: options.empty ? 0 : 1, with_photo: options.empty ? 0 : 1,
       with_location: options.empty ? 0 : 1,
     });
+    if (url.endsWith("/api/v1/admin/work-summary")) return json({ unassigned_department: 0, assigned_to_me: 0, unassigned_in_my_departments: 0, in_progress_assigned_to_me: 0, departments: [] });
+    if (url.includes("/api/v1/admin/departments")) return json([]);
     if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}/status`) && init?.method === "PATCH") {
       if (options.conflict) return json({ detail: "Complaint changed." }, 409);
       current = { ...current, status: "under_review", updated_at: "2026-09-29T09:00:00Z" };
@@ -66,7 +70,7 @@ function installAdminApi(options: { empty?: boolean; fail?: boolean; conflict?: 
       }];
       return json(current);
     }
-    if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...current, history });
+    if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...current, history, assignment_history: [] });
     if (url.includes("/api/v1/admin/complaints?")) return json({
       items: options.empty ? [] : [current], page: 1, page_size: 10,
       total: options.empty ? 0 : 1, total_pages: options.empty ? 0 : 1,
@@ -119,7 +123,7 @@ test("shows zero-result filters", async () => {
   const user = userEvent.setup();
   window.history.replaceState({}, "", "/admin/complaints");
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("No complaints match these filters");
   await user.type(screen.getByLabelText("Search"), "missing complaint");
   await user.click(screen.getByRole("button", { name: "Apply filters" }));
   expect(await screen.findByText("No complaints match these filters")).toBeInTheDocument();
@@ -168,7 +172,8 @@ test("handles missing image and missing map without breaking detail", async () =
   const noLocation = { ...complaint, image_ref: null, latitude: null, longitude: null, location_label: null, location_precision: null, location_details: null, location_source: null };
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     if (String(input).endsWith("/api/v1/auth/me")) return json(authSession);
-    if (String(input).endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...noLocation, history: [createdEvent] });
+    if (String(input).includes("/api/v1/admin/departments")) return json([]);
+    if (String(input).endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...noLocation, history: [createdEvent], assignment_history: [] });
     return Promise.reject(new Error("Unexpected request"));
   });
   window.history.replaceState({}, "", `/admin/complaints/${complaint.complaint_id}`);
@@ -195,6 +200,7 @@ test("blocks an unauthenticated admin route and signs in safely", async () => {
     if (url.endsWith("/api/v1/auth/me")) return authenticated ? json(authSession) : json({ message: "Authentication required." }, 401);
     if (url.endsWith("/api/v1/auth/login") && init?.method === "POST") { authenticated = true; return json(authSession); }
     if (url.endsWith("/api/v1/admin/dashboard")) return json({ total: 0, submitted: 0, under_review: 0, in_progress: 0, resolved: 0, rejected: 0, submitted_last_7_days: 0, with_photo: 0, with_location: 0 });
+    if (url.endsWith("/api/v1/admin/work-summary")) return json({ unassigned_department: 0, assigned_to_me: 0, unassigned_in_my_departments: 0, in_progress_assigned_to_me: 0, departments: [] });
     return Promise.reject(new Error(`Unexpected request ${url}`));
   });
   const user = userEvent.setup();
@@ -224,6 +230,7 @@ test("logout invalidates frontend state and sends the CSRF token", async () => {
     const url = String(input);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (url.endsWith("/api/v1/admin/dashboard")) return json({ total: 0, submitted: 0, under_review: 0, in_progress: 0, resolved: 0, rejected: 0, submitted_last_7_days: 0, with_photo: 0, with_location: 0 });
+    if (url.endsWith("/api/v1/admin/work-summary")) return json({ unassigned_department: 0, assigned_to_me: 0, unassigned_in_my_departments: 0, in_progress_assigned_to_me: 0, departments: [] });
     if (url.endsWith("/api/v1/auth/logout")) return Promise.resolve(new Response(null, { status: 204 }));
     return Promise.reject(new Error("Unexpected request"));
   });
@@ -246,6 +253,7 @@ test("an expired session during protected loading returns to login", async () =>
     const url = String(input);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (url.endsWith("/api/v1/admin/dashboard")) return json({ message: "Authentication required." }, 401);
+    if (url.endsWith("/api/v1/admin/work-summary")) return json({ message: "Authentication required." }, 401);
     return Promise.reject(new Error(`Unexpected request ${url}`));
   });
   window.history.replaceState({}, "", "/admin"); render(<App />);
@@ -323,4 +331,47 @@ test("renders an admin not-found page instead of silently opening the dashboard"
   render(<App />);
   expect(await screen.findByRole("heading", { name: "That municipal page does not exist" })).toBeInTheDocument();
   await waitFor(() => expect(document.title).toBe("Page not found | CivicAI Operations"));
+});
+
+test("operator can switch server-backed work queues", async () => {
+  const fetchMock = installAdminApi(); const user = userEvent.setup();
+  window.history.replaceState({}, "", "/admin/complaints"); render(<App />);
+  const departmentQueue = await screen.findByRole("button", { name: "Department queue" });
+  await user.click(departmentQueue);
+  await waitFor(() => expect(fetchMock.mock.calls.some(([value]) => String(value).includes("queue=my_departments_unassigned"))).toBe(true));
+  expect(departmentQueue).toHaveAttribute("aria-pressed", "true");
+});
+
+test("administrator can view department management and membership controls", async () => {
+  const adminSession = { ...authSession, user: { ...authSession.user, role: "municipal_admin" } };
+  const drainage = { department_id: "9a2019ed-27f0-4f67-a57f-13bb895cae55", slug: "drainage", display_name: "Drainage & Sewerage", description: "Handles drainage work", is_active: true, created_at: complaint.created_at, updated_at: complaint.updated_at, members: [] };
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(adminSession);
+    if (url.includes("/api/v1/admin/departments")) return json([drainage]);
+    if (url.endsWith("/api/v1/admin/users")) return json([adminSession.user]);
+    return Promise.reject(new Error(`Unexpected request ${url}`));
+  });
+  window.history.replaceState({}, "", "/admin/departments"); render(<App />);
+  expect(await screen.findByRole("heading", { name: "Departments and membership" })).toBeInTheDocument();
+  expect(await screen.findByText("Drainage & Sewerage")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Deactivate" })).toBeInTheDocument();
+  expect(screen.getByLabelText("Add member to Drainage & Sewerage")).toBeInTheDocument();
+});
+
+test("eligible operator can claim an unassigned department complaint", async () => {
+  const user = userEvent.setup(); const departmentId = "9a2019ed-27f0-4f67-a57f-13bb895cae55";
+  let current: Record<string, any> = { ...complaint, department: { department_id: departmentId, slug: "drainage", display_name: "Drainage & Sewerage", is_active: true }, assignee: null };
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+    const url = String(input);
+    if (url.endsWith("/api/v1/auth/me")) return json(authSession);
+    if (url.includes("/api/v1/admin/departments")) return json([{ ...current.department, description: null, created_at: complaint.created_at, updated_at: complaint.updated_at, members: [authSession.user] }]);
+    if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}/claim`) && init?.method === "POST") { current = { ...current, assignee: { user_id: authSession.user.user_id, username: authSession.user.username, is_active: true } }; return json(current); }
+    if (url.endsWith(`/api/v1/admin/complaints/${complaint.complaint_id}`)) return json({ ...current, history: [createdEvent], assignment_history: [] });
+    return Promise.reject(new Error(`Unexpected request ${url}`));
+  });
+  window.history.replaceState({}, "", `/admin/complaints/${complaint.complaint_id}`); render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Assign to me" }));
+  expect(await screen.findByText("Complaint assigned to you.")).toBeInTheDocument();
+  expect(screen.getAllByText("ward.operator").length).toBeGreaterThan(1);
 });

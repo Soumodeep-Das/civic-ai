@@ -98,7 +98,7 @@ def client(migrated_engine, tmp_path, monkeypatch):
                 with Session(bind=connection, join_transaction_mode="create_savepoint") as seed:
                     user = MunicipalUser(
                         username="test.operator", password_hash=DUMMY_PASSWORD_HASH,
-                        role="municipal_operator", is_active=True,
+                        role="municipal_admin", is_active=True,
                     )
                     seed.add(user)
                     seed.flush()
@@ -124,8 +124,13 @@ def anonymous_client(client):
 
 @pytest.fixture
 def admin_client(client):
+    return client
+
+
+@pytest.fixture
+def operator_client(client):
     with Session(bind=client.app.state.test_connection, join_transaction_mode="create_savepoint") as session:
         user = session.scalar(select(MunicipalUser).where(MunicipalUser.username == "test.operator"))
-        user.role = "municipal_admin"
+        user.role = "municipal_operator"
         session.commit()
     return client

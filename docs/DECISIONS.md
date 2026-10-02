@@ -1,5 +1,13 @@
 # Decision Log
 
+## D026 Department ownership and accountable work queues (2026-10-02, accepted)
+
+- Separate a complaint's nullable owning department from its nullable individual assignee. Use explicit many-to-many memberships independently from authentication roles; require an active assignee to be a current member of the active owning department.
+- Preserve current state on complaints and append immutable assignment history in the same database transaction. Exact desired-state retries are idempotent; different stale writes fail through `expected_updated_at`.
+- Let administrators manage/reassign all ownership and let operators view member-department/individual work and self-claim eligible unassigned department work. Keep citizen schemas free of ownership data.
+- Block department deactivation and membership removal while they would strand unresolved work. Preserve disabled-user assignments and mark them inactive until an administrator explicitly reassigns.
+- Add lightweight validated/generated request IDs and privacy-minimized local JSON request logs. Defer generic idempotency storage, external observability, boards, SLAs and automatic/ML routing.
+
 ## D025 Issue #10 public-service UX boundary (2026-10-02, accepted)
 
 - Retain one-page citizen reporting and existing application contracts. Improve hierarchy, feedback, error recovery and responsiveness without adding a wizard, UI framework, backend migration or security relaxation.

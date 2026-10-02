@@ -142,4 +142,12 @@ footer { min-height: 4.5rem; padding: var(--space-4) clamp(var(--space-4), 5vw, 
 }
 
 @media (orientation: landscape) and (max-height: 31rem) and (max-width: 58rem) { .hero { padding-block: var(--space-6); grid-template-columns: 1.5fr 1fr; }.hero-assurance { padding: var(--space-4); }.dialog-backdrop { align-items: start; overflow-y: auto; }.confirm-dialog { margin-block: var(--space-3); } }
+.queue-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-block: var(--space-4); }
+.queue-tabs button { min-height: 2.75rem; background: var(--white); color: var(--ink-900); border: 1px solid var(--paper-400); }
+.queue-tabs button[aria-pressed="true"] { background: var(--teal-800); color: var(--white); border-color: var(--teal-800); }
+.department-row { display: grid; gap: var(--space-3); padding-block: var(--space-4); border-bottom: 1px solid var(--paper-300); }
+.department-row small,.department-row p { display: block; margin-block-start: var(--space-1); }
+.member-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.member-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.member-list button { min-height: 2.5rem; }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

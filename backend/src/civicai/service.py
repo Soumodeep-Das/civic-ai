@@ -9,7 +9,7 @@ from civicai.domain import (
     ComplaintNotFound, ComplaintStatus, InvalidStatusTransition, StaleComplaintUpdate,
     transition_is_allowed,
 )
-from civicai.models import Complaint, ComplaintStatusEvent
+from civicai.models import Complaint, ComplaintStatusEvent, MunicipalDepartmentMembership, MunicipalUser
 from civicai.schemas import ComplaintCreate, ComplaintStatusUpdate
 
 
@@ -78,8 +78,35 @@ def list_admin_complaints(
     has_location: bool | None = None,
     has_photo: bool | None = None,
     query: str | None = None,
+    actor: MunicipalUser | None = None,
+    department_id: UUID | None = None,
+    assignee_user_id: UUID | None = None,
+    assignment_state: str | None = None,
+    queue: str | None = None,
 ) -> tuple[list[Complaint], int]:
     filters = []
+    if actor is not None and actor.role != "municipal_admin":
+        member_departments = select(MunicipalDepartmentMembership.department_id).where(
+            MunicipalDepartmentMembership.user_id == actor.user_id
+        )
+        filters.append(or_(Complaint.department_id.in_(member_departments), Complaint.assignee_user_id == actor.user_id))
+    if department_id is not None:
+        filters.append(Complaint.department_id == department_id)
+    if assignee_user_id is not None:
+        filters.append(Complaint.assignee_user_id == assignee_user_id)
+    if assignment_state == "assigned":
+        filters.append(Complaint.assignee_user_id.is_not(None))
+    elif assignment_state == "unassigned":
+        filters.append(Complaint.assignee_user_id.is_(None))
+    if queue == "unassigned":
+        filters.append(Complaint.department_id.is_(None))
+    elif queue == "mine" and actor is not None:
+        filters.append(Complaint.assignee_user_id == actor.user_id)
+    elif queue == "my_departments_unassigned" and actor is not None:
+        member_departments = select(MunicipalDepartmentMembership.department_id).where(
+            MunicipalDepartmentMembership.user_id == actor.user_id
+        )
+        filters.extend((Complaint.department_id.in_(member_departments), Complaint.assignee_user_id.is_(None)))
     if status is not None:
         filters.append(Complaint.status == status)
     if created_from is not None:
@@ -117,9 +144,11 @@ def list_admin_complaints(
 
 
 def update_complaint_status(
-    session: Session, complaint_id: UUID, data: ComplaintStatusUpdate, actor_id: UUID
+    session: Session, complaint_id: UUID, data: ComplaintStatusUpdate, actor: MunicipalUser
 ) -> Complaint:
+    from civicai.ownership import require_complaint_access
     complaint = get_complaint(session, complaint_id)
+    require_complaint_access(session, actor, complaint)
     current = ComplaintStatus(complaint.status)
     expected = data.expected_updated_at.astimezone(timezone.utc)
     actual = complaint.updated_at.astimezone(timezone.utc)
@@ -147,14 +176,14 @@ def update_complaint_status(
         previous_status=current,
         new_status=data.new_status,
         operator_note=data.operator_note,
-        actor_id=actor_id,
+        actor_id=actor.user_id,
     ))
     session.commit()
     session.refresh(updated)
     return updated
 
 
-def dashboard_statistics(session: Session) -> dict[str, int]:
+def dashboard_statistics(session: Session, actor: MunicipalUser | None = None) -> dict[str, int]:
     recent_boundary = datetime.now(timezone.utc) - timedelta(days=7)
     statement = select(
         func.count().label("total"),
@@ -167,6 +196,13 @@ def dashboard_statistics(session: Session) -> dict[str, int]:
         func.count().filter(Complaint.image_ref.is_not(None)).label("with_photo"),
         func.count().filter(and_(Complaint.latitude.is_not(None), Complaint.longitude.is_not(None))).label("with_location"),
     )
+    if actor is not None and actor.role != "municipal_admin":
+        member_departments = select(MunicipalDepartmentMembership.department_id).where(
+            MunicipalDepartmentMembership.user_id == actor.user_id
+        )
+        statement = statement.where(or_(
+            Complaint.department_id.in_(member_departments), Complaint.assignee_user_id == actor.user_id
+        ))
     row = session.execute(statement).one()
     return {key: int(value) for key, value in row._mapping.items()}
 

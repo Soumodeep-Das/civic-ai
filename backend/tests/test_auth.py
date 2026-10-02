@@ -75,10 +75,10 @@ def test_expired_and_missing_sessions_are_rejected(client):
     assert client.get("/api/v1/admin/dashboard").status_code == 401
 
 
-def test_operator_can_use_operations_but_not_account_management(client):
-    assert client.get("/api/v1/admin/dashboard").status_code == 200
-    assert client.get("/api/v1/admin/users").status_code == 403
-    assert client.post("/api/v1/admin/users", json={
+def test_operator_can_use_operations_but_not_account_management(operator_client):
+    assert operator_client.get("/api/v1/admin/dashboard").status_code == 200
+    assert operator_client.get("/api/v1/admin/users").status_code == 403
+    assert operator_client.post("/api/v1/admin/users", json={
         "username": "new.operator", "password": "a-defensible-demo-password", "role": "municipal_operator"
     }).status_code == 403
 

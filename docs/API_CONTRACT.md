@@ -32,6 +32,18 @@ The Nominatim fallback is country-restricted through configuration, limited to o
 
 ## Municipal operations
 
+Issue #11 extends municipal resources only. Citizen complaint list/detail still serialize `ComplaintRead` and never include department, assignee, membership, workload or assignment history.
+
+`GET /api/v1/admin/complaints` additionally accepts `department_id`, `assignee_user_id`, `assignment_state=assigned|unassigned`, and `queue=unassigned|mine|my_departments_unassigned`. The organization-wide `unassigned` queue is administrator-only. Operators receive only current member-department complaints or complaints individually assigned to them. Existing pagination and filters compose server-side.
+
+Municipal list/detail items add safe department/assignee summaries. Detail adds chronological immutable `assignment_history`. `PATCH /api/v1/admin/complaints/{id}/assignment` is administrator-only and accepts nullable `department_id`, nullable `assignee_user_id`, timezone-aware `expected_updated_at`, and optional 1–1,000 character reason. Assignee requires an active member of the active selected department. An exact desired-state retry is idempotent; different stale state returns `409 stale_complaint_update`.
+
+`POST /api/v1/admin/complaints/{id}/claim` accepts timezone-aware `expected_updated_at`. An active operator can claim only an unassigned complaint owned by a current member department. Concurrent claims use conditional update; one wins and stale competitors receive 409. `GET /api/v1/admin/work-summary` returns truthful personal/department queue counts, never performance or priority scores.
+
+Department administration uses `GET|POST /api/v1/admin/departments`, `PATCH /api/v1/admin/departments/{id}`, `POST /api/v1/admin/departments/{id}/members`, and `DELETE /api/v1/admin/departments/{id}/members/{user_id}`. Mutations require admin plus CSRF. Slugs are stable; deactivation and membership removal fail with 409 while unresolved work would be stranded.
+
+Every response contains `X-Request-ID`. Safe caller IDs match 8–64 ASCII letters/digits/dot/underscore/hyphen; invalid/missing values are replaced by server-generated UUID hex.
+
 Every `/api/v1/admin/*` route requires a valid active municipal session. Complaint operations accept `municipal_operator` and `municipal_admin`; account routes require `municipal_admin`. Missing, expired, revoked or disabled-user sessions return 401. Insufficient role returns 403. The backend is authoritative regardless of visible frontend controls.
 
 `GET /api/v1/admin/complaints` returns `{items,page,page_size,total,total_pages}`. Query parameters:

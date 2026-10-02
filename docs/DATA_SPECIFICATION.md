@@ -12,6 +12,8 @@ Migration 0004 adds nullable location_source VARCHAR(20) and location_accuracy_m
 
 Migration 0005 expands application status to `submitted`, `under_review`, `in_progress`, `resolved` or `rejected`; creates immutable `complaint_status_events`; backfills a `created` event for each existing complaint at its original `created_at`; and adds indexes for admin listing/history. Workflow status remains operational state, never an ML label.
 
+Migration 0007 adds nullable `department_id` and `assignee_user_id` to complaints; administrator-managed `municipal_departments`; many-to-many current memberships; immutable membership events; and immutable complaint assignment events containing previous/resulting ownership, actor, reason and time. Existing rows remain null/unassigned. These operational fields and histories are excluded from citizen schemas and research datasets.
+
 ## Canonical complaint record
 
 | Group | Field | Type or form | Purpose |

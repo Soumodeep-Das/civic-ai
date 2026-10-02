@@ -66,6 +66,12 @@ class Complaint(Base):
     location_source: Mapped[str | None] = mapped_column(String(20))
     location_accuracy_m: Mapped[float | None] = mapped_column(Double)
     status: Mapped[str] = mapped_column(String(20), server_default=text("'submitted'"))
+    department_id: Mapped[UUID | None] = mapped_column(
+        Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT")
+    )
+    assignee_user_id: Mapped[UUID | None] = mapped_column(
+        Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT")
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -90,6 +96,53 @@ class MunicipalUser(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class MunicipalDepartment(Base):
+    __tablename__ = "municipal_departments"
+    __table_args__ = (
+        CheckConstraint("slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'", name="ck_departments_slug"),
+        CheckConstraint("length(display_name) BETWEEN 2 AND 100", name="ck_departments_display_name_length"),
+        CheckConstraint("display_name ~ '[^[:space:]]'", name="ck_departments_display_name"),
+    )
+
+    department_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    slug: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    display_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name_key: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    description: Mapped[str | None] = mapped_column(String(500))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+
+class MunicipalDepartmentMembership(Base):
+    __tablename__ = "municipal_department_memberships"
+
+    department_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT"), primary_key=True
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), primary_key=True
+    )
+    created_by_user_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp())
+
+
+class DepartmentMembershipEvent(Base):
+    __tablename__ = "department_membership_events"
+    __table_args__ = (
+        CheckConstraint("event_type IN ('membership_added', 'membership_removed')", name="ck_membership_events_type"),
+    )
+
+    event_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    department_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), nullable=False)
+    event_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    actor_user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp())
 
 
 class MunicipalSession(Base):
@@ -150,6 +203,32 @@ class ComplaintStatusEvent(Base):
     )
 
 
+class ComplaintAssignmentEvent(Base):
+    __tablename__ = "complaint_assignment_events"
+    __table_args__ = (
+        CheckConstraint(
+            "event_type IN ('department_assigned', 'department_reassigned', 'operator_assigned', "
+            "'operator_changed', 'operator_self_assigned', 'operator_unassigned', 'returned_to_department_queue')",
+            name="ck_assignment_events_type",
+        ),
+        CheckConstraint(
+            "reason IS NULL OR (length(reason) <= 1000 AND reason ~ '[^[:space:]]')",
+            name="ck_assignment_events_reason",
+        ),
+    )
+
+    event_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    complaint_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("complaints.complaint_id", ondelete="RESTRICT"), nullable=False)
+    event_type: Mapped[str] = mapped_column(String(40), nullable=False)
+    previous_department_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT"))
+    new_department_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT"))
+    previous_assignee_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    new_assignee_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    actor_user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), nullable=False)
+    reason: Mapped[str | None] = mapped_column(String(1000))
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp())
+
+
 Index("ix_complaints_created_id_desc", Complaint.created_at.desc(), Complaint.complaint_id.desc())
 Index("ix_complaints_status_created_desc", Complaint.status, Complaint.created_at.desc())
 Index(
@@ -161,3 +240,7 @@ Index(
 Index("ix_municipal_sessions_token_hash", MunicipalSession.token_hash, unique=True)
 Index("ix_municipal_sessions_expires_at", MunicipalSession.expires_at)
 Index("ix_security_audit_time", SecurityAuditEvent.occurred_at, SecurityAuditEvent.event_id)
+Index("ix_complaints_department_created", Complaint.department_id, Complaint.created_at.desc())
+Index("ix_complaints_assignee_created", Complaint.assignee_user_id, Complaint.created_at.desc())
+Index("ix_department_memberships_user", MunicipalDepartmentMembership.user_id, MunicipalDepartmentMembership.department_id)
+Index("ix_assignment_events_complaint_time", ComplaintAssignmentEvent.complaint_id, ComplaintAssignmentEvent.occurred_at, ComplaintAssignmentEvent.event_id)

@@ -1,4 +1,9 @@
 from contextlib import asynccontextmanager
+import json
+import logging
+import re
+from time import perf_counter
+from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -8,11 +13,14 @@ from sqlalchemy.exc import OperationalError
 from civicai.auth import LoginThrottle
 from civicai.config import auth_settings, database_url, geocoding_settings
 from civicai.database import build_engine
-from civicai.domain import ComplaintNotFound, InvalidStatusTransition, StaleComplaintUpdate
+from civicai.domain import AssignmentConflict, ComplaintNotFound, DepartmentNotFound, InvalidStatusTransition, StaleComplaintUpdate
 from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
 from civicai.routes import router
 from civicai.uploads import upload_directory
 from starlette.exceptions import HTTPException
+
+LOGGER = logging.getLogger("civicai.requests")
+REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 
 
 def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> FastAPI:
@@ -46,12 +54,22 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
+        supplied = request.headers.get("x-request-id", "")
+        request_id = supplied if REQUEST_ID_PATTERN.fullmatch(supplied) else uuid4().hex
+        request.state.request_id = request_id
+        started = perf_counter()
         response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         if request.url.path.startswith(("/api/v1/auth", "/api/v1/admin")):
             response.headers["Cache-Control"] = "no-store"
+        LOGGER.info(json.dumps({
+            "event": "http_request", "request_id": request_id,
+            "method": request.method, "path": request.url.path,
+            "status": response.status_code, "duration_ms": round((perf_counter() - started) * 1000, 2),
+        }, separators=(",", ":")))
         return response
 
     @app.exception_handler(HTTPException)
@@ -80,8 +98,16 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
     async def stale_update(request: Request, exc: StaleComplaintUpdate):
         return JSONResponse(status_code=409, content={
             "code": "stale_complaint_update",
-            "message": "This complaint changed after you opened it. Reload before updating its status.",
+            "message": "This complaint was changed by another municipal user. Refresh the latest information before changing it.",
         })
+
+    @app.exception_handler(AssignmentConflict)
+    async def assignment_conflict(request: Request, exc: AssignmentConflict):
+        return JSONResponse(status_code=409, content={"code": exc.code, "message": exc.message})
+
+    @app.exception_handler(DepartmentNotFound)
+    async def department_missing(request: Request, exc: DepartmentNotFound):
+        return JSONResponse(status_code=404, content={"code": "department_not_found", "message": "Department not found"})
 
     @app.exception_handler(RequestValidationError)
     async def invalid(request: Request, exc: RequestValidationError):

@@ -10,6 +10,9 @@ Description = Annotated[str, StringConstraints(strip_whitespace=True, min_length
 LocationLabel = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)]
 LocationDetails = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
 SearchQuery = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=200)]
+DepartmentName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=100)]
+DepartmentSlug = Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True, min_length=2, max_length=64, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")]
+DepartmentDescription = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
 
 
 class ComplaintCreate(BaseModel):
@@ -64,6 +67,25 @@ class ComplaintRead(BaseModel):
         return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+class DepartmentSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    department_id: UUID
+    slug: str
+    display_name: str
+    is_active: bool
+
+
+class AssigneeSummary(BaseModel):
+    user_id: UUID
+    username: str
+    is_active: bool
+
+
+class AdminComplaintRead(ComplaintRead):
+    department: DepartmentSummary | None = None
+    assignee: AssigneeSummary | None = None
+
+
 OperatorNote = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]
 
 
@@ -99,12 +121,31 @@ class ComplaintStatusEventRead(BaseModel):
         return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-class AdminComplaintDetail(ComplaintRead):
+class ComplaintAssignmentEventRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    event_id: UUID
+    complaint_id: UUID
+    event_type: str
+    previous_department_id: UUID | None
+    new_department_id: UUID | None
+    previous_assignee_user_id: UUID | None
+    new_assignee_user_id: UUID | None
+    actor_user_id: UUID
+    reason: str | None
+    occurred_at: datetime
+
+    @field_serializer("occurred_at")
+    def serialize_event_time(self, value: datetime) -> str:
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class AdminComplaintDetail(AdminComplaintRead):
     history: list[ComplaintStatusEventRead]
+    assignment_history: list[ComplaintAssignmentEventRead]
 
 
 class AdminComplaintPage(BaseModel):
-    items: list[ComplaintRead]
+    items: list[AdminComplaintRead]
     page: int
     page_size: int
     total: int
@@ -180,6 +221,91 @@ class MunicipalUserUpdate(BaseModel):
         if self.role is None and self.is_active is None:
             raise ValueError("At least one account change is required")
         return self
+
+
+class MunicipalDepartmentCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    slug: DepartmentSlug
+    display_name: DepartmentName
+    description: DepartmentDescription | None = None
+
+
+class MunicipalDepartmentUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    display_name: DepartmentName | None = None
+    description: DepartmentDescription | None = None
+    is_active: bool | None = None
+
+    @model_validator(mode="after")
+    def require_department_change(self):
+        if self.display_name is None and self.description is None and self.is_active is None:
+            raise ValueError("At least one department change is required")
+        return self
+
+
+class DepartmentMemberRead(BaseModel):
+    user_id: UUID
+    username: str
+    role: MunicipalRole
+    is_active: bool
+
+
+class MunicipalDepartmentRead(DepartmentSummary):
+    description: str | None
+    created_at: datetime
+    updated_at: datetime
+    members: list[DepartmentMemberRead] = Field(default_factory=list)
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_department_time(self, value: datetime) -> str:
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class DepartmentMembershipCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    user_id: UUID
+
+
+class ComplaintAssignmentUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    department_id: UUID | None
+    assignee_user_id: UUID | None = None
+    expected_updated_at: datetime
+    reason: OperatorNote | None = None
+
+    @field_validator("expected_updated_at")
+    @classmethod
+    def require_assignment_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("expected_updated_at must include a timezone")
+        return value
+
+
+class ComplaintClaimRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    expected_updated_at: datetime
+
+    @field_validator("expected_updated_at")
+    @classmethod
+    def require_claim_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("expected_updated_at must include a timezone")
+        return value
+
+
+class DepartmentWorkload(BaseModel):
+    department: DepartmentSummary
+    unresolved: int
+    assigned: int
+    unassigned: int
+
+
+class WorkQueueStatistics(BaseModel):
+    unassigned_department: int
+    assigned_to_me: int
+    unassigned_in_my_departments: int
+    in_progress_assigned_to_me: int
+    departments: list[DepartmentWorkload]
 
 
 class LocationSearchRequest(BaseModel):

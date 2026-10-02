@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response, HTTPException, Query
@@ -10,7 +10,7 @@ from starlette.datastructures import UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from civicai import service
+from civicai import ownership, service
 from civicai.auth import (
     DUMMY_PASSWORD_HASH, AdminAuth, CsrfAuth, OperatorAuth, create_login_session,
     create_user, record_audit, utc_now, verify_password, update_user,
@@ -18,17 +18,40 @@ from civicai.auth import (
 from civicai.database import get_session
 from civicai.geocoding import Geocoder
 from civicai.schemas import (
-    AdminComplaintDetail, AdminComplaintPage, ComplaintCreate, ComplaintRead,
+    AdminComplaintDetail, AdminComplaintPage, AdminComplaintRead, ComplaintCreate, ComplaintRead,
     ComplaintStatusEventRead, ComplaintStatusUpdate, DashboardStatistics,
     LocationCapabilities, LocationReverseRequest, LocationSearchRequest, LocationSearchResult,
     AuthSessionRead, LoginRequest, MunicipalUserCreate, MunicipalUserRead, MunicipalUserUpdate,
+    MunicipalDepartmentCreate, MunicipalDepartmentRead, MunicipalDepartmentUpdate,
+    DepartmentMembershipCreate, DepartmentMemberRead, DepartmentSummary,
+    ComplaintAssignmentEventRead, ComplaintAssignmentUpdate, ComplaintClaimRequest,
+    WorkQueueStatistics,
 )
 from civicai.domain import ComplaintStatus
-from civicai.models import MunicipalSession, MunicipalUser
+from civicai.models import MunicipalDepartment, MunicipalSession, MunicipalUser
 from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
 
 router = APIRouter(tags=["complaints"])
 DatabaseSession = Annotated[Session, Depends(get_session)]
+
+
+def department_read(session: Session, department: MunicipalDepartment) -> MunicipalDepartmentRead:
+    members = [DepartmentMemberRead.model_validate({
+        "user_id": user.user_id, "username": user.username, "role": user.role, "is_active": user.is_active,
+    }) for user in ownership.department_members(session, department.department_id)]
+    values = MunicipalDepartmentRead.model_validate(department).model_dump()
+    values["members"] = members
+    return MunicipalDepartmentRead(**values)
+
+
+def admin_complaint_read(session: Session, complaint) -> AdminComplaintRead:
+    department = session.get(MunicipalDepartment, complaint.department_id) if complaint.department_id else None
+    assignee = session.get(MunicipalUser, complaint.assignee_user_id) if complaint.assignee_user_id else None
+    return AdminComplaintRead(
+        **ComplaintRead.model_validate(complaint).model_dump(),
+        department=DepartmentSummary.model_validate(department) if department else None,
+        assignee={"user_id": assignee.user_id, "username": assignee.username, "is_active": assignee.is_active} if assignee else None,
+    )
 
 
 def get_geocoder(request: Request) -> Geocoder:
@@ -164,7 +187,7 @@ def get_one(complaint_id: UUID, session: DatabaseSession):
 @router.get("/api/v1/admin/complaints", response_model=AdminComplaintPage, tags=["municipal operations"])
 def admin_list(
     session: DatabaseSession,
-    _auth: OperatorAuth,
+    auth: OperatorAuth,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
     status: ComplaintStatus | None = None,
@@ -173,6 +196,10 @@ def admin_list(
     has_location: bool | None = None,
     has_photo: bool | None = None,
     q: Annotated[str | None, Query(max_length=200)] = None,
+    department_id: UUID | None = None,
+    assignee_user_id: UUID | None = None,
+    assignment_state: Literal["assigned", "unassigned"] | None = None,
+    queue: Literal["unassigned", "mine", "my_departments_unassigned"] | None = None,
 ):
     if created_from and (created_from.tzinfo is None or created_from.utcoffset() is None):
         raise HTTPException(422, "created_from must include a timezone.")
@@ -180,13 +207,19 @@ def admin_list(
         raise HTTPException(422, "created_to must include a timezone.")
     if created_from and created_to and created_from > created_to:
         raise HTTPException(422, "created_from must not be after created_to.")
+    if queue == "unassigned" and auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Only administrators can view the organization-wide unassigned queue.")
+    if assignee_user_id is not None and auth.user.role != "municipal_admin" and assignee_user_id != auth.user.user_id:
+        raise HTTPException(403, "Operators may filter only their own individual assignments.")
     items, total = service.list_admin_complaints(
         session, page=page, page_size=page_size, status=status,
         created_from=created_from, created_to=created_to,
-        has_location=has_location, has_photo=has_photo, query=q,
+        has_location=has_location, has_photo=has_photo, query=q, actor=auth.user,
+        department_id=department_id, assignee_user_id=assignee_user_id,
+        assignment_state=assignment_state, queue=queue,
     )
     return AdminComplaintPage(
-        items=items, page=page, page_size=page_size, total=total,
+        items=[admin_complaint_read(session, item) for item in items], page=page, page_size=page_size, total=total,
         total_pages=service.page_count(total, page_size),
     )
 
@@ -196,9 +229,13 @@ def admin_list(
     response_model=AdminComplaintDetail,
     tags=["municipal operations"],
 )
-def admin_get(complaint_id: UUID, session: DatabaseSession, _auth: OperatorAuth):
+def admin_get(complaint_id: UUID, session: DatabaseSession, auth: OperatorAuth):
     complaint, history = service.get_admin_complaint(session, complaint_id)
-    return AdminComplaintDetail(**ComplaintRead.model_validate(complaint).model_dump(), history=history)
+    ownership.require_complaint_access(session, auth.user, complaint)
+    return AdminComplaintDetail(
+        **admin_complaint_read(session, complaint).model_dump(), history=history,
+        assignment_history=ownership.assignment_history(session, complaint_id),
+    )
 
 
 @router.get(
@@ -206,7 +243,9 @@ def admin_get(complaint_id: UUID, session: DatabaseSession, _auth: OperatorAuth)
     response_model=list[ComplaintStatusEventRead],
     tags=["municipal operations"],
 )
-def admin_history(complaint_id: UUID, session: DatabaseSession, _auth: OperatorAuth):
+def admin_history(complaint_id: UUID, session: DatabaseSession, auth: OperatorAuth):
+    complaint = service.get_complaint(session, complaint_id)
+    ownership.require_complaint_access(session, auth.user, complaint)
     return service.list_status_history(session, complaint_id)
 
 
@@ -218,14 +257,70 @@ def admin_history(complaint_id: UUID, session: DatabaseSession, _auth: OperatorA
 def admin_update_status(
     complaint_id: UUID, data: ComplaintStatusUpdate, session: DatabaseSession, auth: CsrfAuth
 ):
-    return service.update_complaint_status(session, complaint_id, data, auth.user.user_id)
+    return service.update_complaint_status(session, complaint_id, data, auth.user)
+
+
+@router.get("/api/v1/admin/departments", response_model=list[MunicipalDepartmentRead], tags=["municipal departments"])
+def admin_departments(session: DatabaseSession, auth: OperatorAuth, include_inactive: bool = True):
+    departments = ownership.list_departments(session, include_inactive=include_inactive if auth.user.role == "municipal_admin" else False)
+    if auth.user.role != "municipal_admin":
+        allowed = ownership.membership_ids(session, auth.user.user_id)
+        departments = [item for item in departments if item.department_id in allowed]
+    return [department_read(session, item) for item in departments]
+
+
+@router.post("/api/v1/admin/departments", response_model=MunicipalDepartmentRead, status_code=201, tags=["municipal departments"])
+def admin_create_department(data: MunicipalDepartmentCreate, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    return department_read(session, ownership.create_department(session, data))
+
+
+@router.patch("/api/v1/admin/departments/{department_id}", response_model=MunicipalDepartmentRead, tags=["municipal departments"])
+def admin_update_department(department_id: UUID, data: MunicipalDepartmentUpdate, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    return department_read(session, ownership.update_department(session, department_id, data))
+
+
+@router.post("/api/v1/admin/departments/{department_id}/members", response_model=DepartmentMemberRead, tags=["municipal departments"])
+def admin_add_department_member(department_id: UUID, data: DepartmentMembershipCreate, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    user = ownership.add_membership(session, department_id, data.user_id, auth.user.user_id)
+    return DepartmentMemberRead.model_validate({"user_id": user.user_id, "username": user.username, "role": user.role, "is_active": user.is_active})
+
+
+@router.delete("/api/v1/admin/departments/{department_id}/members/{user_id}", status_code=204, tags=["municipal departments"])
+def admin_remove_department_member(department_id: UUID, user_id: UUID, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Administrator permission required.")
+    ownership.remove_membership(session, department_id, user_id, auth.user.user_id)
+    return Response(status_code=204)
+
+
+@router.patch("/api/v1/admin/complaints/{complaint_id}/assignment", response_model=AdminComplaintRead, tags=["municipal operations"])
+def admin_update_assignment(complaint_id: UUID, data: ComplaintAssignmentUpdate, session: DatabaseSession, auth: CsrfAuth):
+    if auth.user.role != "municipal_admin":
+        raise HTTPException(403, "Only administrators can assign or reassign complaints.")
+    return admin_complaint_read(session, ownership.update_assignment(session, complaint_id, data, auth.user))
+
+
+@router.post("/api/v1/admin/complaints/{complaint_id}/claim", response_model=AdminComplaintRead, tags=["municipal operations"])
+def claim_assignment(complaint_id: UUID, data: ComplaintClaimRequest, session: DatabaseSession, auth: CsrfAuth):
+    return admin_complaint_read(session, ownership.claim_complaint(session, complaint_id, data.expected_updated_at, auth.user))
 
 
 @router.get(
     "/api/v1/admin/dashboard", response_model=DashboardStatistics, tags=["municipal operations"]
 )
-def admin_dashboard(session: DatabaseSession, _auth: OperatorAuth):
-    return service.dashboard_statistics(session)
+def admin_dashboard(session: DatabaseSession, auth: OperatorAuth):
+    return service.dashboard_statistics(session, auth.user)
+
+
+@router.get("/api/v1/admin/work-summary", response_model=WorkQueueStatistics, tags=["municipal operations"])
+def admin_work_summary(session: DatabaseSession, auth: OperatorAuth):
+    return ownership.work_queue_statistics(session, auth.user)
 
 
 @router.get("/api/v1/admin/users", response_model=list[MunicipalUserRead], tags=["municipal accounts"])

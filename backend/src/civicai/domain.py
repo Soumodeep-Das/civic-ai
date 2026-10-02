@@ -35,6 +35,16 @@ class MunicipalRole(StrEnum):
     ADMIN = "municipal_admin"
 
 
+class AssignmentEventType(StrEnum):
+    DEPARTMENT_ASSIGNED = "department_assigned"
+    DEPARTMENT_REASSIGNED = "department_reassigned"
+    OPERATOR_ASSIGNED = "operator_assigned"
+    OPERATOR_CHANGED = "operator_changed"
+    OPERATOR_SELF_ASSIGNED = "operator_self_assigned"
+    OPERATOR_UNASSIGNED = "operator_unassigned"
+    RETURNED_TO_DEPARTMENT_QUEUE = "returned_to_department_queue"
+
+
 class ComplaintNotFound(Exception):
     """No complaint exists with the requested identifier."""
 
@@ -47,6 +57,16 @@ class InvalidStatusTransition(Exception):
 
 class StaleComplaintUpdate(Exception):
     """The complaint changed after the operator loaded it."""
+
+
+class AssignmentConflict(Exception):
+    def __init__(self, code: str, message: str):
+        self.code = code
+        self.message = message
+
+
+class DepartmentNotFound(Exception):
+    """No department exists with the requested identifier."""
 
 
 def transition_is_allowed(current: ComplaintStatus, requested: ComplaintStatus) -> bool:

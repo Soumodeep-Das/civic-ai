@@ -14,6 +14,17 @@ export type Complaint = {
   updated_at: string;
 };
 
+export type DepartmentSummary = { department_id: string; slug: string; display_name: string; is_active: boolean };
+export type AssigneeSummary = { user_id: string; username: string; is_active: boolean };
+export type AdminComplaint = Complaint & { department: DepartmentSummary | null; assignee: AssigneeSummary | null };
+
+export type AssignmentEvent = {
+  event_id: string; complaint_id: string; event_type: string;
+  previous_department_id: string | null; new_department_id: string | null;
+  previous_assignee_user_id: string | null; new_assignee_user_id: string | null;
+  actor_user_id: string; reason: string | null; occurred_at: string;
+};
+
 export type ComplaintStatus = "submitted" | "under_review" | "in_progress" | "resolved" | "rejected";
 
 export type ComplaintStatusEvent = {
@@ -27,10 +38,10 @@ export type ComplaintStatusEvent = {
   occurred_at: string;
 };
 
-export type AdminComplaintDetail = Complaint & { history: ComplaintStatusEvent[] };
+export type AdminComplaintDetail = AdminComplaint & { history: ComplaintStatusEvent[]; assignment_history: AssignmentEvent[] };
 
 export type AdminComplaintPage = {
-  items: Complaint[];
+  items: AdminComplaint[];
   page: number;
   page_size: number;
   total: number;
@@ -49,6 +60,12 @@ export type DashboardStatistics = {
   with_location: number;
 };
 
+export type WorkQueueStatistics = {
+  unassigned_department: number; assigned_to_me: number; unassigned_in_my_departments: number;
+  in_progress_assigned_to_me: number;
+  departments: Array<{ department: DepartmentSummary; unresolved: number; assigned: number; unassigned: number }>;
+};
+
 export type AdminComplaintFilters = {
   page?: number;
   pageSize?: number;
@@ -56,6 +73,10 @@ export type AdminComplaintFilters = {
   query?: string;
   hasPhoto?: boolean;
   hasLocation?: boolean;
+  departmentId?: string;
+  assigneeUserId?: string;
+  assignmentState?: "assigned" | "unassigned";
+  queue?: "unassigned" | "mine" | "my_departments_unassigned";
 };
 
 export type LocationPrecision = "exact" | "approximate" | "broad";
@@ -178,6 +199,10 @@ export function getDashboardStatistics(): Promise<DashboardStatistics> {
   return request<DashboardStatistics>("/api/v1/admin/dashboard");
 }
 
+export function getWorkQueueStatistics(): Promise<WorkQueueStatistics> {
+  return request("/api/v1/admin/work-summary");
+}
+
 export function listAdminComplaints(filters: AdminComplaintFilters = {}): Promise<AdminComplaintPage> {
   const parameters = new URLSearchParams();
   parameters.set("page", String(filters.page ?? 1));
@@ -186,7 +211,29 @@ export function listAdminComplaints(filters: AdminComplaintFilters = {}): Promis
   if (filters.query?.trim()) parameters.set("q", filters.query.trim());
   if (filters.hasPhoto !== undefined) parameters.set("has_photo", String(filters.hasPhoto));
   if (filters.hasLocation !== undefined) parameters.set("has_location", String(filters.hasLocation));
+  if (filters.departmentId) parameters.set("department_id", filters.departmentId);
+  if (filters.assigneeUserId) parameters.set("assignee_user_id", filters.assigneeUserId);
+  if (filters.assignmentState) parameters.set("assignment_state", filters.assignmentState);
+  if (filters.queue) parameters.set("queue", filters.queue);
   return request<AdminComplaintPage>(`/api/v1/admin/complaints?${parameters}`);
+}
+
+export function updateComplaintAssignment(
+  complaintId: string,
+  input: { departmentId: string | null; assigneeUserId: string | null; expectedUpdatedAt: string; reason?: string },
+  csrfToken: string,
+): Promise<AdminComplaint> {
+  return request<AdminComplaint>(`/api/v1/admin/complaints/${encodeURIComponent(complaintId)}/assignment`, {
+    method: "PATCH", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+    body: JSON.stringify({ department_id: input.departmentId, assignee_user_id: input.assigneeUserId, expected_updated_at: input.expectedUpdatedAt, reason: input.reason?.trim() || null }),
+  });
+}
+
+export function claimComplaint(complaintId: string, expectedUpdatedAt: string, csrfToken: string): Promise<AdminComplaint> {
+  return request<AdminComplaint>(`/api/v1/admin/complaints/${encodeURIComponent(complaintId)}/claim`, {
+    method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+    body: JSON.stringify({ expected_updated_at: expectedUpdatedAt }),
+  });
 }
 
 export function getAdminComplaint(complaintId: string): Promise<AdminComplaintDetail> {

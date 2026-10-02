@@ -6,6 +6,8 @@ This document defines a deliberately small architecture. The design favors clear
 
 Issue #1 implementation lives in backend/src/civicai: routes.py delegates to service.py; schemas.py handles HTTP validation/serialization; models.py and database.py handle SQLAlchemy persistence. domain.py defines complaint status and missing-record semantics. main.py owns application lifecycle and error handlers. Alembic migrations are separate from app startup. The backend, migration and persistence flow are locally verified; see CURRENT_STATE.md.
 
+Issue #11 keeps ownership rules in `ownership.py`: routes authenticate/validate, ownership/service code enforces membership/concurrency/lifecycle rules, and SQLAlchemy/PostgreSQL atomically update current assignment plus immutable business history. Authentication role and organizational membership remain separate. Queues are parameterized database views over complaints, never copied records. Citizen schemas continue to exclude internal ownership.
+
 ## Intended system
 
 ```text

@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-10-02 — Issue #11 department ownership completed
+
+- Added migration `0007`, department/membership administration, current complaint ownership, immutable assignment/membership histories, permission-aware server queues, self-claim, concurrency and naturally idempotent retry behavior.
+- Added municipal ownership UI, responsive queue metadata, assignment detail/history, department management and My work/workload counts. Added validated response request IDs and safe structured local request logs.
+- Added edge-case coverage for duplicate/invalid/inactive departments, membership retry/removal constraints, cross-department and disabled-user assignment, exact retry, stale conflict, concurrent-style self-claim, operator RBAC, citizen privacy, transactional rollback, database event immutability and safe request IDs.
+- Final verification passed 177 Python tests (121 backend and 56 unchanged research), 27 citizen frontend tests, 23 municipal frontend tests, TypeScript compilation and production build. The three known dependency deprecations remain non-blocking and unchanged.
+- Development PostgreSQL reached `0007`. The real browser verified department/operator setup, membership, department assignment, operator queue visibility, self-claim, status progression, clear stale-write rejection while preserving the unsaved note and a usable 390 × 844 CSS-pixel operator queue; final browser warning/error logs were empty. Direct PostgreSQL inspection confirmed the current assignment with two assignment events and three status events; anonymous API output had no ownership fields. Both synthetic accounts were disabled and their sessions revoked after testing.
+- The raw OpenCity CSV remained SHA-256 `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Issue #7 Stage B remains paused; no taxonomy, label, split, approval, model, routing recommendation, priority or result changed.
+- Publication is pending: the verified working tree could not be committed because the Codex sandbox identity has an explicit Windows deny ACL on this repository's `.git` directory, so no remote state changed. The owner can run the documented `git add`, `git commit` and `git push origin main` commands in normal PowerShell.
+
 ## 2026-10-02 — Issue #10 professional UX hardening completed
 
 Audited every citizen and municipal route in the live Chromium application before redesign, including narrow reflow, keyboard behavior, validation, image/map behavior, session/account states, failures and unknown routes. Reviewed GIGW 3.0, WCAG 2.2, GOV.UK, USWDS and web.dev guidance and recorded the bounded findings/adopted principles in `ISSUE_010_PRODUCT_UX_HARDENING.md`.

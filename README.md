@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issue #9 adds municipal accounts and protects the operations workspace without introducing citizen accounts. Issue #10 hardens both experiences for responsive, accessible public-service use; see the [UX audit and verification report](docs/ISSUE_010_PRODUCT_UX_HARDENING.md). Video, ML, classification and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issues #9–#10 add protected municipal operations and responsive/accessibility hardening. Completed Issue #11 adds [departments, membership, accountable assignment and server-backed work queues](docs/ISSUE_011_DEPARTMENT_OWNERSHIP.md). Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
 Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
@@ -18,7 +18,7 @@ The citizen form and municipal workspace reflow from small phones through large 
 
 ## Municipal authentication
 
-Apply migration `0006`, then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
+Apply migrations through `0007`, then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic upgrade head
@@ -150,7 +150,7 @@ The development proxy is loaded when Vite starts. Restarting is required after a
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and migrations through 0006.
+- backend/migrations: Alembic environment and migrations through 0007.
 - backend/tests: API, migration consistency and database constraint tests.
 - frontend/src: React complaint form, accessible location picker, lazy-loaded map, recent-complaint list, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
