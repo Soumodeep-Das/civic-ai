@@ -72,6 +72,9 @@ class Complaint(Base):
     assignee_user_id: Mapped[UUID | None] = mapped_column(
         Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT")
     )
+    citizen_account_id: Mapped[UUID | None] = mapped_column(
+        Uuid, ForeignKey("citizen_accounts.account_id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -90,12 +93,111 @@ class MunicipalUser(Base):
 
     user_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    email: Mapped[str | None] = mapped_column(String(254))
+    email_normalized: Mapped[str | None] = mapped_column(String(254), unique=True)
+    display_name: Mapped[str | None] = mapped_column(String(100))
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(32), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CitizenAccount(Base):
+    __tablename__ = "citizen_accounts"
+    __table_args__ = (
+        CheckConstraint("state IN ('pending_verification', 'active', 'disabled')", name="ck_citizen_accounts_state"),
+        CheckConstraint("email_normalized = lower(email_normalized)", name="ck_citizen_accounts_email_lower"),
+        CheckConstraint("display_name ~ '[^[:space:]]'", name="ck_citizen_accounts_display_name"),
+    )
+
+    account_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(String(254), nullable=False)
+    email_normalized: Mapped[str] = mapped_column(String(254), nullable=False, unique=True)
+    display_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    state: Mapped[str] = mapped_column(String(24), nullable=False, server_default=text("'pending_verification'"))
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CitizenPasswordCredential(Base):
+    __tablename__ = "citizen_password_credentials"
+
+    account_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("citizen_accounts.account_id", ondelete="CASCADE"), primary_key=True
+    )
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+
+class FederatedIdentity(Base):
+    __tablename__ = "federated_identities"
+    __table_args__ = (
+        CheckConstraint("provider IN ('google')", name="ck_federated_identities_provider"),
+    )
+
+    identity_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    account_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("citizen_accounts.account_id", ondelete="CASCADE"), nullable=False)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)
+    issuer: Mapped[str] = mapped_column(String(255), nullable=False)
+    subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class IdentityToken(Base):
+    __tablename__ = "identity_tokens"
+    __table_args__ = (
+        CheckConstraint("purpose IN ('verify_email', 'reset_password')", name="ck_identity_tokens_purpose"),
+    )
+
+    token_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    account_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("citizen_accounts.account_id", ondelete="CASCADE"), nullable=False)
+    purpose: Mapped[str] = mapped_column(String(32), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class OIDCFlow(Base):
+    __tablename__ = "oidc_flows"
+
+    flow_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    state_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    nonce_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class StaffInvitation(Base):
+    __tablename__ = "staff_invitations"
+    __table_args__ = (
+        CheckConstraint("role IN ('municipal_operator', 'municipal_admin')", name="ck_staff_invitations_role"),
+    )
+
+    invitation_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(String(254), nullable=False)
+    email_normalized: Mapped[str] = mapped_column(String(254), nullable=False)
+    role: Mapped[str] = mapped_column(String(32), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    invited_by_user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    accepted_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class StaffInvitationDepartment(Base):
+    __tablename__ = "staff_invitation_departments"
+
+    invitation_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("staff_invitations.invitation_id", ondelete="CASCADE"), primary_key=True)
+    department_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_departments.department_id", ondelete="RESTRICT"), primary_key=True)
 
 
 class MunicipalDepartment(Base):
@@ -149,7 +251,8 @@ class MunicipalSession(Base):
     __tablename__ = "municipal_sessions"
 
     session_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
-    user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="CASCADE"))
+    citizen_account_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("citizen_accounts.account_id", ondelete="CASCADE"))
     token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     csrf_token: Mapped[str] = mapped_column(String(64), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
@@ -165,6 +268,8 @@ class SecurityAuditEvent(Base):
     event_type: Mapped[str] = mapped_column(String(40), nullable=False)
     actor_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
     subject_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    actor_citizen_account_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("citizen_accounts.account_id", ondelete="SET NULL"))
+    subject_citizen_account_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("citizen_accounts.account_id", ondelete="SET NULL"))
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp())
 
 
@@ -239,6 +344,16 @@ Index(
 )
 Index("ix_municipal_sessions_token_hash", MunicipalSession.token_hash, unique=True)
 Index("ix_municipal_sessions_expires_at", MunicipalSession.expires_at)
+Index("ix_municipal_sessions_citizen", MunicipalSession.citizen_account_id)
+Index("uq_federated_identity_subject", FederatedIdentity.provider, FederatedIdentity.issuer, FederatedIdentity.subject, unique=True)
+Index("ix_identity_tokens_account_purpose", IdentityToken.account_id, IdentityToken.purpose)
+Index("ix_oidc_flows_expires", OIDCFlow.expires_at)
+Index("ix_staff_invitations_email", StaffInvitation.email_normalized)
+Index(
+    "uq_staff_pending_invitation_email", StaffInvitation.email_normalized, unique=True,
+    postgresql_where=(StaffInvitation.accepted_at.is_(None) & StaffInvitation.revoked_at.is_(None)),
+)
+Index("ix_complaints_citizen_created", Complaint.citizen_account_id, Complaint.created_at.desc())
 Index("ix_security_audit_time", SecurityAuditEvent.occurred_at, SecurityAuditEvent.event_id)
 Index("ix_complaints_department_created", Complaint.department_id, Complaint.created_at.desc())
 Index("ix_complaints_assignee_created", Complaint.assignee_user_id, Complaint.created_at.desc())

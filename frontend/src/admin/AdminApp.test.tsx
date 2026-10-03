@@ -205,7 +205,7 @@ test("blocks an unauthenticated admin route and signs in safely", async () => {
   });
   const user = userEvent.setup();
   window.history.replaceState({}, "", "/admin"); render(<App />);
-  expect(await screen.findByRole("heading", { name: "Municipal sign in" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Municipal staff sign in" })).toBeInTheDocument();
   await user.type(screen.getByLabelText("Username"), "ward.operator");
   await user.type(screen.getByLabelText("Password"), "demo-password-value");
   await user.click(screen.getByRole("button", { name: "Sign in" }));
@@ -218,7 +218,7 @@ test("shows a generic login error", async () => {
     if (String(input).endsWith("/api/v1/auth/login")) return json({ message: "Invalid username or password." }, 401);
     return Promise.reject(new Error("Unexpected request"));
   });
-  const user = userEvent.setup(); render(<App />); await screen.findByText("Municipal sign in");
+  const user = userEvent.setup(); render(<App />); await screen.findByText("Municipal staff sign in");
   await user.type(screen.getByLabelText("Username"), "unknown.user");
   await user.type(screen.getByLabelText("Password"), "wrong-password");
   await user.click(screen.getByRole("button", { name: "Sign in" }));
@@ -236,7 +236,7 @@ test("logout invalidates frontend state and sends the CSRF token", async () => {
   });
   const user = userEvent.setup(); render(<App />); await screen.findByText("ward.operator");
   await user.click(screen.getByRole("button", { name: "Sign out" }));
-  expect(await screen.findByText("Municipal sign in")).toBeInTheDocument();
+  expect(await screen.findByText("Municipal staff sign in")).toBeInTheDocument();
   const call = fetchMock.mock.calls.find(([value]) => String(value).endsWith("/api/v1/auth/logout"));
   expect(new Headers(call?.[1]?.headers).get("X-CSRF-Token")).toBe("test-csrf-token");
 });
@@ -245,7 +245,7 @@ test("operator cannot open administrator account controls", async () => {
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => String(input).endsWith("/api/v1/auth/me") ? json(authSession) : Promise.reject(new Error("Unexpected request")));
   window.history.replaceState({}, "", "/admin/users"); render(<App />);
   expect(await screen.findByRole("alert")).toHaveTextContent("Administrator permission required");
-  expect(screen.queryByText("Accounts")).not.toBeInTheDocument();
+  expect(screen.queryByText("Municipal Staff")).not.toBeInTheDocument();
 });
 
 test("an expired session during protected loading returns to login", async () => {
@@ -257,9 +257,9 @@ test("an expired session during protected loading returns to login", async () =>
     return Promise.reject(new Error(`Unexpected request ${url}`));
   });
   window.history.replaceState({}, "", "/admin"); render(<App />);
-  expect(await screen.findByRole("heading", { name: "Municipal sign in" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Municipal staff sign in" })).toBeInTheDocument();
   expect(screen.getByText("Your municipal session ended. Sign in again to continue.")).toBeInTheDocument();
-  expect(window.location.pathname).toBe("/admin/login");
+  expect(window.location.pathname).toBe("/staff/sign-in");
 });
 
 test("administrator sees and manages municipal accounts", async () => {
@@ -268,12 +268,14 @@ test("administrator sees and manages municipal accounts", async () => {
     const url = String(input);
     if (url.endsWith("/api/v1/auth/me")) return json(adminSession);
     if (url.endsWith("/api/v1/admin/users")) return json([adminSession.user]);
+    if (url.endsWith("/api/v1/admin/staff-invitations")) return json([]);
+    if (url.includes("/api/v1/admin/departments")) return json([]);
     return Promise.reject(new Error(`Unexpected request ${url}`));
   });
   window.history.replaceState({}, "", "/admin/users"); render(<App />);
-  expect(await screen.findByRole("heading", { name: "Municipal accounts" })).toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: "Create account" })).toBeInTheDocument();
-  expect(screen.getByText("Accounts")).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Municipal Staff" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Invite staff member" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Municipal Staff" })).toBeInTheDocument();
 });
 
 test("mobile navigation exposes state and closes with Escape", async () => {

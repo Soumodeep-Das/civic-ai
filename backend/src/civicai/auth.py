@@ -140,7 +140,7 @@ def create_login_session(
 ) -> tuple[str, MunicipalSession]:
     raw_token = secrets.token_urlsafe(32)
     auth_session = MunicipalSession(
-        user_id=user.user_id,
+        user_id=user.user_id, citizen_account_id=None,
         token_hash=token_digest(raw_token),
         csrf_token=secrets.token_urlsafe(32),
         expires_at=utc_now() + timedelta(hours=settings.session_hours),
@@ -161,6 +161,7 @@ def get_auth_context(request: Request, session: Annotated[Session, Depends(get_s
         raise HTTPException(401, "Authentication required.")
     auth_session = session.scalar(select(MunicipalSession).where(
         MunicipalSession.token_hash == token_digest(raw_token),
+        MunicipalSession.user_id.is_not(None),
         MunicipalSession.revoked_at.is_(None),
         MunicipalSession.expires_at > func.now(),
     ))

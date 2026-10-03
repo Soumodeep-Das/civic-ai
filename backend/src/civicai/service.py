@@ -13,8 +13,11 @@ from civicai.models import Complaint, ComplaintStatusEvent, MunicipalDepartmentM
 from civicai.schemas import ComplaintCreate, ComplaintStatusUpdate
 
 
-def create_complaint(session: Session, data: ComplaintCreate, image_ref: str | None = None) -> Complaint:
-    complaint = Complaint(**data.model_dump(), image_ref=image_ref)
+def create_complaint(
+    session: Session, data: ComplaintCreate, image_ref: str | None = None,
+    citizen_account_id: UUID | None = None,
+) -> Complaint:
+    complaint = Complaint(**data.model_dump(), image_ref=image_ref, citizen_account_id=citizen_account_id)
     session.add(complaint)
     session.flush()
     session.add(ComplaintStatusEvent(

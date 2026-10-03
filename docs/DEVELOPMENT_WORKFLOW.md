@@ -50,6 +50,8 @@ Add the smallest justified dependency, pin or lock it through the chosen package
 
 For a fresh municipal environment, apply Alembic first and run `python -m civicai.bootstrap_admin` interactively. Never place a bootstrap password in a shell argument, tracked script, `.env`, screenshot or development log. Local HTTP uses `AUTH_COOKIE_SECURE=false`; production must set `APP_ENV=production` and `AUTH_COOKIE_SECURE=true`. Keep citizen and municipal data contracts separate when extending either surface.
 
+Citizen accounts may self-register; municipal authority must always originate from bootstrap or an authenticated administrator invitation. Never add public role/membership fields. Identity changes must test enumeration resistance, hashed single-use tokens, expiry/reuse, session revocation, CSRF, cross-account access and citizen-to-municipal denial. Use the ignored email capture adapter locally; production identity work must verify its configured SMTP and exact Google redirect URI without logging secrets.
+
 Production changes must also render the Compose model, build the real frontend/container images, verify `/health` and `/ready` through Caddy, and exercise secure cookie/CSRF/evidence behavior through the proxy. Back up database and evidence before migration; do not start the backend if the one-shot migration fails. A backup is unverified until restored into disposable database/media targets. Never mount or archive research data with runtime application data. Use `docs/DEPLOYMENT.md`, `docs/BACKUP_RESTORE.md` and `docs/OPERATIONS_RUNBOOK.md` rather than undocumented shell history.
 
 ## Research experiment workflow

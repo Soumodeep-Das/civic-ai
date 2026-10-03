@@ -1,5 +1,13 @@
 # API Contract
 
+## Issue #13 citizen identity and staff provisioning
+
+Citizen identity: `POST /api/v1/citizen-auth/sign-up`, `/verify-email`, `/resend-verification`, `/login`, `/logout`, `/forgot-password`, `/reset-password`, `/change-password`; `GET /api/v1/citizen-auth/me`; and Google start/callback under `/api/v1/citizen-auth/google/*`. Google start/callback is redirect based and action-token values are never returned.
+
+Owned complaints: `GET /api/v1/citizen/complaints` is server-paginated and session-scoped; `GET /api/v1/citizen/complaints/{id}` returns an owned record plus sanitized status history; `POST /api/v1/citizen/complaints/{id}/claim` requires citizen CSRF plus the valid Issue #12 capability in `{token}`. Authenticated ordinary submission links ownership from the cookie session; no account ID is accepted.
+
+Staff provisioning: administrators use `GET|POST /api/v1/admin/staff-invitations` and `POST /api/v1/admin/staff-invitations/{id}/revoke`; invitees use `POST /api/v1/staff/accept-invite`. Public callers never choose role/departments. Existing municipal session and admin API contracts remain compatible.
+
 Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds optional location context and selection quality to that compatible multipart contract, plus provider-neutral search/reverse/capability endpoints. JSON complaint creation still returns 415. Issue #12 deliberately replaces anonymous list/detail/evidence reads with a private status capability and municipal-only evidence access.
 
 ## Submission
@@ -28,7 +36,7 @@ The Nominatim fallback is country-restricted through configuration, limited to o
 - `GET /api/v1/complaints/{complaint_id}?tracking_token=<capability>` returns only `complaint_id`, description, status and created/updated timestamps. Missing, malformed or wrong capabilities return 404 to avoid existence disclosure. Coordinates, location labels/details, image references, ownership and internal history are excluded.
 - `GET /api/v1/complaint-images/{filename}` requires a valid municipal session and complaint-level permission. Unauthenticated callers receive 401; authenticated but unauthorized callers receive 403; authorized missing files receive 404. Successful evidence uses its explicit raster MIME and `Cache-Control: private, no-store`.
 - `GET /health` returns `{"status":"ok","release":"<safe-release-id>"}` without dependency checks.
-- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at `0007`, and evidence storage is writable; otherwise sanitized 503 JSON is returned.
+- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at `0008`, and evidence storage is writable; otherwise sanitized 503 JSON is returned.
 - `/docs` and `/openapi.json` describe the multipart endpoint.
 
 ## Municipal operations

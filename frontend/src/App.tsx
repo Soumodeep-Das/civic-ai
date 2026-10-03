@@ -3,8 +3,11 @@ import { FormEvent, lazy, Suspense, useEffect, useMemo, useRef, useState } from 
 import { CitizenComplaintStatus, ComplaintInput, ComplaintSubmission, createComplaint, getComplaintStatus } from "./api/complaints";
 import LocationPicker, { LocationSelection } from "./LocationPicker";
 import { StatusBadge } from "./ui/StatusBadge";
+import { CitizenSession, getCitizenSession } from "./api/citizenAuth";
 
 const AdminApp = lazy(() => import("./admin/AdminApp"));
+const CitizenIdentity = lazy(() => import("./CitizenIdentity"));
+const StaffAcceptInvite = lazy(() => import("./StaffAcceptInvite"));
 
 type FormFields = { description: string };
 type FormErrors = { description?: string; image?: string; location?: string };
@@ -32,11 +35,11 @@ function ErrorSummary({ errors, summaryRef }: { errors: FormErrors; summaryRef: 
   return <div className="error-summary" role="alert" tabIndex={-1} ref={summaryRef} aria-labelledby="error-summary-title"><h3 id="error-summary-title">There is a problem</h3><ul>{entries.map((entry) => <li key={entry.href}><a href={entry.href}>{entry.message}</a></li>)}</ul></div>;
 }
 
-function CitizenHeader() {
-  return <header className="site-header"><a className="brand" href="/" aria-label="CivicAI citizen complaint service home"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span><span>Civic<span>AI</span></span></a><nav aria-label="Service navigation"><a href="/#report-heading">Report an issue</a><a href="/admin">Municipal sign in</a></nav></header>;
+export function CitizenHeader({ accountName }: { accountName?: string } = {}) {
+  return <header className="site-header"><a className="brand" href="/" aria-label="CivicAI citizen complaint service home"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span><span>Civic<span>AI</span></span></a><nav aria-label="Service navigation"><a href="/#report-heading">Report Issue</a>{accountName ? <><a href="/my-complaints">My Complaints</a><a href="/profile">Profile<span className="sr-only"> for {accountName}</span></a></> : <><a href="/sign-in">Sign in</a><a href="/sign-up">Create account</a></>}<a href="/staff/sign-in">Municipal staff</a></nav></header>;
 }
 
-function CitizenFooter() {
+export function CitizenFooter() {
   return <footer><span>CivicAI · MCA academic project</span><span>Photos and locations are used as complaint evidence</span></footer>;
 }
 
@@ -53,6 +56,8 @@ function CitizenApp() {
   const submittingRef = useRef(false);
   const [submitError, setSubmitError] = useState("");
   const [createdComplaint, setCreatedComplaint] = useState<ComplaintSubmission>();
+  const [citizenSession, setCitizenSession] = useState<CitizenSession>();
+  useEffect(() => { void getCitizenSession().then(setCitizenSession).catch(() => undefined); }, []);
 
   const previewUrl = useMemo(() => !image || typeof URL.createObjectURL !== "function" ? "" : URL.createObjectURL(image), [image]);
   useEffect(() => () => { if (previewUrl && typeof URL.revokeObjectURL === "function") URL.revokeObjectURL(previewUrl); }, [previewUrl]);
@@ -103,7 +108,7 @@ function CitizenApp() {
   }
 
   return <div className="citizen-app">
-    <a className="skip-link" href="#main-content">Skip to main content</a><CitizenHeader />
+    <a className="skip-link" href="#main-content">Skip to main content</a><CitizenHeader accountName={citizenSession?.account.display_name} />
     <main id="main-content">
       <section className="hero" aria-labelledby="page-title"><div><p className="eyebrow">CivicAI citizen service</p><h1 id="page-title">Report a civic issue</h1><p className="hero-copy">Tell the municipal team what happened, show the issue and confirm where it is. You can search for the place or use your current location.</p></div><div className="hero-assurance" aria-label="What you will need"><strong>Before you start</strong><span>A clear description</span><span>One photo</span><span>The issue location</span></div></section>
       <div className="workspace">
@@ -114,7 +119,7 @@ function CitizenApp() {
             <section className="form-step" aria-labelledby="description-heading"><div className="step-heading"><span aria-hidden="true">1</span><div><h3 id="description-heading">Describe the problem</h3><p>Say what is wrong and include a nearby landmark if helpful.</p></div></div><label htmlFor="description">What is happening? <span className="required-text">Required</span></label><textarea id="description" value={fields.description} onChange={(event) => updateDescription(event.target.value)} placeholder="Example: Large pothole beside the school entrance" rows={5} aria-invalid={Boolean(errors.description)} aria-describedby={errors.description ? "description-error" : "description-help"} />{errors.description ? <p className="field-error" id="description-error"><span className="sr-only">Error: </span>{errors.description}</p> : <p className="field-help" id="description-help">Do not include names, phone numbers or other private information.</p>}</section>
             <fieldset className="form-step" disabled={isSubmitting} aria-describedby={errors.image || imageError ? "image-error" : "image-help"}><legend><span className="step-number" aria-hidden="true">2</span><span><strong>Add photo evidence</strong><small>A clear photo helps staff identify the issue.</small></span></legend><label htmlFor="image">Attach a photo</label><span className="required-text">Required</span><input ref={imageInput} id="image" type="file" accept="image/jpeg,image/png" capture="environment" onChange={(event) => chooseImage(event.target.files?.[0])} aria-invalid={Boolean(errors.image || imageError)} /><p className="field-help" id="image-help">JPEG or PNG, up to 5 MiB. Avoid faces and private information.</p>{image && <div className="selected-image"><div className="image-preview">{previewUrl ? <img src={previewUrl} alt="Preview of selected complaint photo" /> : <span>Photo selected</span>}</div><div><strong>Selected: {image.name}</strong><button className="text-button" type="button" onClick={removeImage}>Remove image</button></div></div>}{imageError && <button className="secondary-button" type="button" onClick={removeImage}>Choose another photo</button>}{(imageError || errors.image) && <p className="field-error" id="image-error" role="alert"><span className="sr-only">Error: </span>{imageError || errors.image}</p>}</fieldset>
             <fieldset className="form-step" disabled={isSubmitting} aria-describedby={errors.location ? "location-error" : undefined}><legend><span className="step-number" aria-hidden="true">3</span><span><strong>Confirm where it happened</strong><small>Search for the issue location or use your device position if you are there now.</small></span></legend><LocationPicker value={location} error={errors.location} disabled={isSubmitting} onChange={(selection) => { setLocation(selection); setCreatedComplaint(undefined); if (selection?.confirmed) setErrors((current) => ({ ...current, location: undefined })); }} /></fieldset>
-            <section className="form-step submit-step" aria-labelledby="submit-heading"><div className="step-heading"><span aria-hidden="true">4</span><div><h3 id="submit-heading">Review and submit</h3><p>Your photo and confirmed location will be stored as protected complaint evidence.</p></div></div>{submitError && <div className="notice error-notice" role="alert"><strong>Complaint not submitted</strong><p>{submitError}</p><p>Your description, photo and location have been kept on this page.</p></div>}{createdComplaint && <div className="success-panel" role="status" tabIndex={-1}><span className="success-icon" aria-hidden="true">✓</span><div><h3>Complaint submitted</h3><span className="sr-only">Complaint #{createdComplaint.complaint_id.slice(0, 8)} was submitted.</span><p>Your reference is <strong>{createdComplaint.complaint_id}</strong>.</p><p>Current status: <strong>Submitted</strong>. Evidence is visible only to authorized municipal staff.</p><a href={`/track/${createdComplaint.complaint_id}?token=${createdComplaint.tracking_token}`}>Open and save your private status link</a><br /><a href="#report-heading">Report another issue</a></div></div>}<button className="primary-button" type="submit" disabled={isSubmitting} aria-describedby="submit-progress"><span>{isSubmitting ? "Submitting complaint…" : "Submit complaint"}</span><span aria-hidden="true">→</span></button><span className="sr-only" id="submit-progress" aria-live="polite">{isSubmitting ? "Submission in progress. Please wait." : ""}</span></section>
+            <section className="form-step submit-step" aria-labelledby="submit-heading"><div className="step-heading"><span aria-hidden="true">4</span><div><h3 id="submit-heading">Review and submit</h3><p>Your photo and confirmed location will be stored as protected complaint evidence.</p></div></div>{!citizenSession && <p className="field-help">You can report without an account. <a href="/sign-in">Sign in</a> first if you want this complaint saved in My Complaints.</p>}{submitError && <div className="notice error-notice" role="alert"><strong>Complaint not submitted</strong><p>{submitError}</p><p>Your description, photo and location have been kept on this page.</p></div>}{createdComplaint && <div className="success-panel" role="status" tabIndex={-1}><span className="success-icon" aria-hidden="true">✓</span><div><h3>Complaint submitted</h3><span className="sr-only">Complaint #{createdComplaint.complaint_id.slice(0, 8)} was submitted.</span><p>Your reference is <strong>{createdComplaint.complaint_id}</strong>.</p><p>Current status: <strong>Submitted</strong>. Evidence is visible only to authorized municipal staff.</p>{citizenSession && <><a href={`/complaints/${createdComplaint.complaint_id}`}>View in My Complaints</a><br /></>}<a href={`/track/${createdComplaint.complaint_id}?token=${createdComplaint.tracking_token}`}>Open and save your private status link</a><br /><a href="#report-heading">Report another issue</a></div></div>}<button className="primary-button" type="submit" disabled={isSubmitting} aria-describedby="submit-progress"><span>{isSubmitting ? "Submitting complaint…" : "Submit complaint"}</span><span aria-hidden="true">→</span></button><span className="sr-only" id="submit-progress" aria-live="polite">{isSubmitting ? "Submission in progress. Please wait." : ""}</span></section>
           </form>
         </section>
         <aside className="list-panel" aria-labelledby="privacy-heading"><div className="section-heading list-heading"><div><span>Evidence privacy</span><h2 id="privacy-heading">Your report is not a public post</h2></div></div><p className="list-intro">Descriptions, exact locations and photos are not published in a global complaint feed. After submission, save the private status link shown in your receipt.</p><div className="state-card"><h3>Municipal access only</h3><p>Authorized staff can inspect the evidence and update the complaint. A tracking link shows only its reference, description, timestamps and status.</p></div></aside>
@@ -142,7 +147,9 @@ function RouteLoader() { return <main className="route-loader" id="main-content"
 
 export default function App() {
   const path = window.location.pathname.replace(/\/$/, "") || "/";
-  if (path.startsWith("/admin")) return <Suspense fallback={<RouteLoader />}><AdminApp /></Suspense>;
+  if (path === "/staff/accept-invite") return <Suspense fallback={<RouteLoader />}><StaffAcceptInvite /></Suspense>;
+  if (path.startsWith("/admin") || path.startsWith("/municipal") || path.startsWith("/staff/")) return <Suspense fallback={<RouteLoader />}><AdminApp /></Suspense>;
   if (path.startsWith("/track/")) return <TrackingPage />;
+  if (["/sign-in", "/sign-up", "/verify-email", "/forgot-password", "/reset-password", "/my-complaints", "/profile"].includes(path) || path.startsWith("/complaints/")) return <Suspense fallback={<RouteLoader />}><CitizenIdentity /></Suspense>;
   return path === "/" ? <CitizenApp /> : <NotFoundPage />;
 }

@@ -198,6 +198,8 @@ class MunicipalUserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     user_id: UUID
     username: str
+    email: str | None = None
+    display_name: str | None = None
     role: MunicipalRole
     is_active: bool
     created_at: datetime
@@ -238,6 +240,102 @@ class MunicipalUserUpdate(BaseModel):
         if self.role is None and self.is_active is None:
             raise ValueError("At least one account change is required")
         return self
+
+
+class CitizenSignupRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    display_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+    email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=254)]
+    password: Annotated[str, StringConstraints(min_length=15, max_length=128)]
+
+
+class CitizenLoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=254)]
+    password: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+
+
+class TokenRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: Annotated[str, StringConstraints(min_length=32, max_length=256)]
+
+
+class ResetPasswordRequest(TokenRequest):
+    password: Annotated[str, StringConstraints(min_length=15, max_length=128)]
+
+
+class EmailRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=254)]
+
+
+class PasswordChangeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    current_password: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+    new_password: Annotated[str, StringConstraints(min_length=15, max_length=128)]
+
+
+class CitizenAccountRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    account_id: UUID
+    display_name: str
+    email: str
+    state: Literal["pending_verification", "active", "disabled"]
+    email_verified_at: datetime | None
+    google_connected: bool = False
+    has_password: bool = False
+
+
+class CitizenSessionRead(BaseModel):
+    account: CitizenAccountRead
+    csrf_token: str
+    expires_at: datetime
+
+
+class CitizenStatusEventRead(BaseModel):
+    event_type: Literal["created", "status_changed"]
+    previous_status: ComplaintStatus | None
+    new_status: ComplaintStatus
+    occurred_at: datetime
+
+
+class CitizenOwnedComplaintRead(ComplaintRead):
+    history: list[CitizenStatusEventRead] = []
+
+
+class CitizenComplaintPage(BaseModel):
+    items: list[CitizenOwnedComplaintRead]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
+class StaffInvitationCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=254)]
+    role: MunicipalRole
+    department_ids: list[UUID] = Field(default_factory=list, max_length=50)
+
+
+class StaffInvitationRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    invitation_id: UUID
+    email: str
+    role: MunicipalRole
+    expires_at: datetime
+    accepted_at: datetime | None
+    revoked_at: datetime | None
+    created_at: datetime
+    department_ids: list[UUID] = []
+
+
+class StaffInvitationAccept(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: Annotated[str, StringConstraints(min_length=32, max_length=256)]
+    display_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+    username: Username
+    password: Password
 
 
 class MunicipalDepartmentCreate(BaseModel):

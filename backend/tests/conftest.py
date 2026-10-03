@@ -79,8 +79,12 @@ def migrated_engine():
 
 @pytest.fixture
 def client(migrated_engine, tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_ENV", "test")
     monkeypatch.setenv("UPLOAD_DIR", str(tmp_path / "uploads"))
     monkeypatch.setenv("AUTH_ALLOWED_ORIGINS", "http://testserver")
+    monkeypatch.setenv("PUBLIC_BASE_URL", "http://testserver")
+    monkeypatch.setenv("EMAIL_TRANSPORT", "capture")
+    monkeypatch.setenv("EMAIL_CAPTURE_DIR", str(tmp_path / "mail"))
     with migrated_engine.connect() as connection:
         transaction = connection.begin()
         app = create_app(migrated_engine.url, geocoder=StubGeocoder())

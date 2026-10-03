@@ -35,6 +35,29 @@ class AuthSettings:
     cookie_name: str
     cookie_secure: bool
     allowed_origins: frozenset[str]
+    public_base_url: str
+    verification_minutes: int
+    reset_minutes: int
+    invitation_hours: int
+
+
+@dataclass(frozen=True)
+class EmailSettings:
+    transport: str
+    from_address: str
+    capture_directory: Path
+    smtp_host: str
+    smtp_port: int
+    smtp_username: str
+    smtp_password: str
+    smtp_starttls: bool
+
+
+@dataclass(frozen=True)
+class OIDCSettings:
+    client_id: str
+    client_secret: str
+    redirect_uri: str
 
 
 @dataclass(frozen=True)
@@ -74,7 +97,51 @@ def auth_settings() -> AuthSettings:
         ).split(",")
         if value.strip()
     )
-    return AuthSettings(hours, cookie_name, secure, origins)
+    base_url = os.environ.get("PUBLIC_BASE_URL", "http://127.0.0.1:5173").strip().rstrip("/")
+    if environment == "production" and not base_url.startswith("https://"):
+        raise RuntimeError("Production PUBLIC_BASE_URL must use HTTPS")
+    verification_minutes = int(os.environ.get("AUTH_VERIFICATION_MINUTES", "60"))
+    reset_minutes = int(os.environ.get("AUTH_RESET_MINUTES", "30"))
+    invitation_hours = int(os.environ.get("AUTH_INVITATION_HOURS", "72"))
+    if not 5 <= verification_minutes <= 1440:
+        raise RuntimeError("AUTH_VERIFICATION_MINUTES must be between 5 and 1440")
+    if not 5 <= reset_minutes <= 120:
+        raise RuntimeError("AUTH_RESET_MINUTES must be between 5 and 120")
+    if not 1 <= invitation_hours <= 168:
+        raise RuntimeError("AUTH_INVITATION_HOURS must be between 1 and 168")
+    return AuthSettings(
+        hours, cookie_name, secure, origins, base_url,
+        verification_minutes, reset_minutes, invitation_hours,
+    )
+
+
+def email_settings() -> EmailSettings:
+    load_dotenv()
+    transport = os.environ.get("EMAIL_TRANSPORT", "capture").strip().lower()
+    if transport not in {"capture", "smtp", "disabled"}:
+        raise RuntimeError("EMAIL_TRANSPORT must be capture, smtp or disabled")
+    environment = os.environ.get("APP_ENV", "development").strip().lower()
+    if environment == "production" and transport == "capture":
+        raise RuntimeError("Production cannot use the development email capture adapter")
+    return EmailSettings(
+        transport=transport,
+        from_address=os.environ.get("EMAIL_FROM", "no-reply@civicai.local").strip(),
+        capture_directory=Path(os.environ.get("EMAIL_CAPTURE_DIR", "tmp/dev-mail")).resolve(),
+        smtp_host=os.environ.get("SMTP_HOST", "").strip(),
+        smtp_port=int(os.environ.get("SMTP_PORT", "587")),
+        smtp_username=os.environ.get("SMTP_USERNAME", "").strip(),
+        smtp_password=os.environ.get("SMTP_PASSWORD", ""),
+        smtp_starttls=_boolean("SMTP_STARTTLS", True),
+    )
+
+
+def oidc_settings() -> OIDCSettings:
+    load_dotenv()
+    return OIDCSettings(
+        client_id=os.environ.get("GOOGLE_OIDC_CLIENT_ID", "").strip(),
+        client_secret=os.environ.get("GOOGLE_OIDC_CLIENT_SECRET", "").strip(),
+        redirect_uri=os.environ.get("GOOGLE_OIDC_REDIRECT_URI", "http://127.0.0.1:8000/api/v1/citizen-auth/google/callback").strip(),
+    )
 
 
 def runtime_settings() -> RuntimeSettings:

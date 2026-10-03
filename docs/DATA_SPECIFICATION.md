@@ -1,5 +1,9 @@
 # Data Specification
 
+## Identity additions (`0008`)
+
+`citizen_accounts` stores minimal citizen profile/state and unique normalized email; password hashes, `(provider,issuer,subject)` federation keys, hashed verification/reset tokens and hashed OIDC flow bindings live separately. `complaints.citizen_account_id` is nullable so anonymous reporting remains first-class. `staff_invitations` and its department join record administrator-selected grants, hashed token, expiry, acceptance/revocation and actor. `municipal_sessions` has an exclusive citizen-or-staff principal constraint. Raw passwords, identity tokens, session values and action tokens are never persisted.
+
 ## Status
 
 The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at; no research dataset is claimed.

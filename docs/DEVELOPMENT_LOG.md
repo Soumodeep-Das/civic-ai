@@ -1,5 +1,9 @@
 # Development Log
 
+## 2026-10-03 — Issue #13 modern identity
+
+Added migration `0008`, verified citizen email/password identity, recovery/change flows, Google OIDC server-flow architecture, account-scoped complaint ownership/history/claiming, shared opaque sessions, provider-agnostic email, invitation-based municipal provisioning, role-neutral municipal routes and responsive identity UI. Existing anonymous capabilities, municipal RBAC/departments and research artifacts remain unchanged. Automated gates: 143 backend, 56 unchanged research and 57 frontend tests plus TypeScript and the production build passed; real Google/provider and final production-like browser verification remain pending external configuration.
+
 ## 2026-10-03 — GitHub Actions package-install repair
 
 The first `main` Quality Gates run failed before test execution because the workflow attempted `pip install -e ./research`, but `research/` is source within the repository rather than an independently packaged project and intentionally has no `pyproject.toml` or `setup.py`. The CI install step now installs the root project with its test extra only; pytest still discovers the unchanged research suite from the repository root. GitHub's container-build job had already passed, and no application, database, deployment or research behavior changed.
@@ -175,6 +179,18 @@ Implemented multipart submission, optional image_ref migration 0002, bounded JPE
 
 
 This log records engineering checkpoints and reproducible evidence. It is not a research-results log.
+
+## 2026-10-03 — Issue #13 identity verification checkpoint
+
+Issue #13 adds separate citizen and municipal identity populations, email/password citizen accounts, Google authorization-code OIDC, account-scoped complaints, anonymous complaint claiming, role-neutral municipal routes and administrator-controlled staff invitations. Migration `0008` is at development head. The final automated regression passes 143 backend tests with the same three dependency deprecations, 56 unchanged research tests and 57 frontend tests; TypeScript and the Vite production build pass.
+
+The owner verified the real Google flow through the production-like HTTPS stack: authorization returned to My Complaints, CivicAI established its opaque server-side session, refresh preserved it, Profile reported Google connection and logout ended it. Google-created identity remains citizen-only by architecture and tests.
+
+The provider-cancellation callback was also exercised in a browser. It returned to citizen sign-in with the generic Google failure message and exposed no authorization code, provider detail or token.
+
+Staff invitation testing exposed two environment defects rather than an authorization defect: a stale development backend lacked the new route, and automated test capture had polluted `tmp/dev-mail` with tokens belonging to isolated test schemas. The backend was restarted; test mail now uses per-test temporary directories; and a focused identity rerun passed 14 tests without changing the developer inbox count. A separate `compose.production.mailpit.yml` local verification override now routes production-like SMTP to a loopback-only Mailpit web inbox while keeping SMTP private. The normal production Compose contains no debug inbox and still rejects capture mode. The owner then successfully received and accepted a fresh invitation against the same production-like database.
+
+The activated operator signed in through the role-neutral staff entry, loaded the permitted dashboard and complaint queue, had no staff/department administration navigation, was denied at the direct staff-management route and successfully logged out. This completes the live municipal authorization-boundary check.
 
 ## 2026-09-20 — Issue #1 verified locally
 

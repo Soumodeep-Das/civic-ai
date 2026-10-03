@@ -19,6 +19,7 @@ dependencies = [
   "Pillow>=11,<13",
   "httpx>=0.27,<1",
   "argon2-cffi>=23.1,<26",
+  "joserfc>=1.6,<2",
 ]
 
 [project.optional-dependencies]

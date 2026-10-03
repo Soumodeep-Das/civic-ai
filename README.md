@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issues #9–#10 add protected municipal operations and responsive/accessibility hardening. Completed Issue #11 adds [departments, membership, accountable assignment and server-backed work queues](docs/ISSUE_011_DEPARTMENT_OWNERSHIP.md). Issue #12 adds a portable [production deployment](docs/DEPLOYMENT.md), protected evidence, private citizen tracking, readiness, backup/restore tooling and CI. Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus confirmed location in the citizen frontend. Issues #9–#11 add protected municipal operations, responsive accessibility, departments and accountable queues. Issue #12 adds portable production deployment, private tracking/evidence, recovery and CI. Issue #13 adds [modern citizen identity and invitation-only municipal access](docs/ISSUE_013_MODERN_IDENTITY.md) without removing anonymous reporting. Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
 Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
@@ -12,13 +12,13 @@ Issue #6 is in progress: [India-only dataset audit and preparation](docs/ISSUE_0
 
 Issue #7 Stage A is implemented: [offline human review](docs/ISSUE_007_HUMAN_REVIEW.md) generates ignored, checksum-bound CSV forms for taxonomy, mapping, privacy, record, duplicate, license and final approval decisions. No decision is prefilled, Stage B is waiting for real reviewers, and training remains prohibited.
 
-Issue #8 adds the [municipal operations vertical slice](docs/ISSUE_008_MUNICIPAL_OPERATIONS.md): controlled lifecycle, immutable history, optimistic concurrency, a paginated/searchable/filterable operator queue, evidence/location detail and real operational counts. Issue #9 adds [real municipal authentication and RBAC](docs/ISSUE_009_AUTH_RBAC.md). Open `/admin`; unauthenticated users see `/admin/login`. Operators manage complaints and administrators additionally manage municipal accounts.
+Issue #8 adds the [municipal operations vertical slice](docs/ISSUE_008_MUNICIPAL_OPERATIONS.md), and Issue #9 adds [municipal authentication and RBAC](docs/ISSUE_009_AUTH_RBAC.md). The visible staff entry is `/staff/sign-in` and the role-neutral workspace is `/municipal`; legacy `/admin` bookmarks remain compatible. Operators manage authorized complaints while administrators additionally manage departments and municipal staff invitations.
 
 The citizen form and municipal workspace reflow from small phones through large desktops. Narrow municipal screens use complaint cards and a compact keyboard-operable menu; wider screens use the data table and full navigation. Every route has a meaningful title and unknown citizen/admin routes have contextual recovery pages. Accessibility work follows selected GIGW/WCAG patterns but is not a formal conformance claim.
 
 ## Municipal authentication
 
-Apply migrations through `0007`, then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
+Apply migrations through `0008`, then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic upgrade head
@@ -26,6 +26,14 @@ Apply migrations through `0007`, then create the first administrator interactive
 ```
 
 Municipal sessions use a random opaque cookie and PostgreSQL session record. Only a SHA-256 digest of the authentication token is stored. The cookie is HttpOnly and SameSite=Strict; authenticated mutations also require a session-bound CSRF token and permitted browser Origin. Sessions expire absolutely after eight hours by default. Set `AUTH_COOKIE_SECURE=true` with `APP_ENV=production`; production startup refuses an insecure cookie. CivicAI intentionally enables no backend CORS middleware because the supported browser deployment is same-origin (Vite proxy locally, reverse proxy in production).
+
+## Citizen accounts and development email
+
+Accounts are optional. Email/password citizens verify ownership before sign-in; Google OIDC is available when configured. Signed-in submissions are saved to `/my-complaints`; guest submissions keep their Issue #12 capability link and can later be claimed only with that capability. Citizen passwords require 15–128 characters and use Argon2id. Municipal authority is never inferred from citizen signup, Google identity or email.
+
+Local `EMAIL_TRANSPORT=capture` writes verification/reset/invitation messages to ignored `tmp/dev-mail/*.json`; open the newest file privately and use its link. Automated tests use their own per-test temporary mail directories and never populate the developer inbox. Production must configure SMTP or explicitly disable delivery. Google needs an OAuth web client and exact callback `http://127.0.0.1:5173/api/v1/citizen-auth/google/callback` for the Vite same-origin development flow (or the real HTTPS-domain callback in production). Keep client secrets in ignored `.env` files.
+
+For production-like Docker verification without a real SMTP provider, add the explicitly local `compose.production.mailpit.yml` override. It routes backend SMTP to Mailpit and exposes the debug inbox only at `http://127.0.0.1:8025`; SMTP is not published to the host. Do not use this override for a real deployment.
 
 Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
 
@@ -78,7 +86,7 @@ Use PostgreSQL's administration tools to create two empty databases: civicai and
 
 Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/complaints, choose Try it out, enter a description and optional coordinates, and Execute. Save both the returned `complaint_id` and `tracking_token`; the status endpoint requires both. There is no anonymous global complaint list. `GET /health` reports process liveness and the safe release identifier; `GET /ready` checks PostgreSQL, migration head and evidence storage.
 
-Schema creation uses Alembic, never automatic startup table creation. Complaint submission is anonymous; later status access requires the returned bearer capability. Every `/api/v1/admin/*` operation and evidence retrieval is authenticated server-side; account management additionally requires `municipal_admin`.
+Schema creation uses Alembic, never automatic startup table creation. Complaint submission may be anonymous or linked from the server-authenticated citizen session; anonymous status access requires its bearer capability. Every municipal operation is authenticated server-side; staff management additionally requires `municipal_admin`.
 
 ### Start the complete local MVP with one command
 
@@ -163,7 +171,7 @@ Do not use example values in production. Follow the full [deployment checklist](
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and migrations through 0007.
+- backend/migrations: Alembic environment and migrations through 0008.
 - backend/tests: API, migration consistency and database constraint tests.
 - frontend/src: React complaint form, accessible location picker, lazy-loaded map, private tracking page, municipal workspace, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.

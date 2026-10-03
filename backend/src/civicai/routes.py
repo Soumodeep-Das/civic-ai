@@ -7,15 +7,16 @@ from fastapi.responses import FileResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from civicai import ownership, service
 from civicai.auth import (
     DUMMY_PASSWORD_HASH, AdminAuth, CsrfAuth, OperatorAuth, create_login_session,
-    create_user, record_audit, utc_now, verify_password, update_user,
+    create_user, record_audit, token_digest, utc_now, verify_password, update_user,
 )
 from civicai.database import get_session
+from civicai.citizen_auth import optional_citizen_context
 from civicai.geocoding import Geocoder
 from civicai.schemas import (
     AdminComplaintDetail, AdminComplaintPage, AdminComplaintRead, ComplaintCreate, ComplaintRead,
@@ -147,7 +148,11 @@ async def create(request: Request, session: DatabaseSession):
             except OSError:
                 raise HTTPException(503, "Image storage is temporarily unavailable.") from None
         try:
-            complaint = service.create_complaint(session, data, image_ref)
+            citizen = optional_citizen_context(request, session)
+            complaint = service.create_complaint(
+                session, data, image_ref,
+                citizen_account_id=citizen.account.account_id if citizen else None,
+            )
             values = ComplaintRead.model_validate(complaint).model_dump()
             values["image_ref"] = None
             values["tracking_token"] = tracking_token(
@@ -368,7 +373,7 @@ def admin_update_user(
 
 
 @router.get("/api/v1/complaint-images/{filename}")
-def get_image(filename: str, request: Request, session: DatabaseSession, auth: OperatorAuth):
+def get_image(filename: str, request: Request, session: DatabaseSession):
     path = image_path(request.app.state.upload_directory, filename)
     if not path.is_file():
         raise HTTPException(404, "Complaint image not found.")
@@ -377,6 +382,19 @@ def get_image(filename: str, request: Request, session: DatabaseSession, auth: O
     ))
     if complaint is None:
         raise HTTPException(404, "Complaint image not found.")
-    ownership.require_complaint_access(session, auth.user, complaint)
+    raw = request.cookies.get(request.app.state.auth_settings.cookie_name, "")
+    auth_session = session.scalar(select(MunicipalSession).where(
+        MunicipalSession.token_hash == token_digest(raw), MunicipalSession.revoked_at.is_(None),
+        MunicipalSession.expires_at > func.now(),
+    )) if raw else None
+    if auth_session is None:
+        raise HTTPException(401, "Authentication required.")
+    if auth_session.user_id is not None:
+        user = session.get(MunicipalUser, auth_session.user_id)
+        if user is None or not user.is_active:
+            raise HTTPException(401, "Authentication required.")
+        ownership.require_complaint_access(session, user, complaint)
+    elif auth_session.citizen_account_id != complaint.citizen_account_id:
+        raise HTTPException(404, "Complaint image not found.")
     return FileResponse(path, media_type="image/png" if path.suffix == ".png" else "image/jpeg",
                         headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, no-store"})

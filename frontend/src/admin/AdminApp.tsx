@@ -6,9 +6,9 @@ import {
   updateComplaintAssignment, updateComplaintStatus,
 } from "../api/complaints";
 import {
-  AuthSession, MunicipalDepartment, MunicipalRole, MunicipalUser, addDepartmentMember,
-  createDepartment, createUser, getSession, listDepartments, listUsers, login, logout,
-  removeDepartmentMember, updateDepartment, updateUser,
+  AuthSession, MunicipalDepartment, MunicipalRole, MunicipalUser, StaffInvitation, addDepartmentMember,
+  createDepartment, getSession, listDepartments, listUsers, login, logout,
+  removeDepartmentMember, updateDepartment, updateUser, inviteStaff, listStaffInvitations, revokeStaffInvitation,
 } from "../api/auth";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { StatusBadge, statusLabels } from "../ui/StatusBadge";
@@ -32,13 +32,20 @@ function readableDate(value: string): string {
 function useDocumentTitle(title: string) { useEffect(() => { document.title = title; }, [title]); }
 
 function usePathname() {
-  const [path, setPath] = useState(window.location.pathname.replace(/\/$/, "") || "/");
+  const normalize = (value: string) => {
+    const clean = value.replace(/\/$/, "") || "/";
+    if (clean === "/staff/sign-in") return "/admin/login";
+    return clean.replace(/^\/municipal/, "/admin");
+  };
+  const publicPath = (value: string) => value.replace(/^\/admin/, "/municipal");
+  const [path, setPath] = useState(normalize(window.location.pathname));
   useEffect(() => {
-    const change = () => setPath(window.location.pathname.replace(/\/$/, "") || "/");
+    const change = () => setPath(normalize(window.location.pathname));
     window.addEventListener("popstate", change); return () => window.removeEventListener("popstate", change);
   }, []);
   const navigate = useCallback((next: string) => {
-    window.history.pushState({}, "", next); setPath(next.replace(/\/$/, "") || "/"); window.scrollTo({ top: 0 });
+    const visible = next === "/admin/login" ? "/staff/sign-in" : publicPath(next);
+    window.history.pushState({}, "", visible); setPath(normalize(visible)); window.scrollTo({ top: 0 });
   }, []);
   return [path, navigate] as const;
 }
@@ -61,8 +68,8 @@ function LoginPage({ returnTo, message, onAuthenticated }: { returnTo: string; m
   }
   return <main className="admin-login-page" id="main-content"><section className="admin-login-card" aria-labelledby="login-title">
     <a href="/" className="admin-brand">Civic<span>AI</span> Operations</a>
-    <p className="eyebrow">Restricted municipal workspace</p><h1 id="login-title">Municipal sign in</h1>
-    <p>Use the account created by your municipal administrator. Citizen complaint submission remains anonymous.</p>
+    <p className="eyebrow">Restricted municipal workspace</p><h1 id="login-title">Municipal staff sign in</h1>
+    <p>Use your approved staff account. Need municipal access? Contact your municipal administrator.</p>
     {message && <div className="admin-notice" role="status">{message}</div>}
     {error && <div className="admin-state admin-error" role="alert"><strong>Sign in failed</strong><p>{error}</p></div>}
     <form onSubmit={submit}><label htmlFor="admin-username">Username</label><input id="admin-username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /><label htmlFor="admin-password">Password</label><input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? "Signing in…" : "Sign in"}</button><span className="sr-only" role="status">{submitting ? "Signing in. Please wait." : ""}</span></form>
@@ -89,7 +96,7 @@ function AdminShell({ children, path, navigate, session, onLogout }: { children:
     <nav ref={nav} id="admin-navigation" className={menuOpen ? "open" : ""} aria-label="Municipal navigation">
       <AdminLink href="/admin" navigate={navigate} onNavigate={closeMenu} className={path === "/admin" ? "active" : undefined}>Dashboard</AdminLink>
       <AdminLink href="/admin/complaints" navigate={navigate} onNavigate={closeMenu} className={path.startsWith("/admin/complaints") ? "active" : undefined}>Complaints</AdminLink>
-      {session.user.role === "municipal_admin" && <AdminLink href="/admin/users" navigate={navigate} onNavigate={closeMenu} className={path === "/admin/users" ? "active" : undefined}>Accounts</AdminLink>}
+      {session.user.role === "municipal_admin" && <AdminLink href="/admin/users" navigate={navigate} onNavigate={closeMenu} className={path === "/admin/users" ? "active" : undefined}>Municipal Staff</AdminLink>}
       {session.user.role === "municipal_admin" && <AdminLink href="/admin/departments" navigate={navigate} onNavigate={closeMenu} className={path === "/admin/departments" ? "active" : undefined}>Departments</AdminLink>}
       <a href="/">Citizen view</a>
     </nav>
@@ -196,40 +203,23 @@ function ComplaintDetail({ complaintId, navigate, session, onExpired }: { compla
 
 type PendingUserAction = { user: MunicipalUser; input: { role?: MunicipalRole; is_active?: boolean }; title: string; description: string; confirmLabel: string; destructive: boolean };
 
-function UserManagement({ session, onExpired }: { session: AuthSession; onExpired: () => void }) {
-  useDocumentTitle("Municipal accounts | CivicAI");
-  const [users, setUsers] = useState<MunicipalUser[]>([]); const [error, setError] = useState(""); const [success, setSuccess] = useState("");
-  const [username, setUsername] = useState(""); const [password, setPassword] = useState(""); const [role, setRole] = useState<MunicipalRole>("municipal_operator"); const [saving, setSaving] = useState(false); const [pending, setPending] = useState<PendingUserAction>(); const actionButton = useRef<HTMLElement>(null);
+function StaffManagement({ session, onExpired }: { session: AuthSession; onExpired: () => void }) {
+  useDocumentTitle("Municipal staff | CivicAI");
+  const [users, setUsers] = useState<MunicipalUser[]>([]); const [invitations, setInvitations] = useState<StaffInvitation[]>([]); const [departments, setDepartments] = useState<MunicipalDepartment[]>([]);
+  const [email, setEmail] = useState(""); const [role, setRole] = useState<MunicipalRole>("municipal_operator"); const [departmentIds, setDepartmentIds] = useState<string[]>([]);
+  const [error, setError] = useState(""); const [success, setSuccess] = useState(""); const [saving, setSaving] = useState(false);
+  const [pending, setPending] = useState<PendingUserAction>(); const actionButton = useRef<HTMLElement>(null);
   const load = useCallback(async () => {
-    try { setUsers(await listUsers()); setError(""); }
-    catch (reason) { if (reason instanceof ApiError && reason.status === 401) onExpired(); else setError(reason instanceof Error ? reason.message : "Accounts could not be loaded."); }
+    try { const [nextUsers, nextInvites, nextDepartments] = await Promise.all([listUsers(), listStaffInvitations(), listDepartments(false)]); setUsers(nextUsers); setInvitations(nextInvites); setDepartments(nextDepartments); setError(""); }
+    catch (reason) { if (reason instanceof ApiError && reason.status === 401) onExpired(); else setError(reason instanceof Error ? reason.message : "Municipal staff could not be loaded."); }
   }, [onExpired]);
   useEffect(() => { void load(); }, [load]);
-  async function submit(event: FormEvent) {
-    event.preventDefault(); if (saving) return; setSaving(true); setError(""); setSuccess("");
-    try { await createUser({ username, password, role }, session.csrf_token); setUsername(""); setPassword(""); setRole("municipal_operator"); await load(); setSuccess("Municipal account created."); }
-    catch (reason) { if (reason instanceof ApiError && reason.status === 401) onExpired(); else setError(reason instanceof Error ? reason.message : "Account could not be created."); }
-    finally { setSaving(false); }
-  }
-  async function applyPending() {
-    if (!pending) return; setSaving(true); setError(""); setSuccess("");
-    try { await updateUser(pending.user.user_id, pending.input, session.csrf_token); await load(); setSuccess(`${pending.user.username} was updated.`); setPending(undefined); }
-    catch (reason) { if (reason instanceof ApiError && reason.status === 401) onExpired(); else setError(reason instanceof Error ? reason.message : "Account could not be updated."); }
-    finally { setSaving(false); }
-  }
-  function requestRole(user: MunicipalUser, nextRole: MunicipalRole, element: HTMLElement) {
-    actionButton.current = element; setPending({ user, input: { role: nextRole }, title: `Change ${user.username}'s role?`, description: `${user.username} will become ${roleLabels[nextRole].toLowerCase()}. Their permissions will change immediately.`, confirmLabel: "Change role", destructive: nextRole === "municipal_operator" });
-  }
-  function requestActive(user: MunicipalUser, element: HTMLElement) {
-    actionButton.current = element;
-    if (!user.is_active) { void updateUser(user.user_id, { is_active: true }, session.csrf_token).then(async () => { await load(); setSuccess(`${user.username} was reactivated.`); }).catch((reason) => { if (reason instanceof ApiError && reason.status === 401) onExpired(); else setError(reason instanceof Error ? reason.message : "Account could not be reactivated."); }); return; }
-    setPending({ user, input: { is_active: false }, title: `Disable ${user.username}?`, description: "The account will be unable to sign in and its active sessions will be revoked. Its audit history will remain.", confirmLabel: "Disable account", destructive: true });
-  }
-  return <section className="admin-users"><div className="admin-title"><div><p className="eyebrow">Administrator only</p><h1>Municipal accounts</h1><p>Create and maintain the minimum accounts needed for complaint operations.</p></div></div>{error && <div className="admin-state admin-error" role="alert"><strong>Account action not completed</strong><p>{error}</p></div>}{success && <div className="admin-success" role="status">{success}</div>}
-    <div className="user-management-grid"><article className="detail-card"><h2>Create account</h2><form onSubmit={submit}><label htmlFor="new-username">Username</label><input id="new-username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} minLength={3} maxLength={64} required /><label htmlFor="new-password">Temporary password</label><input id="new-password" type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} minLength={12} maxLength={128} required /><p className="detail-muted">Use 12–128 characters. Share it through a secure channel.</p><label htmlFor="new-role">Role</label><select id="new-role" value={role} onChange={(event) => setRole(event.target.value as MunicipalRole)}><option value="municipal_operator">Municipal operator</option><option value="municipal_admin">Municipal administrator</option></select><button disabled={saving}>{saving ? "Creating account…" : "Create account"}</button></form><p className="detail-muted">Password reset is outside this milestone. Never reuse a personal password.</p></article>
-      <article className="detail-card account-list"><h2>Existing accounts</h2>{users.length === 0 ? <div className="evidence-placeholder">No municipal accounts were returned.</div> : users.map((user) => <div className="account-row" key={user.user_id}><div><strong>{user.username}</strong><small>{roleLabels[user.role]} · {user.is_active ? "Active" : "Disabled"}</small></div><label><span className="sr-only">Role for {user.username}</span><select aria-label={`Role for ${user.username}`} value={user.role} disabled={user.user_id === session.user.user_id || saving} onChange={(event) => requestRole(user, event.target.value as MunicipalRole, event.currentTarget)}><option value="municipal_operator">Operator</option><option value="municipal_admin">Administrator</option></select></label><button type="button" disabled={user.user_id === session.user.user_id || saving} onClick={(event) => requestActive(user, event.currentTarget)}>{user.is_active ? "Disable" : "Reactivate"}</button></div>)}</article></div>
-    <ConfirmDialog open={Boolean(pending)} title={pending?.title ?? "Confirm account change"} description={<p>{pending?.description}</p>} confirmLabel={pending?.confirmLabel ?? "Confirm"} destructive={pending?.destructive} busy={saving} returnFocusRef={actionButton} onCancel={() => setPending(undefined)} onConfirm={() => void applyPending()} />
-  </section>;
+  async function submit(event: FormEvent) { event.preventDefault(); setSaving(true); setError(""); setSuccess(""); try { await inviteStaff({ email, role, department_ids: departmentIds }, session.csrf_token); setEmail(""); setDepartmentIds([]); await load(); setSuccess("Invitation sent through the configured email service."); } catch (reason) { setError(reason instanceof Error ? reason.message : "Invitation could not be created."); } finally { setSaving(false); } }
+  async function revoke(invitation: StaffInvitation) { setSaving(true); try { await revokeStaffInvitation(invitation.invitation_id, session.csrf_token); await load(); setSuccess("Pending invitation revoked."); } catch (reason) { setError(reason instanceof Error ? reason.message : "Invitation could not be revoked."); } finally { setSaving(false); } }
+  async function applyPending() { if (!pending) return; setSaving(true); setError(""); try { await updateUser(pending.user.user_id, pending.input, session.csrf_token); await load(); setSuccess(`${pending.user.username} was updated.`); setPending(undefined); } catch (reason) { setError(reason instanceof Error ? reason.message : "Account could not be updated."); } finally { setSaving(false); } }
+  function requestRole(user: MunicipalUser, next: MunicipalRole, element: HTMLElement) { actionButton.current = element; setPending({ user, input: { role: next }, title: `Change ${user.username}'s role?`, description: `${user.username} will become ${roleLabels[next].toLowerCase()}. Their permissions will change immediately.`, confirmLabel: "Change role", destructive: next === "municipal_operator" }); }
+  function requestActive(user: MunicipalUser, element: HTMLElement) { actionButton.current = element; if (!user.is_active) { void updateUser(user.user_id, { is_active: true }, session.csrf_token).then(async () => { await load(); setSuccess(`${user.username} was reactivated.`); }).catch((reason) => setError(reason instanceof Error ? reason.message : "Account could not be reactivated.")); return; } setPending({ user, input: { is_active: false }, title: `Disable ${user.username}?`, description: "The account will be unable to sign in and its active sessions will be revoked. Its audit history will remain.", confirmLabel: "Disable account", destructive: true }); }
+  return <section className="admin-users"><div className="admin-title"><div><p className="eyebrow">Administrator only</p><h1>Municipal Staff</h1><p>Invite approved staff. Recipients choose their own password; role and departments stay under administrator control.</p></div></div>{error && <div className="admin-state admin-error" role="alert"><strong>Staff action not completed</strong><p>{error}</p></div>}{success && <div className="admin-success" role="status">{success}</div>}<div className="user-management-grid"><article className="detail-card"><h2>Invite staff member</h2><form onSubmit={submit}><label htmlFor="invite-email">Work email</label><input id="invite-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /><label htmlFor="invite-role">Role</label><select id="invite-role" value={role} onChange={(event) => setRole(event.target.value as MunicipalRole)}><option value="municipal_operator">Municipal operator</option><option value="municipal_admin">Municipal administrator</option></select><fieldset className="invite-departments"><legend>Initial departments</legend>{departments.map((department) => <label key={department.department_id}><input type="checkbox" checked={departmentIds.includes(department.department_id)} onChange={(event) => setDepartmentIds((current) => event.target.checked ? [...current, department.department_id] : current.filter((id) => id !== department.department_id))} /> {department.display_name}</label>)}</fieldset><button disabled={saving}>{saving ? "Sending invitation…" : "Invite staff member"}</button></form></article><article className="detail-card account-list"><h2>Existing staff</h2>{users.map((user) => <div className="account-row" key={user.user_id}><div><strong>{user.display_name || user.username}</strong><small>{user.username} · {roleLabels[user.role]} · {user.is_active ? "Active" : "Disabled"}</small></div><select aria-label={`Role for ${user.username}`} value={user.role} disabled={user.user_id === session.user.user_id || saving} onChange={(event) => requestRole(user, event.target.value as MunicipalRole, event.currentTarget)}><option value="municipal_operator">Operator</option><option value="municipal_admin">Administrator</option></select><button type="button" disabled={user.user_id === session.user.user_id || saving} onClick={(event) => requestActive(user, event.currentTarget)}>{user.is_active ? "Disable" : "Reactivate"}</button></div>)}</article></div><article className="detail-card"><h2>Invitations</h2>{invitations.length === 0 ? <p>No staff invitations yet.</p> : invitations.map((invitation) => <div className="account-row" key={invitation.invitation_id}><div><strong>{invitation.email}</strong><small>{roleLabels[invitation.role]} · {invitation.accepted_at ? "Accepted" : invitation.revoked_at ? "Revoked" : "Pending"}</small></div>{!invitation.accepted_at && !invitation.revoked_at && <button type="button" disabled={saving} onClick={() => void revoke(invitation)}>Revoke</button>}</div>)}</article><ConfirmDialog open={Boolean(pending)} title={pending?.title ?? "Confirm account change"} description={<p>{pending?.description}</p>} confirmLabel={pending?.confirmLabel ?? "Confirm"} destructive={pending?.destructive} busy={saving} returnFocusRef={actionButton} onCancel={() => setPending(undefined)} onConfirm={() => void applyPending()} /></section>;
 }
 
 function DepartmentManagement({ session, onExpired }: { session: AuthSession; onExpired: () => void }) {
@@ -258,7 +248,7 @@ export default function AdminApp() {
   const intendedPath = path === "/admin/login" ? "/admin" : path;
   const verify = useCallback(async () => {
     setLoading(true); setStartupError("");
-    try { const current = await getSession(); setSession(current); if (window.location.pathname === "/admin/login") navigate("/admin"); }
+    try { const current = await getSession(); setSession(current); if (["/admin/login", "/staff/sign-in"].includes(window.location.pathname)) navigate("/admin"); }
     catch (reason) { setSession(undefined); if (!(reason instanceof ApiError && reason.status === 401)) setStartupError(reason instanceof Error ? reason.message : "Authentication service unavailable."); }
     finally { setLoading(false); }
   }, [navigate]);
@@ -270,7 +260,7 @@ export default function AdminApp() {
   if (path === "/admin") content = <Dashboard navigate={navigate} onExpired={expired} session={session} />;
   else if (path === "/admin/complaints") content = <ComplaintTable navigate={navigate} onExpired={expired} session={session} />;
   else if (match) content = <ComplaintDetail complaintId={decodeURIComponent(match[1])} navigate={navigate} session={session} onExpired={expired} />;
-  else if (path === "/admin/users") content = session.user.role === "municipal_admin" ? <UserManagement session={session} onExpired={expired} /> : <section className="admin-state admin-error" role="alert"><strong>Administrator permission required</strong><p>Your account can review complaints but cannot manage municipal accounts.</p></section>;
+  else if (path === "/admin/users") content = session.user.role === "municipal_admin" ? <StaffManagement session={session} onExpired={expired} /> : <section className="admin-state admin-error" role="alert"><strong>Administrator permission required</strong><p>Your account can review complaints but cannot manage municipal accounts.</p></section>;
   else if (path === "/admin/departments") content = session.user.role === "municipal_admin" ? <DepartmentManagement session={session} onExpired={expired} /> : <section className="admin-state admin-error" role="alert"><strong>Administrator permission required</strong><p>Your account cannot manage departments.</p></section>;
   else content = <AdminNotFound navigate={navigate} />;
   return <AdminShell path={path} navigate={navigate} session={session} onLogout={async () => { try { await logout(session.csrf_token); } finally { setSession(undefined); setAuthMessage("You have signed out."); navigate("/admin/login"); } }}>{content}</AdminShell>;

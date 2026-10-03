@@ -88,6 +88,19 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-900); }
 .image-preview { width: 6rem; aspect-ratio: 4/3; display: grid; place-items: center; overflow: hidden; background: var(--paper-200); color: var(--ink-600); font-size: .75rem; }
 .image-preview img { width: 100%; height: 100%; object-fit: cover; }.selected-image strong { display: block; overflow-wrap: anywhere; }.selected-image .text-button { margin-top: var(--space-2); }
 .notice { margin-top: var(--space-4); padding: var(--space-4); border-left: 4px solid; line-height: 1.5; }.notice p { margin: .35rem 0 0; }.error-notice { border-color: var(--danger-700); background: var(--danger-100); color: #681f18; }
+.success-notice { border-color: var(--success-700); background: var(--success-100); color: var(--success-700); }
+
+/* Citizen identity */
+.identity-page, .account-page { width: min(100% - 2rem, 70rem); min-height: calc(100vh - 10rem); margin: 0 auto; padding: clamp(2rem, 7vw, 5rem) 0; }
+.identity-card { width: min(100%, 34rem); margin: 0 auto; padding: clamp(1.25rem, 5vw, 2.5rem); border: 1px solid var(--paper-300); border-radius: var(--radius-lg); background: var(--paper-50); box-shadow: var(--shadow-1); }
+.identity-card h1, .account-page > h1 { margin: 0 0 var(--space-3); font: 700 clamp(2rem, 6vw, 3.2rem)/1.05 var(--font-display); }
+.identity-card form { margin-top: var(--space-4); }.identity-card .primary-button { margin-top: var(--space-5); }
+.google-button { min-height: 3.25rem; margin-top: var(--space-5); display: grid; place-items: center; border: 2px solid var(--ink-700); border-radius: var(--radius-sm); background: var(--white); font-weight: 800; text-decoration: none; }
+.identity-divider { margin: var(--space-5) 0; display: flex; align-items: center; gap: var(--space-3); color: var(--ink-600); font-size: .8rem; text-transform: uppercase; }.identity-divider::before,.identity-divider::after { content: ""; height: 1px; flex: 1; background: var(--paper-300); }
+.form-side-link { margin-top: var(--space-3); display: inline-block; }.account-page > p { max-width: 52rem; line-height: 1.6; }
+.account-page .complaint-list { margin-top: var(--space-6); }.account-page > .detail-card { margin-top: var(--space-5); }
+.status-timeline { padding-left: 1.4rem; }.status-timeline li { padding: var(--space-3); }.status-timeline strong { text-transform: capitalize; }.status-timeline time { margin-left: var(--space-3); color: var(--ink-600); font-size: .82rem; }
+.invite-departments { margin: var(--space-4) 0; padding: var(--space-3); border: 1px solid var(--paper-300); }.invite-departments label { display: flex; align-items: center; gap: var(--space-2); }.invite-departments input { width: auto; min-height: auto; }
 .success-panel { margin: var(--space-4) 0; padding: var(--space-5); display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); border: 2px solid var(--success-700); background: var(--success-100); }
 .success-panel h3, .success-panel p { margin: 0; }.success-panel p { margin-top: var(--space-2); line-height: 1.5; overflow-wrap: anywhere; }.success-panel a { display: inline-block; margin-top: var(--space-3); font-weight: 800; }.success-icon { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--success-700); color: var(--white); font-weight: 900; }
 

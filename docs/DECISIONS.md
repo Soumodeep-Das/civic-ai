@@ -1,5 +1,17 @@
 # Decision Log
 
+## D029 Separate citizen identity and explicit municipal authority (2026-10-03, accepted)
+
+- Citizens self-register; staff remain bootstrap/invitation-only.
+- Preserve `municipal_users` and evolve the session table instead of rewriting proven RBAC/history.
+- Use 15–128 character citizen passwords, Argon2id, bounded common-password blocking and no composition/rotation rule.
+- Normalize email by trim plus lowercase comparison; never apply provider-specific transformations.
+- Store action tokens hashed, single-use and time-limited; reset revokes citizen sessions.
+- Use Google authorization-code OIDC, JWKS signature validation, state/nonce and issuer+subject; refuse email-only linking.
+- Use captured development mail and configurable production SMTP through `EmailService`.
+- Use `/municipal` and `/staff/sign-in` visibly while preserving `/admin` compatibility.
+- Defer explicit federation linking, staff Google login, MFA, account deletion and notifications.
+
 ## D028 Separate public MapTiler tile credential (2026-10-02, accepted)
 
 - Context: Production-like browser verification showed OpenStreetMap `Access blocked / 403` tiles when `tile.openstreetmap.org` was compiled as the production default. OSM policy must not be bypassed or spoofed.

@@ -39,6 +39,9 @@ Generate separate random values for `POSTGRES_PASSWORD` and `PUBLIC_TRACKING_SEC
 - `RELEASE_ID` to the deployed Git commit SHA;
 - `MAPTILER_API_KEY` for geocoding and, on the current one-key plan, frontend tiles;
 - optional `VITE_MAPTILER_API_KEY` only when a future plan permits a distinct browser key.
+- `PUBLIC_BASE_URL` and `AUTH_ALLOWED_ORIGINS` to the exact HTTPS CivicAI origin;
+- SMTP transport/from/host/credential settings for verification, reset and invitation mail;
+- a Google OAuth web client ID/secret and exact HTTPS callback when Google citizen sign-in is enabled.
 
 `.env.production` is ignored. Never put credentials in Compose YAML, shell history, images, screenshots, logs, or Git. With the current single-key MapTiler plan, leave `VITE_MAPTILER_API_KEY` empty: Compose supplies `MAPTILER_API_KEY` to both backend geocoding and the Vite build. That shared value is visible in the compiled bundle and browser network requests, so it is not secret. In MapTiler, add `localhost` (without protocol or port) to Allowed HTTP Origins for local production-like verification and restrict real deployment to the actual CivicAI domain. Compose derives `MAPTILER_REQUEST_ORIGIN=https://CIVICAI_SITE_ADDRESS` so origin-restricted server geocoding identifies the same application origin. MapTiler's localhost rule is only a usage control and cannot authenticate a local machine. If the plan later permits multiple keys, set `VITE_MAPTILER_API_KEY` to a distinct browser-restricted value without changing code.
 
@@ -74,6 +77,16 @@ docker compose --env-file .env.production -f compose.production.yml exec backend
 ```
 
 The password prompt is interactive; no password belongs in `.env.production` or Compose.
+
+In Google Cloud, configure the OAuth consent screen, permitted test users if the app is still in testing, and exact redirect `https://YOUR_DOMAIN/api/v1/citizen-auth/google/callback`. This server flow loads no Google JavaScript in CivicAI, so Caddy's CSP requires no broad Google script/frame allowance. Verify SMTP delivery and Google login with synthetic accounts before announcing those methods as available.
+
+### Local production-like email verification
+
+When verifying the Docker deployment on one developer machine without a real SMTP provider, include `compose.production.mailpit.yml` after the normal Compose file. Open the captured inbox at `http://127.0.0.1:8025`. The override publishes only the Mailpit web UI to loopback; its SMTP listener stays inside the private Compose network. It is a local testing tool, not a deployment component, and must not be included in a real production command.
+
+```powershell
+docker compose --env-file .env.production -f compose.production.yml -f compose.production.mailpit.yml up -d --force-recreate mailpit backend proxy
+```
 
 Clean shutdown retains all named volumes:
 

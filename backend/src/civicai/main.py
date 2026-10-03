@@ -12,12 +12,15 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from civicai.auth import LoginThrottle
-from civicai.config import auth_settings, database_url, geocoding_settings, runtime_settings
+from civicai.auth import DUMMY_PASSWORD_HASH, LoginThrottle
+from civicai.config import auth_settings, database_url, email_settings, geocoding_settings, oidc_settings, runtime_settings
 from civicai.database import build_engine
 from civicai.domain import AssignmentConflict, ComplaintNotFound, DepartmentNotFound, InvalidStatusTransition, StaleComplaintUpdate
 from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
 from civicai.routes import router
+from civicai.identity_routes import identity_router
+from civicai.emailing import build_email_service
+from civicai.oidc import GoogleOIDCClient
 from civicai.uploads import upload_directory
 from starlette.exceptions import HTTPException
 
@@ -34,6 +37,11 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
         app.state.upload_directory.mkdir(parents=True, exist_ok=True)
         app.state.auth_settings = auth_settings()
         app.state.login_throttle = LoginThrottle()
+        app.state.identity_throttle = LoginThrottle(limit=5, window_seconds=600)
+        app.state.dummy_password_hash = DUMMY_PASSWORD_HASH
+        app.state.email_service = build_email_service(email_settings())
+        app.state.oidc_settings = oidc_settings()
+        app.state.oidc_client = GoogleOIDCClient(app.state.oidc_settings)
         settings = geocoding_settings()
         if geocoder is not None:
             app.state.geocoder = geocoder
@@ -55,6 +63,7 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
 
     app = FastAPI(title="CivicAI", version="0.1.0", lifespan=lifespan)
     app.include_router(router)
+    app.include_router(identity_router)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
@@ -72,7 +81,7 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
             response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
         if request.app.state.runtime_settings.environment == "production":
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        if request.url.path.startswith(("/api/v1/auth", "/api/v1/admin")):
+        if request.url.path.startswith(("/api/v1/auth", "/api/v1/citizen", "/api/v1/staff", "/api/v1/admin")):
             response.headers["Cache-Control"] = "no-store"
         LOGGER.info(json.dumps({
             "event": "http_request", "request_id": request_id,
@@ -103,7 +112,7 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
                 revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one_or_none()
         except Exception:
             return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "database"})
-        if revision != "0007":
+        if revision != "0008":
             return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "schema"})
         return {"status": "ready", "release": request.app.state.runtime_settings.release_id}
 

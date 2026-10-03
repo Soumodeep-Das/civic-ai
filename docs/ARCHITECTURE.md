@@ -1,5 +1,9 @@
 # Architecture
 
+## Issue #13 identity boundary
+
+Citizen authentication uses `citizen_accounts` plus separate password and federated credentials. Municipal authorization remains explicit in `municipal_users` and department memberships; email matching never grants authority. The existing PostgreSQL opaque-session table now represents exactly one citizen or municipal principal per row, preserving revocation, CSRF, Secure/HttpOnly/SameSite cookies and existing staff sessions. Complaint ownership is a nullable citizen foreign key assigned only from a validated session. See `ISSUE_013_MODERN_IDENTITY.md`.
+
 ## Status and principles
 
 This document defines a deliberately small architecture. The design favors clear component boundaries, replaceable future ML models, testability, and a vertical-slice delivery sequence.
@@ -94,6 +98,6 @@ Issue #12 selects a portable single-host Docker Compose topology: Caddy is the o
 
 The private network pins Caddy at `172.28.0.10`; Uvicorn trusts forwarded headers only from that address. Changing the network requires changing this allowlist. Caddy handles backend paths before SPA fallback. It applies a 6 MiB outer body limit, compression, minimal CSP/security headers, no-store HTML and immutable fingerprinted-asset caching. Vite is never a production process.
 
-`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, migration `0007` and writable evidence storage but not optional geocoding. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
+`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, migration `0008` and writable evidence storage but not optional geocoding/email/OIDC providers. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
 
 The topology intentionally remains platform-neutral and single-host. It does not provide high availability, a distributed rate limiter, legal retention automation, cloud object storage, external metrics/log aggregation or automated deployment. See `DEPLOYMENT.md`, `BACKUP_RESTORE.md` and `OPERATIONS_RUNBOOK.md`.

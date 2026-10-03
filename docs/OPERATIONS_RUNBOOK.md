@@ -19,11 +19,13 @@ The diagnostic command shows service health, migration head, a read-only evidenc
 
 ## API returns 502/503
 
-Check `backend`, then `db`, then the `migrate` one-shot service. `/health` means the process is alive; `/ready` additionally requires PostgreSQL, migration `0007` and writable evidence storage. Readiness deliberately ignores the external geocoder. Fix the dependency and let Compose restart; do not create an infinite migration/retry loop.
+Check `backend`, then `db`, then the `migrate` one-shot service. `/health` means the process is alive; `/ready` additionally requires PostgreSQL, migration `0008` and writable evidence storage. Readiness deliberately ignores external geocoding, email and OIDC providers. Fix the dependency and let Compose restart; do not create an infinite migration/retry loop.
 
 ## Login fails for everyone
 
 Check HTTPS, host clock, `AUTH_ALLOWED_ORIGINS`, secure cookie attributes and PostgreSQL. Confirm the browser origin exactly matches the configured `https://` origin. Do not disable Secure cookies or CSRF to diagnose deployment. Use the interactive bootstrap command only if no viable administrator exists.
+
+For citizen verification/reset/invitation mail, check the selected email transport and provider delivery without printing message bodies or credentials. For Google login, verify client ID/secret, consent-screen/test-user status and an exact redirect URI match. Do not weaken state/nonce, cookies, CSP or email-link expiry as a workaround.
 
 ## Image is missing or access is denied
 

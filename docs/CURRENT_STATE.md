@@ -1,5 +1,11 @@
 # Current State
 
+## Issue #13 — modern identity (implemented and live-verified)
+
+CivicAI preserves anonymous reporting while adding self-service verified citizen accounts (email/password and Google OIDC architecture), secure recovery, server-owned complaint ownership, My Complaints, sanitized status history and capability-proven anonymous complaint claiming. Municipal access is presented through `/staff/sign-in` and role-neutral `/municipal`; administrators provision staff with fixed-role/fixed-department invitations. Existing municipal users, RBAC, memberships and histories remain intact through migration `0008`.
+
+Automated state: 143 backend tests, 56 unchanged research tests, 57 frontend tests, TypeScript and the Vite production build pass. The owner completed real Google sign-in, callback, citizen-session persistence/profile/logout checks through the production-like HTTPS stack. A local-only Mailpit override then verified SMTP delivery, successful municipal invitation acceptance, operator sign-in, authorized queue access, admin-control hiding, direct admin-route denial and logout without weakening the normal production configuration. See `docs/ISSUE_013_MODERN_IDENTITY.md`.
+
 ## Issue #12 production tile defect fixed and human-verified
 
 Production-like verification found that the compiled `tile.openstreetmap.org` default returned visible `Access blocked / 403` tiles. The rest of the production stack remains healthy. The narrow remediation replaces that unsupported production default with MapTiler Streets v4 through browser-public `VITE_MAPTILER_API_KEY`. Because the current MapTiler plan permits only one active key, Compose reuses `MAPTILER_API_KEY` when no frontend override is set; that shared value is publicly observable and must be origin/usage restricted. Separate frontend/backend values remain supported later. Compose also derives `MAPTILER_REQUEST_ORIGIN` from the site address so MapTiler continues to accept backend geocoding after the key is origin-restricted. The proxy build fails without either key value, Leaflet retains MapTiler/OpenStreetMap attribution, and Caddy permits only MapTiler's image origin. There is no silent anonymous fallback.
