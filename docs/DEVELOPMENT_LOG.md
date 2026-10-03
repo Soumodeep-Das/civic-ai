@@ -1,5 +1,9 @@
 # Development Log
 
+## 2026-10-03 — GitHub Actions package-install repair
+
+The first `main` Quality Gates run failed before test execution because the workflow attempted `pip install -e ./research`, but `research/` is source within the repository rather than an independently packaged project and intentionally has no `pyproject.toml` or `setup.py`. The CI install step now installs the root project with its test extra only; pytest still discovers the unchanged research suite from the repository root. GitHub's container-build job had already passed, and no application, database, deployment or research behavior changed.
+
 ## 2026-10-03 — Issue #12 completed after production-like human verification
 
 Final regression passed 185 Python tests (129 backend and unchanged 56 research) with the three known dependency deprecations plus the local pytest-cache ACL warning; 52 frontend tests; TypeScript compilation; and the Vite production build. The initial bundle remains 246.27 kB (76.35 kB gzip), contains MapTiler Streets v4 and contains no old OSM tile host. `git diff --check` and value-based secret scanning passed. `.env.production` is ignored and untracked, its PostgreSQL/tracking/MapTiler values occur zero times in the prospective commit, and `.env.production.example` contains placeholders/empty optional override only.
