@@ -59,7 +59,7 @@ function Wait-ForEndpoint {
 
 $backendHealthUrl = "http://127.0.0.1:$backendPort/health"
 $frontendUrl = "http://127.0.0.1:5173/"
-$proxyUrl = "http://127.0.0.1:5173/api/v1/complaints"
+$proxyUrl = "http://127.0.0.1:5173/health"
 
 if (Test-Endpoint -Uri $backendHealthUrl) {
     Write-Output "Backend is already running."

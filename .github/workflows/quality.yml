@@ -1,0 +1,72 @@
+name: Quality gates
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18.1-alpine
+        env:
+          POSTGRES_USER: civicai_test
+          POSTGRES_PASSWORD: civicai_ci_only
+          POSTGRES_DB: civicai_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U civicai_test -d civicai_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://civicai_test:civicai_ci_only@127.0.0.1:5432/civicai_test
+      APP_ENV: test
+      PUBLIC_TRACKING_SECRET: ci-only-tracking-secret-not-for-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.12"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend and research package
+        run: python -m pip install -e ".[test]" -e ./research
+      - name: Check Python dependency consistency
+        run: python -m pip check
+      - name: Apply database migrations
+        run: alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+psycopg://civicai_test:civicai_ci_only@127.0.0.1:5432/civicai_test
+      - name: Run Python tests
+        run: python -m pytest -q
+      - name: Install locked frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test
+      - name: Audit production frontend dependencies
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+      - name: Compile and build frontend
+        working-directory: frontend
+        run: npm run build
+
+  container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production Compose model
+        run: docker compose --env-file .env.production.example -f compose.production.yml config --quiet
+      - name: Build immutable application images
+        run: docker compose --env-file .env.production.example -f compose.production.yml build backend proxy

@@ -190,6 +190,7 @@ class MapTilerGeocoder:
         api_key: str,
         country_codes: str,
         proximity: str = "",
+        request_origin: str = "",
         *,
         timeout_seconds: float = 8,
         transport: httpx.AsyncBaseTransport | None = None,
@@ -200,6 +201,7 @@ class MapTilerGeocoder:
         self.api_key = api_key
         self.country_codes = country_codes
         self.proximity = proximity
+        self.request_origin = request_origin
         self.timeout_seconds = timeout_seconds
         self.transport = transport
 
@@ -225,11 +227,14 @@ class MapTilerGeocoder:
         return results[0] if results else None
 
     async def _request(self, location: str, params: dict[str, str]) -> Any:
+        headers = {"Accept": "application/json"}
+        if self.request_origin:
+            headers["Origin"] = self.request_origin
         try:
             async with httpx.AsyncClient(
                 transport=self.transport,
                 timeout=self.timeout_seconds,
-                headers={"Accept": "application/json"},
+                headers=headers,
             ) as client:
                 response = await client.get(f"{self.base_url}/geocoding/{location}.json", params=params)
                 response.raise_for_status()

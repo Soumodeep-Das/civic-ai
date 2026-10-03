@@ -1,5 +1,22 @@
 # Decision Log
 
+## D028 Separate public MapTiler tile credential (2026-10-02, accepted)
+
+- Context: Production-like browser verification showed OpenStreetMap `Access blocked / 403` tiles when `tile.openstreetmap.org` was compiled as the production default. OSM policy must not be bypassed or spoofed.
+- Decision: Use `MAPTILER_API_KEY` for FastAPI geocoding and `VITE_MAPTILER_API_KEY` for Leaflet MapTiler Streets v4 tiles. Because the current plan allows one active key, Compose defaults the Vite value to `MAPTILER_API_KEY`; a distinct override remains supported later. Any reused/browser value is public, requires MapTiler Allowed HTTP Origin/usage restrictions, preserves MapTiler/OpenStreetMap attribution, and is the only external image origin allowed by CSP. Set `MAPTILER_REQUEST_ORIGIN` on backend geocoding requests so the provider accepts the origin-restricted shared key. Fail the production frontend build when neither value exists and provide no anonymous tile fallback.
+- Consequence: Local production-like use requires `localhost` in the browser-used key's allowed origins; real deployment requires the actual CivicAI domain. The current shared credential cannot be considered server-secret. A provider account/quota remains an operational dependency; plans with multiple keys can restore credential separation without code changes.
+
+## D027 Portable production and private evidence boundary (2026-10-02, accepted)
+
+- Deploy one Caddy → private FastAPI/Uvicorn → private PostgreSQL Compose topology on a normal single host. Serve the multi-stage Vite build from Caddy; never run Vite or publish Uvicorn/PostgreSQL in production. Use deliberate one-shot Alembic migration and persistent database/evidence/Caddy volumes.
+- Trust forwarded headers only from Caddy's fixed private address. Require genuine HTTPS, Secure/HttpOnly/SameSite=Strict host-only cookies, existing CSRF/origin enforcement, a 6 MiB proxy limit, derived CSP/security headers and bounded container logs.
+- Fail closed in production for weak/default capability secret, insecure cookie, non-HTTPS origin, invalid environment/release/log settings or non-absolute evidence storage. Keep provider/database secrets out of images, Git and logs.
+- Remove the anonymous global complaint feed. Give the submitter an HMAC-SHA-256 bearer capability and expose only UUID, description, status and timestamps through that private link. Never expose coordinates, location labels, evidence, ownership or internal history there. Require municipal complaint authorization for every evidence response.
+- Use coordinated `pg_dump` plus evidence archive backups and require disposable restore testing. Report media inconsistencies with a read-only tool; never delete solely from one audit. Treat sample backup rotation as an operational default, not legal retention law.
+- Add a small GitHub Actions quality gate but no automatic deployment. Keep the deployment platform-neutral and research-isolated. Retain process-local login throttling as a documented single-instance limitation rather than adding Redis/custom Caddy plugins without measured need.
+
+Consequences: the anonymous read API is intentionally breaking, existing tracking links did not exist and newly created links depend on preserving `PUBLIC_TRACKING_SECRET`. The topology is reproducible and recoverable but does not claim HA, zero downtime, legal compliance, provider SLA, centralized monitoring or distributed abuse protection.
+
 ## D026 Department ownership and accountable work queues (2026-10-02, accepted)
 
 - Separate a complaint's nullable owning department from its nullable individual assignee. Use explicit many-to-many memberships independently from authentication roles; require an active assignee to be a current member of the active owning department.
@@ -85,7 +102,7 @@ Consequences: migration 0005 backfills history for existing complaints; citizen 
 - Context: a stale host-level listener can occupy the default port and make the launcher attach the frontend to the wrong backend even when that process cannot be managed by its previously reported PID.
 - Consequence: developers may select a free local port in the ignored `.env` without editing source or exposing credentials. Both services must be restarted after a port change; production deployment configuration is unchanged.
 
-## D016 Raster map compatibility fallback (2026-09-21, accepted)
+## D016 Raster map compatibility fallback (2026-09-21, accepted; provider default superseded by D028)
 
 - Replace the Issue #4 MapLibre/OpenFreeMap renderer with lazy-loaded Leaflet and configurable raster tiles after the vector style and attribution loaded but the WebGL canvas remained blank in the actual in-app browser.
 - Default the local academic demonstration to standard OpenStreetMap tiles with visible attribution. Permit only ordinary human interactive viewing: no prefetch, bulk download or offline mode. Keep `VITE_MAP_TILE_URL` configurable and choose a provider with a suitable SLA/terms before public deployment.

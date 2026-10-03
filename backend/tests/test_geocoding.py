@@ -113,7 +113,7 @@ def test_maptiler_adapter_autocomplete_country_proximity_and_reverse():
         }]})
 
     geocoder = MapTilerGeocoder(
-        "https://api.maptiler.invalid", "secret-key", "in", "88.36,22.57",
+        "https://api.maptiler.invalid", "secret-key", "in", "88.36,22.57", "https://localhost",
         transport=httpx.MockTransport(handler),
     )
 
@@ -128,6 +128,7 @@ def test_maptiler_adapter_autocomplete_country_proximity_and_reverse():
     assert requests[0].url.params["autocomplete"] == "true"
     assert requests[0].url.params["country"] == "in"
     assert requests[0].url.params["proximity"] == "88.36,22.57"
+    assert requests[0].headers["origin"] == "https://localhost"
     assert requests[1].url.path.endswith("/geocoding/88.3800000,22.6500000.json")
 
 

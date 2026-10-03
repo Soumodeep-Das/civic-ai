@@ -19,16 +19,22 @@ def submit(client, content, mime="image/png", name="../../attack.png"):
     })
 
 
+def no_uploads(client):
+    directory = client.app.state.upload_directory
+    return not directory.exists() or not any(directory.iterdir())
+
+
 @pytest.mark.parametrize("format,mime", [("PNG", "image/png"), ("JPEG", "image/jpeg")])
-def test_image_persists_and_is_served(client, format, mime):
-    result = submit(client, picture(format), mime)
+def test_image_persists_and_is_served_only_to_authorized_staff(admin_client, format, mime):
+    result = submit(admin_client, picture(format), mime)
     assert result.status_code == 201
     body = result.json()
-    assert body["image_ref"].startswith("/api/v1/complaint-images/")
-    assert "attack" not in body["image_ref"] and ".." not in body["image_ref"]
-    assert client.get("/api/v1/complaints/" + body["complaint_id"]).json() == body
-    assert client.get("/api/v1/complaints").json()[0]["image_ref"] == body["image_ref"]
-    image = client.get(body["image_ref"])
+    assert body["image_ref"] is None
+    detail = admin_client.get("/api/v1/admin/complaints/" + body["complaint_id"]).json()
+    reference = detail["image_ref"]
+    assert reference.startswith("/api/v1/complaint-images/")
+    assert "attack" not in reference and ".." not in reference
+    image = admin_client.get(reference)
     assert image.status_code == 200
     assert image.headers["content-type"] == mime
     assert image.headers["x-content-type-options"] == "nosniff"
@@ -41,12 +47,12 @@ def test_image_persists_and_is_served(client, format, mime):
 ])
 def test_invalid_images(client, content, mime):
     assert submit(client, content, mime).status_code == 422
-    assert client.get("/api/v1/complaints").json() == []
+    assert no_uploads(client)
 
 
 def test_oversized_image(client):
     assert submit(client, b"x" * (MAX_IMAGE_BYTES + 1)).status_code == 413
-    assert client.get("/api/v1/complaints").json() == []
+    assert no_uploads(client)
 
 
 def test_image_reference_cannot_be_supplied(client):
@@ -76,7 +82,7 @@ def test_storage_failure_is_clear(client, monkeypatch):
     response = submit(client, picture())
     assert response.status_code == 503
     assert response.json()["message"] == "Image storage is temporarily unavailable."
-    assert client.get("/api/v1/complaints").json() == []
+    assert no_uploads(client)
 
 
 def test_database_failure_cleans_up_image(client, monkeypatch):
@@ -94,12 +100,13 @@ def test_whole_request_is_bounded(client):
     assert response.status_code == 413
 
 
-def test_metadata_is_removed(client):
+def test_metadata_is_removed(admin_client):
     from PIL.PngImagePlugin import PngInfo
     stream = io.BytesIO()
     metadata = PngInfo()
     metadata.add_text("private_note", "Must not survive")
     Image.new("RGB", (10, 10)).save(stream, format="PNG", pnginfo=metadata)
-    response = submit(client, stream.getvalue())
-    image = client.get(response.json()["image_ref"])
+    response = submit(admin_client, stream.getvalue())
+    reference = admin_client.get("/api/v1/admin/complaints/" + response.json()["complaint_id"]).json()["image_ref"]
+    image = admin_client.get(reference)
     assert "private_note" not in Image.open(io.BytesIO(image.content)).info

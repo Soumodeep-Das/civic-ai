@@ -4,7 +4,7 @@
 
 The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at; no research dataset is claimed.
 
-Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are local runtime files; only their relative serving URL is stored in PostgreSQL. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only and excluded from the current text/image/multimodal classification experiment. No reporter_id field is implemented.
+Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are runtime evidence files; only an internal relative API reference is stored in PostgreSQL. In production the files live in a private persistent volume and require municipal complaint authorization for retrieval. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only and excluded from the current text/image/multimodal classification experiment. No reporter_id field is implemented.
 
 Migration 0003 adds nullable location_label VARCHAR(300), location_precision VARCHAR(20) and location_details VARCHAR(500). Precision is controlled to exact, approximate or broad. New context requires both coordinates plus a label and precision; legacy coordinate-only rows remain valid. `exact` means the citizen confirmed a device position or map point, not a surveyed measurement. These fields are application metadata and remain excluded from the current classification experiment.
 
@@ -80,6 +80,10 @@ Severity and priority require separate rubrics. Priority must not be backfilled 
 ## Storage and versioning
 
 Raw data is immutable and access controlled. Derived data should be reproducible from raw inputs plus versioned transformation code. Git stores schemas, manifests, small non-sensitive samples, checksums, and documentation—not unrestricted raw media or large model-ready datasets.
+
+Production runtime data is separate from research data. Runtime backups contain the PostgreSQL application database and private evidence volume only; the Docker build excludes `data/`, `research/`, `ml/`, `models/`, backups and secrets. A private tracking token is derived with HMAC from `complaint_id` and a production secret; it is not a database field, research label or log field. Its status response exposes only UUID, description, status and timestamps. Exact location/evidence/ownership remain municipal-only after submission.
+
+The operational default is no automatic deletion. Project backup-retention examples are not legal policy. Complaint, evidence, audit-log and backup retention require an authorized real-deployment decision; no Indian municipal retention rule is claimed here. The read-only media audit detects missing, orphan and invalid evidence references without deleting files.
 
 ## Municipal identity data
 

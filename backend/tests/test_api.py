@@ -18,7 +18,7 @@ def test_health_without_database():
     with TestClient(create_app("postgresql+psycopg://unused@127.0.0.1:1/unused")) as client:
         response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "ok", "release": "development"}
 
 
 def test_create_and_persist(client):
@@ -36,20 +36,21 @@ def test_create_and_persist(client):
     assert set(body) == {
         "complaint_id", "description", "latitude", "longitude", "location_label",
         "location_precision", "location_details", "location_source", "location_accuracy_m",
-        "status", "created_at", "updated_at", "image_ref",
+        "status", "created_at", "updated_at", "image_ref", "tracking_token",
     }
     assert body["location_label"] is None
     assert body["location_precision"] is None
     assert body["location_details"] is None
     assert body["location_source"] is None
     assert body["location_accuracy_m"] is None
+    assert len(body["tracking_token"]) == 64
     for field in ("created_at", "updated_at"):
         assert datetime.fromisoformat(body[field]).utcoffset() == timedelta(0)
     assert body["created_at"] == body["updated_at"]
     # A new HTTP request opens a different Session and reads persisted state.
-    fetched = client.get(f'/api/v1/complaints/{body["complaint_id"]}')
+    fetched = client.get(f'/api/v1/complaints/{body["complaint_id"]}?tracking_token={body["tracking_token"]}')
     assert fetched.status_code == 200
-    assert fetched.json() == body
+    assert set(fetched.json()) == {"complaint_id", "description", "status", "created_at", "updated_at"}
 
 
 @pytest.mark.parametrize("description", ["", " ", "\t\n", None])
@@ -93,7 +94,9 @@ def test_location_context_is_persisted(client):
     assert body["location_details"] == "Opposite the main entrance"
     assert body["location_source"] == "device"
     assert body["location_accuracy_m"] == 18.5
-    assert client.get(f'/api/v1/complaints/{body["complaint_id"]}').json() == body
+    tracked = client.get(f'/api/v1/complaints/{body["complaint_id"]}?tracking_token={body["tracking_token"]}').json()
+    assert tracked["description"] == body["description"]
+    assert "latitude" not in tracked and "image_ref" not in tracked
 
 
 @pytest.mark.parametrize("values", [
@@ -116,9 +119,9 @@ def test_coordinate_boundaries(client, latitude, longitude):
 
 
 def test_missing_complaint(client):
-    response = client.get(f"/api/v1/complaints/{uuid4()}")
+    response = client.get(f"/api/v1/complaints/{uuid4()}?tracking_token={'0' * 64}")
     assert response.status_code == 404
-    assert response.json()["code"] == "complaint_not_found"
+    assert response.json()["code"] == "request_error"
 
 
 def test_invalid_uuid(client):
@@ -126,11 +129,16 @@ def test_invalid_uuid(client):
 
 
 def test_list(client):
-    assert client.get("/api/v1/complaints").json() == []
-    created = [post_complaint(client, {"description": item}).json() for item in ("First", "Second")]
     response = client.get("/api/v1/complaints")
-    assert response.status_code == 200
-    assert {item["complaint_id"] for item in response.json()} == {item["complaint_id"] for item in created}
+    assert response.status_code == 404
+    assert "private tracking link" in response.json()["message"]
+
+
+def test_tracking_capability_rejects_missing_and_wrong_token(client):
+    created = post_complaint(client, {"description": "Private status"}).json()
+    path = f'/api/v1/complaints/{created["complaint_id"]}'
+    assert client.get(path).status_code == 422
+    assert client.get(f"{path}?tracking_token={'0' * 64}").status_code == 404
 
 
 def test_location_search_returns_normalized_results(client):
@@ -211,6 +219,6 @@ def test_server_owned_and_future_fields_rejected(client, field):
 
 def test_database_unavailable():
     with TestClient(create_app("postgresql+psycopg://unused@127.0.0.1:1/unused?connect_timeout=1")) as client:
-        response = client.get("/api/v1/complaints")
+        response = client.get("/ready")
     assert response.status_code == 503
-    assert response.json() == {"code": "database_unavailable", "message": "Database temporarily unavailable"}
+    assert response.json() == {"status": "not_ready", "reason": "database"}

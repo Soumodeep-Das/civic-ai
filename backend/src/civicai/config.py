@@ -1,5 +1,7 @@
 import os
+import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy.engine import make_url
@@ -23,6 +25,7 @@ class GeocodingSettings:
     country_codes: str
     maptiler_base_url: str
     maptiler_api_key: str
+    maptiler_request_origin: str
     proximity: str
 
 
@@ -32,6 +35,17 @@ class AuthSettings:
     cookie_name: str
     cookie_secure: bool
     allowed_origins: frozenset[str]
+
+
+@dataclass(frozen=True)
+class RuntimeSettings:
+    environment: str
+    release_id: str
+    public_tracking_secret: str
+    log_level: str
+
+
+RELEASE_PATTERN = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
 
 def _boolean(name: str, default: bool = False) -> bool:
@@ -63,6 +77,30 @@ def auth_settings() -> AuthSettings:
     return AuthSettings(hours, cookie_name, secure, origins)
 
 
+def runtime_settings() -> RuntimeSettings:
+    load_dotenv()
+    environment = os.environ.get("APP_ENV", "development").strip().lower()
+    if environment not in {"development", "test", "production"}:
+        raise RuntimeError("APP_ENV must be development, test or production")
+    release_id = os.environ.get("RELEASE_ID", "development").strip()
+    if not RELEASE_PATTERN.fullmatch(release_id):
+        raise RuntimeError("RELEASE_ID must contain 1-64 safe identifier characters")
+    secret = os.environ.get("PUBLIC_TRACKING_SECRET", "development-only-tracking-secret-change-me").strip()
+    log_level = os.environ.get("LOG_LEVEL", "INFO").strip().upper()
+    if log_level not in {"INFO", "WARNING", "ERROR"}:
+        raise RuntimeError("LOG_LEVEL must be INFO, WARNING or ERROR")
+    if environment == "production":
+        if len(secret.encode("utf-8")) < 32 or secret == "development-only-tracking-secret-change-me":
+            raise RuntimeError("Production requires a unique PUBLIC_TRACKING_SECRET of at least 32 bytes")
+        origins = auth_settings().allowed_origins
+        if not origins or any(not origin.startswith("https://") for origin in origins):
+            raise RuntimeError("Production AUTH_ALLOWED_ORIGINS must contain only HTTPS origins")
+        configured_upload = os.environ.get("UPLOAD_DIR", "").strip()
+        if not configured_upload or not Path(configured_upload).is_absolute():
+            raise RuntimeError("Production requires an absolute UPLOAD_DIR")
+    return RuntimeSettings(environment, release_id, secret, log_level)
+
+
 def geocoding_settings() -> GeocodingSettings:
     load_dotenv()
     return GeocodingSettings(
@@ -72,5 +110,6 @@ def geocoding_settings() -> GeocodingSettings:
         country_codes=os.environ.get("GEOCODING_COUNTRY_CODES", "in"),
         maptiler_base_url=os.environ.get("MAPTILER_BASE_URL", "https://api.maptiler.com"),
         maptiler_api_key=os.environ.get("MAPTILER_API_KEY", "").strip(),
+        maptiler_request_origin=os.environ.get("MAPTILER_REQUEST_ORIGIN", "").strip().rstrip("/"),
         proximity=os.environ.get("GEOCODING_PROXIMITY", "").strip(),
     )

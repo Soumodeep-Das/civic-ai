@@ -67,6 +67,23 @@ class ComplaintRead(BaseModel):
         return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+class ComplaintSubmissionRead(ComplaintRead):
+    tracking_token: str
+
+
+class CitizenComplaintStatusRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    complaint_id: UUID
+    description: str
+    status: ComplaintStatus
+    created_at: datetime
+    updated_at: datetime
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_utc(self, value: datetime) -> str:
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 class DepartmentSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     department_id: UUID

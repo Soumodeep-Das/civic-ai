@@ -2,7 +2,7 @@
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issues #9–#10 add protected municipal operations and responsive/accessibility hardening. Completed Issue #11 adds [departments, membership, accountable assignment and server-backed work queues](docs/ISSUE_011_DEPARTMENT_OWNERSHIP.md). Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus a confirmed issue location in the citizen frontend. The backend keeps both fields nullable so existing records and direct API clients remain compatible. Issues #9–#10 add protected municipal operations and responsive/accessibility hardening. Completed Issue #11 adds [departments, membership, accountable assignment and server-backed work queues](docs/ISSUE_011_DEPARTMENT_OWNERSHIP.md). Issue #12 adds a portable [production deployment](docs/DEPLOYMENT.md), protected evidence, private citizen tracking, readiness, backup/restore tooling and CI. Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
 
 Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
@@ -31,9 +31,9 @@ Citizens can explicitly search by locality, PIN code, street, address or landmar
 
 The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.
 
-With the default public-Nominatim fallback, search is sent only when the user presses Search or Enter. When `GEOCODING_PROVIDER=maptiler` and a server-side `MAPTILER_API_KEY` are configured, the frontend enables debounced search-as-you-type suggestions. The backend also supports reverse geocoding after the pin moves. Provider capabilities are discovered at runtime, so public Nominatim never receives autocomplete traffic. Both public geocoding modes are local-demo dependencies without a production SLA.
+With the default public-Nominatim fallback, search is sent only when the user presses Search or Enter. When `GEOCODING_PROVIDER=maptiler` and `MAPTILER_API_KEY` are configured, the frontend enables debounced search-as-you-type suggestions. If that same key is browser-origin restricted, `MAPTILER_REQUEST_ORIGIN` identifies the CivicAI origin on backend geocoding calls; production Compose derives it from `CIVICAI_SITE_ADDRESS`. The backend also supports reverse geocoding after the pin moves. Provider capabilities are discovered at runtime, so public Nominatim never receives autocomplete traffic. Both public geocoding modes are external dependencies without a CivicAI SLA.
 
-The street map is lazy-loaded and uses Leaflet with OpenStreetMap raster tiles by default. It supports desktop left-click, marker drag, touch pan/zoom and marker drag; the old directional controls are removed. `VITE_MAP_TILE_URL` keeps the tile provider replaceable. The default is appropriate for modest, interactive academic-demo use only and must follow the OpenStreetMap tile policy; select a supported production provider before public deployment. See `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
+The street map is lazy-loaded and uses Leaflet with MapTiler Streets v4 raster tiles. It supports desktop left-click, marker drag, touch pan/zoom and marker drag; the old directional controls are removed. Tiles use browser-public `VITE_MAPTILER_API_KEY`; there is no anonymous tile fallback. A one-key MapTiler account may use the same value for `MAPTILER_API_KEY` and `VITE_MAPTILER_API_KEY`; once compiled into JavaScript it is publicly observable and must be protected with MapTiler Allowed HTTP Origins/usage restrictions rather than secrecy. Separate values remain supported when the plan permits them. MapTiler and OpenStreetMap attribution remain visible. See `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
 
 ## Issue #3: photos and location
 
@@ -41,9 +41,9 @@ After pulling, install updated backend dependencies with `python -m pip install 
 
 POST now uses multipart/form-data, including for text-only submissions. JSON clients must migrate; see docs/API_CONTRACT.md. The frontend handles this automatically.
 
-Attach one optional JPEG/PNG (5 MiB maximum). Images must decode successfully and match their declared MIME, be at most 20 million pixels and have one frame. Re-encoding preserves orientation while removing EXIF/text metadata. Total multipart body is bounded to 5 MiB + 256 KiB. Stored filenames are generated, original names ignored, and image responses use explicit raster MIME plus nosniff. These measures reduce upload risks but do not replace production access controls or malware scanning.
+The citizen frontend requires one JPEG/PNG (5 MiB maximum); the backward-compatible API keeps it optional. Images must decode successfully and match their declared MIME, be at most 20 million pixels and have one frame. Re-encoding preserves orientation while removing EXIF/text metadata. Total multipart body is bounded to 5 MiB + 256 KiB, while Caddy rejects production requests above 6 MiB. Stored filenames are generated and original names ignored.
 
-Files are stored under data/uploads/complaints, excluded from Git, outside executable source paths. UPLOAD_DIR can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Anonymous image URLs are suitable for local demonstration only.
+Files are stored under data/uploads/complaints locally and a private named evidence volume in production. `UPLOAD_DIR` can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Issue #12 removes anonymous evidence access: the image route now requires a municipal session and complaint-level authorization. `python -m civicai.media_audit` reports missing/orphan evidence without deleting it.
 
 Use “Use my current location” while near the issue. Permission is requested on demand. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. A failure preserves the draft and lets the citizen search for the issue instead. Location remains optional in the backward-compatible API but is required by the citizen form; it does not enter the current classification experiment.
 
@@ -76,9 +76,9 @@ Use PostgreSQL's administration tools to create two empty databases: civicai and
 .\.venv\Scripts\python.exe -m uvicorn civicai.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/complaints, choose Try it out, enter a description and optional coordinates, and Execute. Copy the returned complaint_id into GET /api/v1/complaints/{complaint_id}; use GET /api/v1/complaints to see the list. GET /health reports process liveness without querying PostgreSQL.
+Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/complaints, choose Try it out, enter a description and optional coordinates, and Execute. Save both the returned `complaint_id` and `tracking_token`; the status endpoint requires both. There is no anonymous global complaint list. `GET /health` reports process liveness and the safe release identifier; `GET /ready` checks PostgreSQL, migration head and evidence storage.
 
-Schema creation uses Alembic, never automatic startup table creation. Citizen complaint endpoints remain anonymous. Every `/api/v1/admin/*` operation is authenticated server-side; account management additionally requires `municipal_admin`.
+Schema creation uses Alembic, never automatic startup table creation. Complaint submission is anonymous; later status access requires the returned bearer capability. Every `/api/v1/admin/*` operation and evidence retrieval is authenticated server-side; account management additionally requires `municipal_admin`.
 
 ### Start the complete local MVP with one command
 
@@ -129,9 +129,9 @@ npm run build
 
 Frontend dependencies are captured in `frontend/package-lock.json`.
 
-`VITE_MAP_TILE_URL` selects the Leaflet raster-tile template and defaults to `https://tile.openstreetmap.org/{z}/{x}/{y}.png`. The map code is loaded only after a location is selected. Do not add offline prefetching or bulk tile download. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
+`VITE_MAPTILER_API_KEY` selects no provider: it supplies the browser-public credential for the fixed MapTiler Streets v4 raster endpoint. The map displays a configuration message rather than silently using an anonymous service when the key is absent; the production image build fails closed. In MapTiler, allow `localhost` for local verification (without scheme or port) and the actual CivicAI domain for deployment. The map code is loaded only after a location is selected. Do not add offline prefetching or bulk tile download. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
 
-### If the frontend reports 404 or “Queue unavailable”
+### If the local frontend reports 404 or cannot reach the API
 
 Run the repository startup helper first:
 
@@ -145,15 +145,30 @@ For a frontend that is already running but serving a stale proxy configuration, 
 npm run dev
 ```
 
-The development proxy is loaded when Vite starts. Restarting is required after a stale development process or proxy-configuration change. A healthy proxy returns complaint JSON from http://127.0.0.1:5173/api/v1/complaints rather than the frontend HTML page.
+The development proxy is loaded when Vite starts. Restarting is required after a stale development process or proxy-configuration change. A healthy proxy returns JSON from http://127.0.0.1:5173/health rather than the frontend HTML page. The anonymous complaint-list route is intentionally disabled.
+
+## Production-like deployment
+
+Production uses Docker Compose, Caddy HTTPS, the built React bundle, private FastAPI/PostgreSQL networking and persistent named volumes. It never runs Vite or exposes PostgreSQL/Uvicorn publicly. Start and stop with:
+
+```powershell
+Copy-Item .env.production.example .env.production
+# Replace every placeholder, then:
+.\scripts\start-production.ps1
+.\scripts\stop-production.ps1
+```
+
+Do not use example values in production. Follow the full [deployment checklist](docs/DEPLOYMENT.md), [backup/restore procedure](docs/BACKUP_RESTORE.md) and [operations runbook](docs/OPERATIONS_RUNBOOK.md). `.env.production` and runtime backups are ignored by Git.
 
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
 - backend/migrations: Alembic environment and migrations through 0007.
 - backend/tests: API, migration consistency and database constraint tests.
-- frontend/src: React complaint form, accessible location picker, lazy-loaded map, recent-complaint list, API client, styles and interaction tests.
+- frontend/src: React complaint form, accessible location picker, lazy-loaded map, private tracking page, municipal workspace, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
+- compose.production.yml, Dockerfile and deploy/: portable Caddy/FastAPI/PostgreSQL production topology.
+- scripts/backup-production.ps1 and verify-backup-restore.ps1: coordinated runtime backup and disposable restore verification.
 - docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
 - docs/reference/project-synopsis.docx: approved synopsis.
 - research: proposed taxonomy, Indian-source acquisition/audit, annotation/data documentation and manifest/preparation validation; no approved training dataset or results yet.

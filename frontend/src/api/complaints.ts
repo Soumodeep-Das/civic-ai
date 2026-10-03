@@ -14,6 +14,9 @@ export type Complaint = {
   updated_at: string;
 };
 
+export type CitizenComplaintStatus = Pick<Complaint, "complaint_id" | "description" | "status" | "created_at" | "updated_at">;
+export type ComplaintSubmission = Complaint & { tracking_token: string };
+
 export type DepartmentSummary = { department_id: string; slug: string; display_name: string; is_active: boolean };
 export type AssigneeSummary = { user_id: string; username: string; is_active: boolean };
 export type AdminComplaint = Complaint & { department: DepartmentSummary | null; assignee: AssigneeSummary | null };
@@ -150,11 +153,7 @@ export async function request<T>(path: string, options?: RequestInit): Promise<T
   return response.json() as Promise<T>;
 }
 
-export function listComplaints(): Promise<Complaint[]> {
-  return request<Complaint[]>("/api/v1/complaints");
-}
-
-export function createComplaint(input: ComplaintInput): Promise<Complaint> {
+export function createComplaint(input: ComplaintInput): Promise<ComplaintSubmission> {
   const body = new FormData();
   body.append("description", input.description);
   if (input.latitude !== undefined) body.append("latitude", String(input.latitude));
@@ -165,7 +164,7 @@ export function createComplaint(input: ComplaintInput): Promise<Complaint> {
   if (input.location_source !== undefined) body.append("location_source", input.location_source);
   if (input.location_accuracy_m !== undefined) body.append("location_accuracy_m", String(input.location_accuracy_m));
   if (input.image) body.append("image", input.image);
-  return request<Complaint>("/api/v1/complaints", {
+  return request<ComplaintSubmission>("/api/v1/complaints", {
     method: "POST",
     body,
   });
@@ -193,6 +192,10 @@ export function reverseLocation(latitude: number, longitude: number): Promise<Lo
 
 export function imageUrl(reference: string): string {
   return apiBaseUrl + reference;
+}
+
+export function getComplaintStatus(complaintId: string, trackingToken: string): Promise<CitizenComplaintStatus> {
+  return request(`/api/v1/complaints/${encodeURIComponent(complaintId)}?tracking_token=${encodeURIComponent(trackingToken)}`);
 }
 
 export function getDashboardStatistics(): Promise<DashboardStatistics> {

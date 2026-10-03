@@ -10,7 +10,14 @@ type Props = Coordinates & {
   readOnly?: boolean;
 };
 
-const tileUrl = import.meta.env.VITE_MAP_TILE_URL?.trim() || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const MAPTILER_ATTRIBUTION = '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">&copy; OpenStreetMap contributors</a>';
+
+export function mapTilerTileUrl(key: string | undefined): string | null {
+  const normalized = key?.trim();
+  return normalized
+    ? `https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${encodeURIComponent(normalized)}`
+    : null;
+}
 
 const issuePin = L.divIcon({
   className: "issue-map-marker",
@@ -25,21 +32,26 @@ export default function LocationMap({ latitude, longitude, onChange, readOnly = 
   const markerRef = useRef<LeafletMarker | null>(null);
   const onChangeRef = useRef(onChange);
   const [mapError, setMapError] = useState("");
+  const tileUrl = mapTilerTileUrl(import.meta.env.VITE_MAPTILER_API_KEY);
 
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
   useEffect(() => {
-    if (!container.current) return;
+    if (!container.current || !tileUrl) return;
     const map = L.map(container.current, {
       center: [latitude, longitude],
       zoom: 17,
       zoomControl: true,
     });
     const tiles = L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
+      attribution: MAPTILER_ATTRIBUTION,
+      crossOrigin: true,
+      minZoom: 1,
+      maxZoom: 20,
+      tileSize: 512,
+      zoomOffset: -1,
     }).addTo(map);
     const marker = L.marker([latitude, longitude], {
       draggable: !readOnly,
@@ -70,7 +82,7 @@ export default function LocationMap({ latitude, longitude, onChange, readOnly = 
       markerRef.current = null;
       mapRef.current = null;
     };
-  }, [readOnly]);
+  }, [readOnly, tileUrl]);
 
   useEffect(() => {
     markerRef.current?.setLatLng([latitude, longitude]);
@@ -79,11 +91,16 @@ export default function LocationMap({ latitude, longitude, onChange, readOnly = 
 
   return (
     <div className="map-adjuster">
-      <div ref={container} className="location-map" aria-label="Map showing the selected issue location" />
+      {tileUrl ? <div className="map-frame">
+        <div ref={container} className="location-map" aria-label="Map showing the selected issue location" />
+        <a className="maptiler-logo" href="https://www.maptiler.com/" target="_blank" rel="noopener" aria-label="Map tiles by MapTiler">
+          <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler" />
+        </a>
+      </div> : <div className="map-loading" role="status">Map tiles are not configured. The selected location is still available.</div>}
       {!readOnly && <p className="field-help">On a computer, left-click the exact spot or drag the marker. On a phone, drag and zoom the map, then drag the marker to the issue.</p>}
       {readOnly && <p className="field-help">Read-only map of the citizen-submitted issue location.</p>}
       {mapError && <p className="field-error" role="status">{mapError}</p>}
-      <p className="map-attribution">Interactive map rendered with Leaflet. OpenStreetMap attribution appears inside the map.</p>
+      <p className="map-attribution">Interactive map rendered with Leaflet and MapTiler. MapTiler and OpenStreetMap attribution appears inside the map.</p>
     </div>
   );
 }

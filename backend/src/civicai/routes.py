@@ -19,6 +19,7 @@ from civicai.database import get_session
 from civicai.geocoding import Geocoder
 from civicai.schemas import (
     AdminComplaintDetail, AdminComplaintPage, AdminComplaintRead, ComplaintCreate, ComplaintRead,
+    ComplaintSubmissionRead, CitizenComplaintStatusRead,
     ComplaintStatusEventRead, ComplaintStatusUpdate, DashboardStatistics,
     LocationCapabilities, LocationReverseRequest, LocationSearchRequest, LocationSearchResult,
     AuthSessionRead, LoginRequest, MunicipalUserCreate, MunicipalUserRead, MunicipalUserUpdate,
@@ -28,8 +29,9 @@ from civicai.schemas import (
     WorkQueueStatistics,
 )
 from civicai.domain import ComplaintStatus
-from civicai.models import MunicipalDepartment, MunicipalSession, MunicipalUser
+from civicai.models import Complaint, MunicipalDepartment, MunicipalSession, MunicipalUser
 from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
+from civicai.tracking import tracking_token, valid_tracking_token
 
 router = APIRouter(tags=["complaints"])
 DatabaseSession = Annotated[Session, Depends(get_session)]
@@ -95,7 +97,7 @@ def logout(request: Request, response: Response, auth: CsrfAuth, session: Databa
     return None
 
 
-@router.post("/api/v1/complaints", response_model=ComplaintRead, status_code=201,
+@router.post("/api/v1/complaints", response_model=ComplaintSubmissionRead, status_code=201,
              openapi_extra={"requestBody": {"required": True, "content": {"multipart/form-data": {
                  "schema": {"type": "object", "required": ["description"], "additionalProperties": False,
                             "properties": {"description": {"type": "string", "minLength": 1},
@@ -145,7 +147,13 @@ async def create(request: Request, session: DatabaseSession):
             except OSError:
                 raise HTTPException(503, "Image storage is temporarily unavailable.") from None
         try:
-            return service.create_complaint(session, data, image_ref)
+            complaint = service.create_complaint(session, data, image_ref)
+            values = ComplaintRead.model_validate(complaint).model_dump()
+            values["image_ref"] = None
+            values["tracking_token"] = tracking_token(
+                complaint.complaint_id, request.app.state.runtime_settings.public_tracking_secret
+            )
+            return values
         except Exception:
             session.rollback()
             if image_ref is not None:
@@ -174,13 +182,21 @@ async def reverse_location(
     return await geocoder.reverse(data.latitude, data.longitude)
 
 
-@router.get("/api/v1/complaints", response_model=list[ComplaintRead])
-def list_all(session: DatabaseSession):
-    return service.list_complaints(session)
+@router.get("/api/v1/complaints")
+def list_all():
+    raise HTTPException(404, "The public complaint directory is disabled. Use your private tracking link.")
 
 
-@router.get("/api/v1/complaints/{complaint_id}", response_model=ComplaintRead)
-def get_one(complaint_id: UUID, session: DatabaseSession):
+@router.get("/api/v1/complaints/{complaint_id}", response_model=CitizenComplaintStatusRead)
+def get_one(
+    complaint_id: UUID,
+    request: Request,
+    session: DatabaseSession,
+    tracking_token_value: Annotated[str, Query(alias="tracking_token", min_length=64, max_length=64)],
+):
+    secret = request.app.state.runtime_settings.public_tracking_secret
+    if not valid_tracking_token(complaint_id, tracking_token_value, secret):
+        raise HTTPException(404, "Complaint not found.")
     return service.get_complaint(session, complaint_id)
 
 
@@ -352,9 +368,15 @@ def admin_update_user(
 
 
 @router.get("/api/v1/complaint-images/{filename}")
-def get_image(filename: str, request: Request):
+def get_image(filename: str, request: Request, session: DatabaseSession, auth: OperatorAuth):
     path = image_path(request.app.state.upload_directory, filename)
     if not path.is_file():
         raise HTTPException(404, "Complaint image not found.")
+    complaint = session.scalar(select(Complaint).where(
+        Complaint.image_ref == f"/api/v1/complaint-images/{filename}"
+    ))
+    if complaint is None:
+        raise HTTPException(404, "Complaint image not found.")
+    ownership.require_complaint_access(session, auth.user, complaint)
     return FileResponse(path, media_type="image/png" if path.suffix == ".png" else "image/jpeg",
-                        headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'"})
+                        headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, no-store"})

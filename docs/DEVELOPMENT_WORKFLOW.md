@@ -50,6 +50,8 @@ Add the smallest justified dependency, pin or lock it through the chosen package
 
 For a fresh municipal environment, apply Alembic first and run `python -m civicai.bootstrap_admin` interactively. Never place a bootstrap password in a shell argument, tracked script, `.env`, screenshot or development log. Local HTTP uses `AUTH_COOKIE_SECURE=false`; production must set `APP_ENV=production` and `AUTH_COOKIE_SECURE=true`. Keep citizen and municipal data contracts separate when extending either surface.
 
+Production changes must also render the Compose model, build the real frontend/container images, verify `/health` and `/ready` through Caddy, and exercise secure cookie/CSRF/evidence behavior through the proxy. Back up database and evidence before migration; do not start the backend if the one-shot migration fails. A backup is unverified until restored into disposable database/media targets. Never mount or archive research data with runtime application data. Use `docs/DEPLOYMENT.md`, `docs/BACKUP_RESTORE.md` and `docs/OPERATIONS_RUNBOOK.md` rather than undocumented shell history.
+
 ## Research experiment workflow
 
 1. Write the question, dataset version, split, metrics, baseline, and acceptance criteria before the final run.
@@ -62,4 +64,4 @@ For a fresh municipal environment, apply Alembic first and run `python -m civica
 
 ## Definition of done
 
-A work item is done when its acceptance criteria are met, relevant tests pass, docs and decisions are current, no secret or prohibited artifact is staged, and remaining limitations are stated. Deployment, performance, accessibility, privacy, and security checks should be proportional to the scope of the item rather than assumed complete.
+A work item is done when its acceptance criteria are met, relevant tests pass, docs and decisions are current, no secret or prohibited artifact is staged, and remaining limitations are stated. Deployment work additionally requires a clean production-like startup, proxy/browser smoke, restart/failure checks and an actual disposable backup restore; configuration alone is not proof. Deployment, performance, accessibility, privacy, and security checks should be proportional to the scope of the item rather than assumed complete.

@@ -23,6 +23,7 @@ const complaint = {
   status: "submitted" as const,
   created_at: "2026-09-20T08:00:00Z",
   updated_at: "2026-09-20T08:00:00Z",
+  tracking_token: "a".repeat(64),
 };
 
 const broadResult = {
@@ -110,40 +111,43 @@ async function confirmCurrentLocation(user: ReturnType<typeof userEvent.setup>) 
   await user.click(await screen.findByRole("button", { name: "Confirm this location" }));
 }
 
-beforeEach(() => mockLocation());
-
-test("loads stored complaints with truthful location context", async () => {
-  installApi({ complaints: [complaint] });
-  render(<App />);
-  expect(screen.getByText("Loading complaints")).toBeInTheDocument();
-  expect(await screen.findByText(complaint.description)).toBeInTheDocument();
-  expect(screen.getByText(complaint.location_label)).toBeInTheDocument();
-  expect(screen.getByText("Confirmed point")).toBeInTheDocument();
+beforeEach(() => {
+  mockLocation();
+  window.history.replaceState({}, "", "/");
 });
 
-test("shows an empty state", async () => {
+test("does not load or expose a global public complaint feed", async () => {
+  installApi({ complaints: [complaint] });
+  render(<App />);
+  expect(await screen.findByText("Municipal access only")).toBeInTheDocument();
+  expect(screen.queryByText(complaint.description)).not.toBeInTheDocument();
+  expect(fetch).not.toHaveBeenCalledWith("/api/v1/complaints", expect.anything());
+});
+
+test("explains the privacy boundary to citizens", async () => {
   installApi();
   render(<App />);
-  expect(await screen.findByText("No complaints yet")).toBeInTheDocument();
+  expect(await screen.findByText("Your report is not a public post")).toBeInTheDocument();
+  expect(screen.getByText(/private status link/)).toBeInTheDocument();
 });
 
 test("requires description photo and confirmed location before sending", async () => {
   const fetchMock = installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Submit complaint" }));
   expect(screen.getAllByText("Tell us what needs attention.")).toHaveLength(2);
   expect(screen.getAllByText("Attach a JPEG or PNG photo of the issue.")).toHaveLength(2);
   expect(screen.getAllByText("Choose the issue location and confirm the selected point.")).toHaveLength(2);
-  expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/api/v1/complaints"))).toHaveLength(1);
+  expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/api/v1/complaints"))).toHaveLength(0);
 });
 
 test("submits photo, device source and browser accuracy", async () => {
   const fetchMock = installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), complaint.description);
   const file = await attachPhoto(user);
   await confirmCurrentLocation(user);
@@ -160,7 +164,7 @@ test("explicit search selects a result, opens the map and submits search source"
   const fetchMock = installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByRole("combobox"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.click(await screen.findByRole("option", { name: /Baranagar/ }));
@@ -177,7 +181,7 @@ test("autocomplete shows suggestions after a short debounce", async () => {
   const fetchMock = installApi({ autocomplete: true });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await screen.findByText("Suggestions update while you type.");
   await user.type(screen.getByRole("combobox"), "Baranagar");
   expect(await screen.findByRole("option", { name: /Baranagar/ }, { timeout: 1500 })).toBeInTheDocument();
@@ -198,7 +202,7 @@ test("an in-flight search cannot show suggestions for an edited query", async ()
   });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   const input = screen.getByRole("combobox");
   await user.type(input, "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
@@ -213,7 +217,7 @@ test("keyboard Enter selects the active suggestion", async () => {
   installApi({ autocomplete: true });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByRole("combobox"), "Baranagar");
   await screen.findByRole("option", { name: /Baranagar/ }, { timeout: 1500 });
   await user.keyboard("{Enter}");
@@ -224,7 +228,7 @@ test("short search is rejected locally", async () => {
   const fetchMock = installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByRole("combobox"), "BT");
   await user.click(screen.getByRole("button", { name: "Search" }));
   expect(screen.getByText(/Enter at least 3 characters/)).toBeInTheDocument();
@@ -235,7 +239,7 @@ test("no results preserves the complaint draft", async () => {
   installApi({ searchResults: [] });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), "Draft complaint");
   await user.type(screen.getByRole("combobox"), "Unknown place");
   await user.click(screen.getByRole("button", { name: "Search" }));
@@ -247,7 +251,7 @@ test("provider failure preserves the complaint draft", async () => {
   installApi({ searchFailure: true });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), "Draft complaint");
   await user.type(screen.getByRole("combobox"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
@@ -259,7 +263,7 @@ test("current location requests higher accuracy, reverse lookup and confirmation
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
   expect(navigator.geolocation.getCurrentPosition).toHaveBeenCalledWith(
     expect.any(Function), expect.any(Function),
@@ -275,7 +279,7 @@ test.each(["denied", "timeout", "unavailable"] as const)("location %s points the
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
   expect(screen.getByText(/(blocked|within 30 seconds|could not be determined).*Search/i)).toBeInTheDocument();
 });
@@ -285,7 +289,7 @@ test("browser without geolocation directs the user to search", async () => {
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
   expect(screen.getByText(/does not support location.*Search/i)).toBeInTheDocument();
 });
@@ -298,7 +302,7 @@ test("a late device callback cannot replace a searched location", async () => {
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
   await user.type(screen.getByRole("combobox"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
@@ -311,7 +315,7 @@ test("map adjustment reverse-geocodes and invalidates confirmation", async () =>
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await confirmCurrentLocation(user);
   await user.click(screen.getByRole("button", { name: "Mock move pin" }));
   expect(await screen.findByText(reverseResult.label)).toBeInTheDocument();
@@ -324,7 +328,7 @@ test("reverse lookup failure retains the moved point for confirmation", async ()
   installApi({ reverseFailure: true });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByRole("combobox"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.click(await screen.findByRole("option", { name: /Baranagar/ }));
@@ -337,7 +341,7 @@ test("keeps all form contents when submission fails", async () => {
   installApi({ submitFailure: true });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   const description = screen.getByLabelText(/What is happening/);
   await user.type(description, complaint.description);
   await attachPhoto(user);
@@ -349,20 +353,33 @@ test("keeps all form contents when submission fails", async () => {
   expect(screen.getByText("Confirmed issue location")).toBeInTheDocument();
 });
 
-test("offers a retry when the complaint list is unavailable", async () => {
-  installApi({ complaints: [complaint], listFailures: 1 });
-  const user = userEvent.setup();
+test("shows only capability-safe fields on a private tracking route", async () => {
+  window.history.replaceState({}, "", `/track/${complaint.complaint_id}?token=${complaint.tracking_token}`);
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url.includes(`/api/v1/complaints/${complaint.complaint_id}?tracking_token=`)) {
+      return jsonResponse({
+        complaint_id: complaint.complaint_id,
+        description: complaint.description,
+        status: complaint.status,
+        created_at: complaint.created_at,
+        updated_at: complaint.updated_at,
+      });
+    }
+    return Promise.reject(new Error(`Unexpected request: ${url}`));
+  });
   render(<App />);
-  expect(await screen.findByText("Queue unavailable")).toBeInTheDocument();
-  await user.click(screen.getByRole("button", { name: "Try again" }));
   expect(await screen.findByText(complaint.description)).toBeInTheDocument();
+  expect(screen.getByText(/precise location.*deliberately not displayed/i)).toBeInTheDocument();
+  expect(screen.queryByText(complaint.location_label)).not.toBeInTheDocument();
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
 });
 
 test("image selection removal and replacement use the final file", async () => {
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   const input = screen.getByLabelText("Attach a photo");
   await user.upload(input, new File(["png"], "first.png", { type: "image/png" }));
   await user.click(screen.getByRole("button", { name: "Remove image" }));
@@ -387,7 +404,7 @@ test("moves focus to an error summary with links to invalid fields", async () =>
   installApi();
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Submit complaint" }));
   const summary = screen.getByRole("alert", { name: "There is a problem" });
   await waitFor(() => expect(summary).toHaveFocus());
@@ -409,7 +426,7 @@ test("prevents duplicate submission while the first request is pending", async (
   const fetchMock = installApi({ submitResponse: pending });
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByText("No complaints yet");
+  await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), complaint.description);
   await attachPhoto(user);
   await confirmCurrentLocation(user);

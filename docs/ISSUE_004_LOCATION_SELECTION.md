@@ -32,7 +32,7 @@ MapTiler is the selected autocomplete and reverse-geocoding adapter. It is enabl
 
 The provider base URL, country restriction and user agent are environment configuration. Provider failure returns a sanitized availability error. Public Nominatim is not a production SLA and may be replaced without changing the frontend contract.
 
-The map renderer is separate from geocoding. The initial MapLibre/OpenFreeMap implementation loaded its style and attribution but produced a blank WebGL canvas in the actual in-app browser. The completed implementation therefore lazy-loads Leaflet with configurable raster tiles; standard OpenStreetMap tiles are the local-demo default. This renderer does not supply search data. It includes visible attribution, does not prefetch, and remains replaceable through `VITE_MAP_TILE_URL`; public tiles offer no production SLA.
+The map renderer is separate from geocoding. The initial MapLibre/OpenFreeMap implementation loaded its style and attribution but produced a blank WebGL canvas in the actual in-app browser. The completed implementation therefore lazy-loads Leaflet raster tiles. Issue #12 production verification later proved that direct `tile.openstreetmap.org` use was not a production-appropriate default: the service returned its 403 Access blocked tiles. CivicAI now uses MapTiler Streets v4 with browser-public `VITE_MAPTILER_API_KEY`, retains MapTiler/OpenStreetMap attribution, performs no prefetch, and has no anonymous fallback. The current one-key plan reuses the geocoding key; a separate frontend value remains supported later. This renderer still does not supply search data.
 
 ## Data additions
 
@@ -62,5 +62,5 @@ Migration 0004 adds nullable `location_source` (`search`, `device` or `map`) and
 - No municipal boundary enforcement, department routing, duplicate detection or PostGIS.
 - No automatic photo-EXIF location; downloaded images and screenshots often lack trustworthy metadata, and CivicAI strips image metadata.
 - No Google Maps/Places account, key or billing configuration.
-- No promise that public OpenStreetMap tiles or a free MapTiler account are production municipal infrastructure.
+- No promise that a free MapTiler account is production municipal infrastructure; quota and provider availability remain deployment concerns.
 - No claim that public geocoding or public map tiles are production infrastructure.

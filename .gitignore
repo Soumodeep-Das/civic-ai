@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.production.example
 *.pem
 *.key
 
@@ -38,6 +39,7 @@ Desktop.ini
 uploads/
 data/uploads/
 logs/
+backups/
 tmp/
 *.log
 

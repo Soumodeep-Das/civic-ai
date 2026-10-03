@@ -1,5 +1,25 @@
 # Development Log
 
+## 2026-10-03 — Issue #12 completed after production-like human verification
+
+Final regression passed 185 Python tests (129 backend and unchanged 56 research) with the three known dependency deprecations plus the local pytest-cache ACL warning; 52 frontend tests; TypeScript compilation; and the Vite production build. The initial bundle remains 246.27 kB (76.35 kB gzip), contains MapTiler Streets v4 and contains no old OSM tile host. `git diff --check` and value-based secret scanning passed. `.env.production` is ignored and untracked, its PostgreSQL/tracking/MapTiler values occur zero times in the prospective commit, and `.env.production.example` contains placeholders/empty optional override only.
+
+The owner rebuilt and started the production-like Docker stack and verified it through `https://localhost`: PostgreSQL, backend and Caddy were healthy; administrator bootstrap/login and municipal screens worked; the production database was intentionally fresh and separate from development; citizen submission, location search and MapTiler rendering worked; the created complaint appeared administratively; and no blocking browser issue remained. The one available MapTiler key is currently shared by backend geocoding and frontend tiles, is publicly observable because it enters the browser bundle, and is restricted to `localhost` for this verification. The configuration retains an optional separate frontend key for a future multi-key plan.
+
+The OpenCity raw source was directly re-hashed as `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Issue #12 is complete as a portable single-host project deployment checkpoint, not as formal production certification. Citizen notifications, signed-in citizen history/status, map visual polish and broader communication UX remain deferred and were not implemented.
+
+## 2026-10-02 — Issue #12 production readiness implementation checkpoint
+
+Selected a bounded, primary-source-backed Caddy/FastAPI/PostgreSQL Compose topology. Added multi-stage production images, private fixed networking, one-shot migration gating, persistent database/evidence/certificate volumes, strict production configuration, release-aware liveness, dependency/schema/storage readiness, derived proxy/application security headers, request-size control and bounded logs. Vite remains development-only and research/data/secrets are excluded from the build.
+
+Closed the production evidence exposure: anonymous global list is 404, private HMAC status links expose only UUID/description/status/timestamps, and evidence requires authenticated complaint-level municipal access. Added a read-only database/media consistency audit, coordinated backup, disposable restore verification, operations/deployment/rollback documentation and a non-deploying GitHub Actions quality gate.
+
+Final code-level verification passes 185 Python tests (129 backend and unchanged 56 research), all 50 frontend tests, TypeScript compilation, the Vite production build, `pip check`, production-dependency `npm audit` with zero findings, PowerShell parsing, Compose rendering and `git diff --check`. The local global npm wrapper remains broken, so its actual installed npm CLI and repository-local test/build binaries were used. The managed default pytest temp/cache ACL remains inaccessible, so backend tests use a fresh workspace `--basetemp`; three existing dependency deprecations plus the cache warning remain non-blocking.
+
+A real native PostgreSQL/evidence backup and restore succeeded into disposable database `civicai_restore_issue12_20261002_195619`: migration `0007`, 11 complaints, 5 municipal users, 1 department, 16 status events, 2 assignment events, 22 security events and five hash-identical evidence files were present; the restored application media audit was 5/5 consistent. Sandbox policy blocked destructive cleanup, so the clearly named disposable database and sibling `civicai-restore-verification-*` scratch directory remain for manual removal.
+
+Live development-browser verification submitted a clearly synthetic image/location complaint, showed the protected-evidence receipt, opened a capability status page with no image/precise location/internal activity, returned 404 for a wrong capability and 401 for anonymous evidence. `/health` and `/ready` returned 200 with request IDs and application security headers. At this checkpoint the managed process could not access Docker; the owner subsequently completed the production-like verification recorded in the 2026-10-03 entry above.
+
 ## 2026-10-02 — Issue #11 department ownership completed
 
 - Added migration `0007`, department/membership administration, current complaint ownership, immutable assignment/membership histories, permission-aware server queues, self-claim, concurrency and naturally idempotent retry behavior.
@@ -201,3 +221,10 @@ A clean restart of the Vite development server restored the configured proxy. Ve
 - The submitted text `Workflow recheck: blocked storm drain near the market` appeared immediately in the queue, which increased from two to three stored complaints.
 
 No backend, database or product-code defect was found, so Issue #1 behavior was not altered. README troubleshooting now records the frontend restart procedure.
+# 2026-10-02 — Issue #12 production MapTiler tile remediation
+
+Production-like HTTPS verification exposed a real, isolated defect: the frontend image had compiled `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, and the browser rendered the provider's `Access blocked / 403` tiles. The fix does not spoof or bypass OSM policy. Leaflet now uses MapTiler Streets v4 through browser-public `VITE_MAPTILER_API_KEY`. The current one-key plan reuses `MAPTILER_API_KEY` through a Compose fallback, so that value is publicly observable and protected through MapTiler origin/usage restrictions; a separate frontend override remains supported later. `MAPTILER_REQUEST_ORIGIN` identifies the same CivicAI site on backend geocoding requests so the origin restriction does not break search. The production proxy build fails closed without either key value, Caddy CSP permits `api.maptiler.com` images, and there is no anonymous fallback. MapTiler and OpenStreetMap attribution remain visible.
+
+Focused code verification passes: 7/7 geocoding tests (including the new shared-key Origin header assertion), 2/2 tile-configuration tests, the unchanged 27 citizen and 23 municipal frontend tests, TypeScript compilation, and the Vite production build. Compose renders successfully, resolves the one-key fallback without a frontend override, and Caddy's CSP contains the MapTiler image origin but not the old OSM tile host. The built frontend contains MapTiler Streets v4 and no `tile.openstreetmap.org` reference. `git diff --check` passes. The browser-used key is restricted in MapTiler to Allowed HTTP Origin `localhost`; its existing value remains only in ignored `.env.production`.
+
+The owner subsequently rebuilt the backend/proxy from normal PowerShell and verified production location search plus visible MapTiler rendering through `https://localhost`; the old 403 tile placeholders and blocking browser issue were gone. No real key was printed or committed, and no unrelated database, research, or ML behavior changed.

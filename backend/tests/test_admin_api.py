@@ -105,7 +105,7 @@ def test_stale_update_is_rejected(client):
     response = change_status(client, current, "in_progress", expected=old_timestamp)
     assert response.status_code == 409
     assert response.json()["code"] == "stale_complaint_update"
-    assert client.get(f"/api/v1/complaints/{complaint['complaint_id']}").json()["status"] == "under_review"
+    assert client.get(f"/api/v1/admin/complaints/{complaint['complaint_id']}").json()["status"] == "under_review"
 
 
 @pytest.mark.parametrize("payload", [
@@ -174,11 +174,22 @@ def test_admin_missing_and_invalid_ids(client):
     assert client.get("/api/v1/admin/complaints/not-a-uuid").status_code == 422
 
 
-def test_citizen_api_compatibility_and_truthful_status(client):
+def test_citizen_private_tracking_shows_truthful_minimal_status(client):
     complaint = create_complaint(client)
     updated = change_status(client, complaint, "under_review").json()
-    assert client.get(f"/api/v1/complaints/{complaint['complaint_id']}").json() == updated
-    assert client.get("/api/v1/complaints").json()[0]["status"] == "under_review"
+    response = client.get(
+        f"/api/v1/complaints/{complaint['complaint_id']}",
+        params={"tracking_token": complaint["tracking_token"]},
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "complaint_id": updated["complaint_id"],
+        "description": updated["description"],
+        "status": "under_review",
+        "created_at": updated["created_at"],
+        "updated_at": updated["updated_at"],
+    }
+    assert client.get("/api/v1/complaints").status_code == 404
 
 
 def test_missing_image_returns_clean_404(client):

@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import json
 import logging
+import os
 import re
 from time import perf_counter
 from uuid import uuid4
@@ -8,10 +9,11 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 from civicai.auth import LoginThrottle
-from civicai.config import auth_settings, database_url, geocoding_settings
+from civicai.config import auth_settings, database_url, geocoding_settings, runtime_settings
 from civicai.database import build_engine
 from civicai.domain import AssignmentConflict, ComplaintNotFound, DepartmentNotFound, InvalidStatusTransition, StaleComplaintUpdate
 from civicai.geocoding import Geocoder, GeocodingUnavailable, MapTilerGeocoder, NominatimGeocoder
@@ -26,8 +28,10 @@ REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        app.state.runtime_settings = runtime_settings()
         app.state.engine = build_engine(url or database_url())
         app.state.upload_directory = upload_directory()
+        app.state.upload_directory.mkdir(parents=True, exist_ok=True)
         app.state.auth_settings = auth_settings()
         app.state.login_throttle = LoginThrottle()
         settings = geocoding_settings()
@@ -36,7 +40,7 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
         elif settings.provider == "maptiler":
             app.state.geocoder = MapTilerGeocoder(
                 settings.maptiler_base_url, settings.maptiler_api_key,
-                settings.country_codes, settings.proximity,
+                settings.country_codes, settings.proximity, settings.maptiler_request_origin,
             )
         elif settings.provider == "nominatim":
             app.state.geocoder = NominatimGeocoder(
@@ -63,11 +67,16 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(self)"
+        if request.url.path.startswith(("/api/", "/health", "/ready")):
+            response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        if request.app.state.runtime_settings.environment == "production":
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         if request.url.path.startswith(("/api/v1/auth", "/api/v1/admin")):
             response.headers["Cache-Control"] = "no-store"
         LOGGER.info(json.dumps({
             "event": "http_request", "request_id": request_id,
-            "method": request.method, "path": request.url.path,
+            "method": request.method, "route": getattr(request.scope.get("route"), "path", "unmatched"),
             "status": response.status_code, "duration_ms": round((perf_counter() - started) * 1000, 2),
         }, separators=(",", ":")))
         return response
@@ -80,8 +89,23 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
         })
 
     @app.get("/health")
-    def health():
-        return {"status": "ok"}
+    def health(request: Request):
+        return {"status": "ok", "release": request.app.state.runtime_settings.release_id}
+
+    @app.get("/ready")
+    def ready(request: Request):
+        directory = request.app.state.upload_directory
+        if not directory.is_dir() or not os.access(directory, os.R_OK | os.W_OK):
+            return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "evidence_storage"})
+        try:
+            with request.app.state.engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+                revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one_or_none()
+        except Exception:
+            return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "database"})
+        if revision != "0007":
+            return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "schema"})
+        return {"status": "ready", "release": request.app.state.runtime_settings.release_id}
 
     @app.exception_handler(ComplaintNotFound)
     async def missing(request: Request, exc: ComplaintNotFound):

@@ -1,12 +1,12 @@
 # API Contract
 
-Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds optional location context and selection quality to that compatible multipart contract, plus provider-neutral search/reverse/capability endpoints. JSON complaint creation still returns 415. GET list/detail and health paths remain unchanged.
+Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds optional location context and selection quality to that compatible multipart contract, plus provider-neutral search/reverse/capability endpoints. JSON complaint creation still returns 415. Issue #12 deliberately replaces anonymous list/detail/evidence reads with a private status capability and municipal-only evidence access.
 
 ## Submission
 
 Multipart fields: description (required trimmed nonempty text), latitude (optional number -90..90), longitude (optional number -180..180), image (optional JPEG/PNG file), location_label (optional nonempty string, 300 characters), location_precision (optional `exact`, `approximate` or `broad`), location_details (optional nonempty string, 500 characters), location_source (optional `search`, `device` or `map`) and location_accuracy_m (optional finite number 0..100000). Omit unavailable coordinates. If any location-context field is sent, both coordinates plus label and precision are required. Accuracy is accepted only with source `device`. Coordinate-only legacy clients remain valid. Duplicate, unknown and server-owned fields are rejected. Do not set the Content-Type header manually in browser code; FormData supplies the boundary.
 
-POST returns 201 with complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at. image_ref is null without an image, otherwise a relative /api/v1/complaint-images/<generated-name> URL. New complaints start as `submitted`; UUID and UTC timestamps remain server-owned.
+POST returns 201 with complaint_id, description, latitude, longitude, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at, updated_at and a 64-character `tracking_token`. `image_ref` is always null in this anonymous response even when evidence was stored. New complaints start as `submitted`; UUID and UTC timestamps remain server-owned. The tracking token is shown only on submission, is a bearer capability and must not be logged or published.
 
 The citizen Issue #4 frontend requires a photo and confirmed location. The API intentionally keeps both optional for existing records, compatibility and non-browser clients; frontend policy must not be described as a database invariant.
 
@@ -22,17 +22,18 @@ Success returns up to five normalized results with provider_id, label, latitude,
 
 The Nominatim fallback is country-restricted through configuration, limited to one upstream request per second and cached in memory for 15 minutes; it never advertises autocomplete. The MapTiler adapter advertises autocomplete and supports optional configured proximity bias. Provider keys stay server-side. Providers receive public-place search text or selected coordinates; users should not enter private information. No search query or coordinates are intentionally written to CivicAI application logs.
 
-## Reads
+## Citizen reads and evidence
 
-- GET /api/v1/complaints returns an array ordered by creation time then UUID.
-- GET /api/v1/complaints/{complaint_id} returns the record or 404.
-- GET /api/v1/complaint-images/{filename} returns validated raster content or 404. Names are restricted to generated hexadecimal UUIDs and jpg/png extensions.
-- GET /health returns 200 {"status":"ok"} as liveness only.
-- /docs and /openapi.json describe the multipart endpoint.
+- `GET /api/v1/complaints` is intentionally disabled and returns 404. There is no anonymous enumeration feed.
+- `GET /api/v1/complaints/{complaint_id}?tracking_token=<capability>` returns only `complaint_id`, description, status and created/updated timestamps. Missing, malformed or wrong capabilities return 404 to avoid existence disclosure. Coordinates, location labels/details, image references, ownership and internal history are excluded.
+- `GET /api/v1/complaint-images/{filename}` requires a valid municipal session and complaint-level permission. Unauthenticated callers receive 401; authenticated but unauthorized callers receive 403; authorized missing files receive 404. Successful evidence uses its explicit raster MIME and `Cache-Control: private, no-store`.
+- `GET /health` returns `{"status":"ok","release":"<safe-release-id>"}` without dependency checks.
+- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at `0007`, and evidence storage is writable; otherwise sanitized 503 JSON is returned.
+- `/docs` and `/openapi.json` describe the multipart endpoint.
 
 ## Municipal operations
 
-Issue #11 extends municipal resources only. Citizen complaint list/detail still serialize `ComplaintRead` and never include department, assignee, membership, workload or assignment history.
+Issue #11 extends municipal resources only. Issue #12's capability status response never includes department, assignee, membership, workload or assignment history.
 
 `GET /api/v1/admin/complaints` additionally accepts `department_id`, `assignee_user_id`, `assignment_state=assigned|unassigned`, and `queue=unassigned|mine|my_departments_unassigned`. The organization-wide `unassigned` queue is administrator-only. Operators receive only current member-department complaints or complaints individually assigned to them. Existing pagination and filters compose server-side.
 
@@ -91,4 +92,4 @@ Errors use code/message, with details for field-validation errors. Invalid field
 
 Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 
-Citizen complaint creation/list/detail and complaint-image retrieval remain anonymous for the current local demonstration. Municipal operations and account data are authenticated. Do not expose evidence publicly or submit private evidence until a production citizen/evidence access policy is designed.
+Citizen complaint creation remains anonymous. Status retrieval requires the per-complaint capability returned at creation. Complaint-image retrieval and municipal operations require authentication and server-side authorization; account administration additionally requires `municipal_admin`. Never expose evidence through a static directory or public object URL.

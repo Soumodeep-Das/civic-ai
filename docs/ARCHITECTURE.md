@@ -30,9 +30,9 @@ The browser will communicate with the backend through a versioned JSON API. The 
 
 ### Frontend
 
-Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission and the recent complaint list. `frontend/src/api/complaints.ts` owns HTTP access; the React component owns the small amount of form and request state. Vite proxies `/api` and `/health` to the local FastAPI server during development, avoiding a backend CORS change. No router, component library, global state library or map provider is needed for the MVP.
+Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission. Issue #12 removes the earlier anonymous recent-complaint feed and adds a private capability status page. `frontend/src/api/complaints.ts` owns HTTP access; React owns the small amount of form and request state. Vite proxies `/api`, `/health` and `/ready` to local FastAPI only during development, avoiding a backend CORS change.
 
-Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from map adjustment. The lazy-loaded Leaflet renderer consumes normalized coordinates and never calls the geocoder directly. Desktop click, marker drag and touch interaction converge on the same location state, and every coordinate change invalidates prior confirmation. Raster rendering was selected after the WebGL vector canvas stayed blank in the actual in-app browser despite loading its style and attribution.
+Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from map adjustment. The lazy-loaded Leaflet renderer consumes normalized coordinates and never calls the geocoder directly. Desktop click, marker drag and touch interaction converge on the same location state, and every coordinate change invalidates prior confirmation. Raster rendering was selected after the WebGL vector canvas stayed blank in the actual in-app browser despite loading its style and attribution. Production tiles use MapTiler Streets v4 through browser-public, origin-restricted `VITE_MAPTILER_API_KEY`. A one-key plan may reuse `MAPTILER_API_KEY`; Compose supports that current deployment while retaining a distinct frontend override for future plans. No anonymous raster service is a production fallback.
 
 Issue #8 keeps one React application with citizen (`/`) and municipal (`/admin`, `/admin/complaints`, `/admin/complaints/:id`) routes. The detail map reuses the lazy Leaflet component in read-only mode, preserving submitted location evidence. Components leave room for later AI sections but render no prediction placeholders or fake values.
 
@@ -40,7 +40,7 @@ Issue #8 keeps one React application with citizen (`/`) and municipal (`/admin`,
 
 A FastAPI service will expose API endpoints, validate input, apply complaint workflow rules, and coordinate persistence and later inference. Domain logic should remain separate from HTTP handlers and database-specific code.
 
-Issue #4 adds provider-neutral search, reverse-geocoding and capability endpoints. Provider response parsing, throttling and caching stay outside route handlers. A Nominatim-compatible adapter supplies policy-limited explicit search; a server-configured MapTiler adapter supplies autocomplete and reverse geocoding. The browser receives only CivicAI's normalized contracts and never receives the MapTiler key. Both are local-demo dependencies, not promised production SLAs.
+Issue #4 adds provider-neutral search, reverse-geocoding and capability endpoints. Provider response parsing, throttling and caching stay outside route handlers. A Nominatim-compatible adapter supplies policy-limited explicit search; a server-configured MapTiler adapter supplies autocomplete and reverse geocoding. The browser receives only CivicAI's normalized geocoding contracts, but its MapTiler tile key is intentionally compiled into the frontend. When one account key supplies both functions, that shared credential is public and must be origin/usage restricted. Because MapTiler rejects origin-restricted requests that omit origin identification, the backend sends the configured CivicAI `MAPTILER_REQUEST_ORIGIN`; production Compose derives it from the public site address. Neither provider is treated as a CivicAI-owned SLA.
 
 Issue #8 adds a small domain state machine and municipal query/update services. Routes validate transport parameters; service code owns pagination, escaped search, real aggregates, transition rules and compare-and-set status updates. Repeating the current state is idempotent; stale `updated_at` fails with a sanitized conflict.
 
@@ -52,7 +52,7 @@ Migration 0005 expands the status constraint and creates append-only `complaint_
 
 ### Media storage
 
-Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local storage under data/uploads/complaints (UPLOAD_DIR override). PostgreSQL stores a nullable image_ref. A restricted API image route serves raster content. Multipart creation coordinates validation, file storage and complaint persistence. This remains a local anonymous demonstration; production retention, quotas, authorization and orphan recovery are unresolved.
+Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local storage under data/uploads/complaints (UPLOAD_DIR override). PostgreSQL stores a nullable image_ref. Multipart creation coordinates validation, file storage and complaint persistence. Issue #12 places production evidence in a private persistent volume and requires municipal authentication plus complaint authorization on the API image route. A read-only audit reports reference/file inconsistency; legal retention and automatic deletion remain unresolved.
 
 ### ML pipeline
 
@@ -88,6 +88,12 @@ Issue #1 established the tested backend persistence flow and Issue #2 completed 
 - Log operational events without recording sensitive complaint text or coordinates unnecessarily.
 - Add authorization before exposing administrative or personally identifying data.
 
-## Deployment
+## Production deployment
 
-No cloud platform, container strategy, CI provider, domain, or production topology has been selected. Deployment decisions should follow a working local vertical slice and be logged in `DECISIONS.md`.
+Issue #12 selects a portable single-host Docker Compose topology: Caddy is the only public service and terminates HTTPS, serves the immutable Vite build and proxies API/health paths; private Uvicorn serves FastAPI; private PostgreSQL and separate evidence storage use named volumes. A one-shot Alembic service gates backend startup. Caddy state is persistent. Neither the source tree, Git metadata, secrets nor research data enters runtime images/volumes.
+
+The private network pins Caddy at `172.28.0.10`; Uvicorn trusts forwarded headers only from that address. Changing the network requires changing this allowlist. Caddy handles backend paths before SPA fallback. It applies a 6 MiB outer body limit, compression, minimal CSP/security headers, no-store HTML and immutable fingerprinted-asset caching. Vite is never a production process.
+
+`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, migration `0007` and writable evidence storage but not optional geocoding. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
+
+The topology intentionally remains platform-neutral and single-host. It does not provide high availability, a distributed rate limiter, legal retention automation, cloud object storage, external metrics/log aggregation or automated deployment. See `DEPLOYMENT.md`, `BACKUP_RESTORE.md` and `OPERATIONS_RUNBOOK.md`.
