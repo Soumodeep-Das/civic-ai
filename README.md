@@ -1,5 +1,13 @@
 # CivicAI
 
+> Closed-beta deployment preparation is available but external provisioning/live verification is still in progress. The normal local workflow remains the source for development.
+
+## Closed-beta deployment path
+
+`Dockerfile.beta` and `render.yaml` define a single-origin Render Free deployment: React is compiled into the image and served by FastAPI alongside the API. Beta PostgreSQL and private evidence storage are supplied by Supabase; transactional identity email uses the Brevo HTTPS API. Start with the placeholder-only `.env.beta.example`, then follow [Issue #14 deployment notes](docs/ISSUE_014_CLOSED_BETA.md). Never commit a populated beta environment file or expose Supabase/Brevo/Google server credentials to Vite.
+
+The existing local Docker/Caddy/PostgreSQL/Mailpit workflow is unchanged and does not require Render, Supabase, or Brevo.
+
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
 The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus confirmed location in the citizen frontend. Issues #9–#11 add protected municipal operations, responsive accessibility, departments and accountable queues. Issue #12 adds portable production deployment, private tracking/evidence, recovery and CI. Issue #13 adds [modern citizen identity and invitation-only municipal access](docs/ISSUE_013_MODERN_IDENTITY.md) without removing anonymous reporting. Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).

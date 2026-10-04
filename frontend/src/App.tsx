@@ -36,7 +36,7 @@ function ErrorSummary({ errors, summaryRef }: { errors: FormErrors; summaryRef: 
 }
 
 export function CitizenHeader({ accountName }: { accountName?: string } = {}) {
-  return <header className="site-header"><a className="brand" href="/" aria-label="CivicAI citizen complaint service home"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span><span>Civic<span>AI</span></span></a><nav aria-label="Service navigation"><a href="/#report-heading">Report Issue</a>{accountName ? <><a href="/my-complaints">My Complaints</a><a href="/profile">Profile<span className="sr-only"> for {accountName}</span></a></> : <><a href="/sign-in">Sign in</a><a href="/sign-up">Create account</a></>}<a href="/staff/sign-in">Municipal staff</a></nav></header>;
+  return <><header className="site-header"><a className="brand" href="/" aria-label="CivicAI citizen complaint service home"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span><span>Civic<span>AI</span></span></a><nav aria-label="Service navigation"><a href="/#report-heading">Report Issue</a><a href="/track">Track complaint</a>{accountName ? <><a href="/my-complaints">My Complaints</a><a href="/profile">Profile<span className="sr-only"> for {accountName}</span></a></> : <><a href="/sign-in">Sign in</a><a href="/sign-up">Create account</a></>}<a href="/staff/sign-in">Municipal staff</a></nav></header>{import.meta.env.VITE_CLOSED_BETA === "true" && <div className="beta-banner" role="status"><strong>Closed beta</strong> — test data may be reset; please avoid personal or sensitive information.</div>}</>;
 }
 
 export function CitizenFooter() {
@@ -138,6 +138,17 @@ function TrackingPage() {
   return <div className="citizen-app"><a className="skip-link" href="#main-content">Skip to main content</a><CitizenHeader /><main id="main-content" className="route-state"><p className="eyebrow">Private complaint tracking</p><h1>Complaint status</h1>{error && <div className="notice error-notice" role="alert"><strong>Status unavailable</strong><p>{error}</p></div>}{!error && !complaint && <p role="status">Loading complaint status…</p>}{complaint && <article className="complaint-card"><div className="card-meta"><StatusBadge status={complaint.status} /><time dateTime={complaint.updated_at}>Updated {readableDate(complaint.updated_at)}</time></div><p>{complaint.description}</p><div className="card-footer"><span className="reference">Reference {complaint.complaint_id}</span></div></article>}<p>Photos, precise location and internal municipal activity are deliberately not displayed here.</p><a className="primary-link" href="/">Return to CivicAI home</a></main><CitizenFooter /></div>;
 }
 
+function TrackingLookupPage() {
+  useDocumentTitle("Track a complaint | CivicAI");
+  const [reference, setReference] = useState("");
+  const [token, setToken] = useState("");
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    if (reference.trim() && token.trim()) window.location.assign(`/track/${encodeURIComponent(reference.trim())}?token=${encodeURIComponent(token.trim())}`);
+  }
+  return <div className="citizen-app"><CitizenHeader /><main id="main-content" className="route-state"><p className="eyebrow">Private complaint tracking</p><h1>Track a complaint</h1><p>Use the reference and private tracking token from your submission receipt.</p><form onSubmit={submit}><label htmlFor="tracking-reference">Complaint reference</label><input id="tracking-reference" required value={reference} onChange={(event) => setReference(event.target.value)} /><label htmlFor="tracking-token">Private tracking token</label><input id="tracking-token" required value={token} onChange={(event) => setToken(event.target.value)} /><button className="primary-button" type="submit">View status</button></form></main><CitizenFooter /></div>;
+}
+
 function NotFoundPage() {
   useDocumentTitle("Page not found | CivicAI");
   return <div className="citizen-app"><a className="skip-link" href="#main-content">Skip to main content</a><CitizenHeader /><main id="main-content" className="route-state"><p className="eyebrow">Page not found</p><h1>We could not find that page</h1><p>Check the address or return to the citizen complaint service.</p><a className="primary-link" href="/">Go to CivicAI home</a></main><CitizenFooter /></div>;
@@ -150,6 +161,7 @@ export default function App() {
   if (path === "/staff/accept-invite") return <Suspense fallback={<RouteLoader />}><StaffAcceptInvite /></Suspense>;
   if (path.startsWith("/admin") || path.startsWith("/municipal") || path.startsWith("/staff/")) return <Suspense fallback={<RouteLoader />}><AdminApp /></Suspense>;
   if (path.startsWith("/track/")) return <TrackingPage />;
+  if (path === "/track") return <TrackingLookupPage />;
   if (["/sign-in", "/sign-up", "/verify-email", "/forgot-password", "/reset-password", "/my-complaints", "/profile"].includes(path) || path.startsWith("/complaints/")) return <Suspense fallback={<RouteLoader />}><CitizenIdentity /></Suspense>;
   return path === "/" ? <CitizenApp /> : <NotFoundPage />;
 }

@@ -1,0 +1,20 @@
+FROM node:22.12-alpine AS frontend
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+ARG VITE_MAPTILER_API_KEY
+ARG VITE_CLOSED_BETA=true
+RUN test -n "$VITE_MAPTILER_API_KEY" && npm run build
+
+FROM python:3.12-slim AS runtime
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 FRONTEND_DIST_DIR=/app/frontend-dist
+WORKDIR /app
+COPY pyproject.toml alembic.ini ./
+COPY backend ./backend
+COPY --from=frontend /app/frontend/dist ./frontend-dist
+RUN pip install --no-cache-dir .
+RUN groupadd --system civicai && useradd --system --gid civicai --home-dir /app civicai && chown -R civicai:civicai /app
+USER civicai
+EXPOSE 10000
+CMD ["sh", "-c", "python -m alembic upgrade head && exec uvicorn civicai.main:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers --forwarded-allow-ips='*'"]

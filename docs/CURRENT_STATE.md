@@ -129,3 +129,8 @@ Successful device location capture is now verified in the live browser. A compla
 ## References
 
 API_CONTRACT.md describes multipart/search contracts and limits. ISSUE_003_EDGE_CASES.md and ISSUE_004_LOCATION_SELECTION.md record primary-source research and tradeoffs. DEVELOPMENT_LOG.md contains checkpoints. No production security, geocoding SLA, public deployment or research-results claim is made.
+# Issue #14 deployment preparation (in progress)
+
+The verified Issue #13 application now has a locally tested closed-beta deployment path: a single Render Docker service serving React and FastAPI, configurable private Supabase S3 evidence storage, Brevo HTTPS transactional email, a closed-beta notice, and a discoverable tracking entry point. Local Docker/Caddy/PostgreSQL/Mailpit behavior remains supported.
+
+External Supabase, Brevo, Render, Google-hostname, first-admin, and live multi-user verification are not complete. Issue #14 is therefore not complete and the project is not formally production-certified. See `docs/ISSUE_014_CLOSED_BETA.md` and `docs/BETA_TEST_PROTOCOL.md`.

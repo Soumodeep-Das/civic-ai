@@ -9,6 +9,8 @@ from uuid import uuid4
 from fastapi import HTTPException
 from PIL import Image, ImageOps, UnidentifiedImageError
 
+from civicai.evidence import EvidenceStorage, LocalEvidenceStorage
+
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 MAX_IMAGE_PIXELS = 20_000_000
 REFERENCE_PREFIX = "/api/v1/complaint-images/"
@@ -19,7 +21,7 @@ def upload_directory() -> Path:
     return Path(os.environ.get("UPLOAD_DIR", str(default))).resolve()
 
 
-def save_image(content: bytes, content_type: str | None, directory: Path) -> str:
+def save_image(content: bytes, content_type: str | None, destination: Path | EvidenceStorage) -> str:
     if len(content) > MAX_IMAGE_BYTES:
         raise HTTPException(413, "Image must be 5 MiB or smaller.")
     if content_type not in {"image/jpeg", "image/png"}:
@@ -45,16 +47,17 @@ def save_image(content: bytes, content_type: str | None, directory: Path) -> str
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError, Image.DecompressionBombWarning):
         raise HTTPException(422, "Upload must contain a valid JPEG or PNG image.") from None
     filename = uuid4().hex + (".jpg" if expected == "JPEG" else ".png")
-    directory.mkdir(parents=True, exist_ok=True)
-    path = directory / filename
+    storage = LocalEvidenceStorage(destination) if isinstance(destination, Path) else destination
     try:
-        with path.open("xb") as target:
-            target.write(encoded)
+        storage.put(filename, encoded, content_type)
     except FileExistsError:
         # Never remove or overwrite an existing file, even on an improbable UUID collision.
         raise
     except OSError:
-        path.unlink(missing_ok=True)
+        try:
+            storage.delete(filename)
+        except OSError:
+            pass
         raise
     return REFERENCE_PREFIX + filename
 

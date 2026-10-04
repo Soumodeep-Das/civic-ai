@@ -70,3 +70,5 @@ jobs:
         run: docker compose --env-file .env.production.example -f compose.production.yml config --quiet
       - name: Build immutable application images
         run: docker compose --env-file .env.production.example -f compose.production.yml build backend proxy
+      - name: Build closed-beta single-service image
+        run: docker build -f Dockerfile.beta --build-arg VITE_MAPTILER_API_KEY=ci-public-placeholder --build-arg VITE_CLOSED_BETA=true .

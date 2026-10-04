@@ -239,3 +239,13 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 - Status: accepted for Issue #2
 - Decision: Use React 19, TypeScript, Vite and Vitest with Testing Library. Keep request code in a small API client and use Vite's local proxy for the existing `/api` and `/health` paths.
 - Consequence: The MVP needs no router, component library, global state library or backend CORS change. Node.js 22.12 or newer is required. npm manages and locks frontend dependencies.
+# Issue #14 closed-beta decisions
+
+- Use one Render Free Docker web service and one HTTPS origin; FastAPI serves the built SPA and API.
+- Keep local Docker/Caddy/PostgreSQL/Mailpit as the independent development path.
+- Use Supabase only for PostgreSQL and a private S3-compatible Storage bucket; CivicAI remains responsible for identity and authorization.
+- Use a storage adapter so local filesystem and private object storage share the existing protected evidence API.
+- Use Brevo's HTTPS API because Render blocks outbound SMTP ports.
+- Run Alembic before Uvicorn startup because Render Free has no interactive shell/one-off job facility.
+- Use the Supabase shared pooler in session mode with a small application pool for IPv4 compatibility and connection-budget safety.
+- Treat beta as fail-closed like production for secure cookies, HTTPS origins, tracking secrets, and real email delivery.

@@ -1,0 +1,65 @@
+services:
+  - type: web
+    name: civicai-beta
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./Dockerfile.beta
+    healthCheckPath: /ready
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_ENV
+        value: beta
+      - key: RELEASE_ID
+        value: render-beta
+      - key: AUTH_COOKIE_SECURE
+        value: "true"
+      - key: AUTH_SESSION_HOURS
+        value: "8"
+      - key: EMAIL_TRANSPORT
+        value: brevo
+      - key: EVIDENCE_STORAGE_BACKEND
+        value: s3
+      - key: GEOCODING_PROVIDER
+        value: maptiler
+      - key: DB_POOL_SIZE
+        value: "3"
+      - key: DB_MAX_OVERFLOW
+        value: "0"
+      - key: DB_POOL_TIMEOUT_SECONDS
+        value: "10"
+      - key: DB_POOL_RECYCLE_SECONDS
+        value: "300"
+      - key: DATABASE_URL
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: AUTH_ALLOWED_ORIGINS
+        sync: false
+      - key: PUBLIC_TRACKING_SECRET
+        generateValue: true
+      - key: MAPTILER_API_KEY
+        sync: false
+      - key: VITE_MAPTILER_API_KEY
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EVIDENCE_S3_ENDPOINT_URL
+        sync: false
+      - key: EVIDENCE_S3_REGION
+        sync: false
+      - key: EVIDENCE_S3_BUCKET
+        sync: false
+      - key: EVIDENCE_S3_ACCESS_KEY_ID
+        sync: false
+      - key: EVIDENCE_S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: GOOGLE_OIDC_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OIDC_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OIDC_REDIRECT_URI
+        sync: false

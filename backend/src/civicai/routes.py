@@ -3,7 +3,6 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response, HTTPException, Query
-from fastapi.responses import FileResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile
@@ -18,6 +17,7 @@ from civicai.auth import (
 from civicai.database import get_session
 from civicai.citizen_auth import optional_citizen_context
 from civicai.geocoding import Geocoder
+from civicai.evidence import validate_key
 from civicai.schemas import (
     AdminComplaintDetail, AdminComplaintPage, AdminComplaintRead, ComplaintCreate, ComplaintRead,
     ComplaintSubmissionRead, CitizenComplaintStatusRead,
@@ -31,7 +31,7 @@ from civicai.schemas import (
 )
 from civicai.domain import ComplaintStatus
 from civicai.models import Complaint, MunicipalDepartment, MunicipalSession, MunicipalUser
-from civicai.uploads import MAX_IMAGE_BYTES, save_image, image_path
+from civicai.uploads import MAX_IMAGE_BYTES, save_image
 from civicai.tracking import tracking_token, valid_tracking_token
 
 router = APIRouter(tags=["complaints"])
@@ -144,7 +144,7 @@ async def create(request: Request, session: DatabaseSession):
         if upload is not None:
             content = await upload.read(MAX_IMAGE_BYTES + 1)
             try:
-                image_ref = save_image(content, upload.content_type, request.app.state.upload_directory)
+                image_ref = save_image(content, upload.content_type, request.app.state.evidence_storage)
             except OSError:
                 raise HTTPException(503, "Image storage is temporarily unavailable.") from None
         try:
@@ -162,7 +162,10 @@ async def create(request: Request, session: DatabaseSession):
         except Exception:
             session.rollback()
             if image_ref is not None:
-                (request.app.state.upload_directory / image_ref.rsplit("/", 1)[1]).unlink(missing_ok=True)
+                try:
+                    request.app.state.evidence_storage.delete(image_ref.rsplit("/", 1)[1])
+                except OSError:
+                    pass
             raise
 
 
@@ -374,9 +377,10 @@ def admin_update_user(
 
 @router.get("/api/v1/complaint-images/{filename}")
 def get_image(filename: str, request: Request, session: DatabaseSession):
-    path = image_path(request.app.state.upload_directory, filename)
-    if not path.is_file():
-        raise HTTPException(404, "Complaint image not found.")
+    try:
+        validate_key(filename)
+    except FileNotFoundError:
+        raise HTTPException(404, "Image not found.") from None
     complaint = session.scalar(select(Complaint).where(
         Complaint.image_ref == f"/api/v1/complaint-images/{filename}"
     ))
@@ -396,5 +400,9 @@ def get_image(filename: str, request: Request, session: DatabaseSession):
         ownership.require_complaint_access(session, user, complaint)
     elif auth_session.citizen_account_id != complaint.citizen_account_id:
         raise HTTPException(404, "Complaint image not found.")
-    return FileResponse(path, media_type="image/png" if path.suffix == ".png" else "image/jpeg",
-                        headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, no-store"})
+    try:
+        content, media_type = request.app.state.evidence_storage.get(filename)
+    except (FileNotFoundError, OSError):
+        raise HTTPException(404, "Complaint image not found.") from None
+    return Response(content=content, media_type=media_type,
+                    headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, no-store"})
