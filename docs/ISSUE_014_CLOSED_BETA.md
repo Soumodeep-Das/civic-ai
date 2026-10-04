@@ -27,6 +27,8 @@ Use `.env.beta.example` only as a variable-name guide. Never commit a populated 
 
 `render.yaml` declares a free Singapore Docker service, `/ready` health check, and deployment only after GitHub checks pass. The generated Render hostname must replace all example host values before deployment. Migrations run before each process start and fail the deployment if they fail.
 
+Docker validates that the public MapTiler build key exists through `process.env`; the key is never interpolated into a `RUN` command because that would disclose it in provider build logs.
+
 ## Backup and recovery limits
 
 Supabase recommends that Free projects make regular off-site CLI database dumps. Database backups do not include Storage objects; evidence requires a separate export. The beta has no formal recovery-time guarantee. Before a destructive change, export both PostgreSQL and the private bucket and verify the exports can be read.
