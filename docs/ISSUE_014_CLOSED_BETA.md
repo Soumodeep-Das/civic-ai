@@ -23,6 +23,8 @@ Brevo sends verification, reset, and staff-invitation messages through its HTTPS
 
 Use `.env.beta.example` only as a variable-name guide. Never commit a populated beta environment file. Render secrets include the database URL/password, tracking secret, Supabase S3 credentials, Brevo key, backend MapTiler key, and Google client secret. `VITE_MAPTILER_API_KEY` is public by design and must be origin-restricted at MapTiler.
 
+`MAPTILER_REQUEST_ORIGIN`, `PUBLIC_BASE_URL`, `AUTH_ALLOWED_ORIGINS`, and the Google redirect URI must use the exact generated Render HTTPS origin. This lets the origin-restricted shared MapTiler key serve both browser tiles and server-side geocoding without weakening its restrictions.
+
 `render.yaml` declares a free Singapore Docker service, `/ready` health check, and deployment only after GitHub checks pass. The generated Render hostname must replace all example host values before deployment. Migrations run before each process start and fail the deployment if they fail.
 
 ## Backup and recovery limits
