@@ -1,5 +1,11 @@
 # Current State
 
+## 2026-10-17 — Engineering handoff and deployed beta reality
+
+The repository has a verified fresh-agent entry point at `docs/AGENT_HANDOFF.md`. The public closed beta is deployed at `https://civicai-beta.onrender.com/` using the Issue #14 Render/Supabase/Brevo/Google/MapTiler architecture. The owner reports that public account creation, Google sign-in, complaint submission and maps work. The repository does not yet contain durable evidence that the first beta administrator was provisioned or that the full municipal, staff-invitation, password-recovery and multi-user protocol was completed; those remain the immediate beta-validation task rather than a new product feature.
+
+Current regression evidence is 147 backend tests, 56 unchanged research tests, 57 frontend tests, passing TypeScript and production build, and consistent Python dependencies. The OpenCity raw checksum remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`; Stage B is paused and `training_approved=false`. See `AGENT_HANDOFF.md` for the feature-by-feature status matrix, security boundaries, deployment facts, known gaps and onboarding order.
+
 ## Issue #13 — modern identity (implemented and live-verified)
 
 CivicAI preserves anonymous reporting while adding self-service verified citizen accounts (email/password and Google OIDC architecture), secure recovery, server-owned complaint ownership, My Complaints, sanitized status history and capability-proven anonymous complaint claiming. Municipal access is presented through `/staff/sign-in` and role-neutral `/municipal`; administrators provision staff with fixed-role/fixed-department invitations. Existing municipal users, RBAC, memberships and histories remain intact through migration `0008`.

@@ -1,8 +1,10 @@
 # Issue #14 — Zero-cost closed beta
 
-Status: deployment preparation implemented and locally verified; external provisioning and live verification are pending. This is not production certification.
+Status: deployed at `https://civicai-beta.onrender.com/`; citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification. Full municipal/admin, staff-invitation, recovery and multi-user beta protocol evidence is still pending. This is not production certification.
 
-Local Phase A gates: 147 backend tests and 56 unchanged research tests passed (203 total), 57 frontend tests passed, TypeScript compilation and the beta-configured Vite production build passed, `pip check` and `git diff --check` passed. The raw OpenCity checksum was reverified as `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. The Dockerfile could not be executed from the Codex sandbox because access to the local Docker named pipe was denied; GitHub CI now builds this image and the Render deployment will provide the next runtime proof.
+Local Phase A gates: 147 backend tests and 56 unchanged research tests passed (203 total), 57 frontend tests passed, TypeScript compilation and the beta-configured Vite production build passed, `pip check` and `git diff --check` passed. The raw OpenCity checksum was reverified as `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. The Dockerfile could not initially be executed from the Codex sandbox because access to the local Docker named pipe was denied; GitHub CI and the subsequent Render deployment supplied runtime proof.
+
+The Render deployment succeeded. Supabase PostgreSQL/private Storage, Brevo HTTPS mail, Google OIDC and MapTiler were configured. Deployment debugging corrected the pooler/database URL, exact Google callback, and MapTiler allowed-origin/request-origin setup; commit `cadb4c5` also prevents the browser-public Vite MapTiler key value from being interpolated into Docker build-command logs. The app previously returned 200 from `/health` and `/ready`. See `AGENT_HANDOFF.md` for the current evidence boundary and remaining validation checklist.
 
 ## Architecture
 

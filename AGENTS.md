@@ -1,6 +1,6 @@
 # CivicAI repository guidance
 
-- Read `docs/CURRENT_STATE.md` first, then consult the relevant files under `docs/`; they are the detailed source of truth.
+- A fresh agent must start with `docs/AGENT_HANDOFF.md`, follow its reading order and run its safe baseline checks. Then consult `docs/CURRENT_STATE.md` and the linked detailed documents.
 - Preserve the distinction between complaint classification (what the issue is) and prioritization (how urgently it should be handled).
 - Do not fabricate citations, datasets, licenses, labels, metrics, experimental results, statistical claims, or novelty claims.
 - User direction: train and evaluate CivicAI on Indian civic issues. Verify Indian provenance per source/subset; foreign civic examples are excluded from training and evaluation. Do not substitute translated foreign complaints for Indian observations.

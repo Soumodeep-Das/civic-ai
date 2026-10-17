@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-10-17 — Complete engineering handoff audit
+
+Added `docs/AGENT_HANDOFF.md` as the central fresh-agent entry point and reconciled README/current beta documentation with the deployed reality. The audit inventories citizen and municipal capabilities with explicit verification status, documents the actual Render/Supabase/Brevo/Google/MapTiler beta, preserves security and research boundaries, records unresolved beta validation and provides a safe onboarding order. No application behavior, migration, cloud infrastructure, dataset or ML artifact changed.
+
+Verification: 147 backend tests passed with the same three dependency deprecation warnings; 56 research tests passed; all 57 frontend tests passed across four independently invoked test files; TypeScript, Vite production build and `pip check` passed. The sandbox's default temp root remained unwritable, so pytest used workspace-local `--basetemp`. The combined frontend command exceeded the command wrapper limit, so unchanged files were run separately. The OpenCity raw source re-hashed to `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Only placeholder environment examples are tracked; `.env`, `.env.beta` and `.env.production` remain ignored.
+
 ## 2026-10-03 — Issue #13 modern identity
 
 Added migration `0008`, verified citizen email/password identity, recovery/change flows, Google OIDC server-flow architecture, account-scoped complaint ownership/history/claiming, shared opaque sessions, provider-agnostic email, invitation-based municipal provisioning, role-neutral municipal routes and responsive identity UI. Existing anonymous capabilities, municipal RBAC/departments and research artifacts remain unchanged. Automated gates: 143 backend, 56 unchanged research and 57 frontend tests plus TypeScript and the production build passed; real Google/provider and final production-like browser verification remain pending external configuration.
