@@ -2,6 +2,8 @@
 
 Verified on 2026-10-17 from branch `main` at starting commit `cadb4c590be9ac5fcbc3e11e8fe75c71e58481e0`. This is the central onboarding map, not a replacement for the linked specifications. It records repository evidence, automated verification and explicitly identified human verification separately.
 
+Research update, 2026-11-16: the user has redirected current work to assistant-led, India-only ML dataset acquisition across all civic domains, explicitly including non-road issues and West Bengal. Read the latest `CURRENT_STATE.md` entry and `research/INDIAN_CIVIC_COVERAGE.md` before relying on the older data-possession inventory below. New local image candidates exist, but no model/training approval or beta-validation claim has changed.
+
 ## START HERE — Fresh Codex Agent
 
 Read, in order:

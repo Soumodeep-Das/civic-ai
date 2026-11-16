@@ -8,6 +8,8 @@ The minor-project study will evaluate how input modality affects classification 
 
 ## Research questions
 
+2026-11-16 scope clarification: discovery must cover Indian civic services broadly, not just road damage. [Indian civic coverage](../research/INDIAN_CIVIC_COVERAGE.md) records the acquired West Bengal waste archive, multi-topic licensed photo review pool, footpath severity metadata and unresolved category gaps. Acquisition does not approve labels/splits or change the proposed taxonomy. Image-based visible severity is a separate target needing category-specific evidence and an explicit unable-to-assess outcome; it must not be inferred from classification confidence. Assistant-led source acquisition/audit is authorized, but AI-proposed labels must remain distinguishable from independent reference annotations.
+
 ### RQ1 Text-only classification
 
 How effectively can complaint descriptions classify records into the agreed civic issue taxonomy?

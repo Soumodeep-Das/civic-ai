@@ -1,5 +1,13 @@
 # Decision Log
 
+## D030 Broad Indian civic coverage and traceable image acquisition (2026-11-16, accepted)
+
+- User direction: the assistant leads dataset discovery/collection, includes West Bengal where available, and covers civic domains beyond roads. Maintain a coverage/gap matrix rather than forcing every service into road-image classes.
+- Acquire documented reusable Indian sources into ignored immutable raw snapshots; retain publisher metadata, attribution, source labels and hashes. Mark incomplete transfers explicitly. Unknown geography or unclear rights stays out of the training pool.
+- Use DWSD as a West Bengal waste candidate and Commons as a small multi-topic review pool. Pune footpath severity labels are a separate category-specific candidate, not universal civic urgency labels. See `research/INDIAN_CIVIC_COVERAGE.md` for actual possession and limitations.
+- Keep classification, visible severity and contextual priority distinct; support uncertain/multiple/nonvisual cases in the eventual design. AI-assisted annotation can create traceable proposals, never fictitious human reviews or gold results.
+- Consequences: no training approval, taxonomy rewrite, final split, model or application inference is introduced. Current Stage A/Stage B state and research integrity gates remain unchanged. Do not adopt augmented publisher splits without original-scene leakage review or invent text/image pairings.
+
 ## D029 Separate citizen identity and explicit municipal authority (2026-10-03, accepted)
 
 - Citizens self-register; staff remain bootstrap/invitation-only.

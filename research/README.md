@@ -72,6 +72,22 @@ Tests (choose a fresh temporary directory if a prior run owns the example path):
 .\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-research-local
 ```
 
+## Acquire Indian civic image candidates
+
+Read [INDIAN_CIVIC_COVERAGE.md](INDIAN_CIVIC_COVERAGE.md) first. Run from the repository root with the existing Python 3.12 environment; no new dependencies are required. Source images/metadata stay in ignored data directories. Use fresh output versions: acquisitions never overwrite an existing directory. Downloads are acquisition for review, not training approval.
+
+```powershell
+.\.venv\Scripts\python.exe -m research.civicai_research.collect_images dwsd --output data/raw/dwsd-west-bengal-v1
+.\.venv\Scripts\python.exe -m research.civicai_research.collect_images commons --output data/raw/commons-indian-civic-v2 --per-query 5
+.\.venv\Scripts\python.exe -m research.civicai_research.collect_images commons --output data/raw/commons-indian-civic-gaps-v1 --per-query 5 --topics water_supply footpath_access public_asset_damage animals_public_space electrical_hazards
+.\.venv\Scripts\python.exe -m research.civicai_research.collect_images footpath --output data/raw/footpath-india-metadata-v1
+.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-research-image-acquisition
+```
+
+The first Commons snapshot predates the added gap queries; current defaults search all 13 topics, so the full command above uses a new `v2` directory. Network search results are time-dependent; retained `search-*.json`, `candidates.json`, `record-*.json` and source/attribution fields describe the exact retrieved pool. Query/topic names never become category labels. India matching is a preliminary title/description screen, not location verification.
+
+DWSD is about 253 MB. Commons is limited to 20 MiB/photo and 300 MiB/run. Footpath defaults to the small metadata/labels/license files; `--include-archive` additionally requests the 4.5 GB archive and requires a 5 GB free-space reserve. The attempted archive transfer was stopped after stalling; its `.zip.partial`/`INCOMPLETE` directory is not usable data. Use a new version directory for a retry. No downloader executes archive content or assigns a split.
+
 ## Files
 
 - `taxonomy/category_v1.json`: machine-readable category identifiers and boundaries.

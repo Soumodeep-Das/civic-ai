@@ -1,5 +1,17 @@
 # Current State
 
+## 2026-11-16 — Broad Indian civic dataset acquisition
+
+The user's current workstream is assistant-led Indian ML data collection across civic domains, including West Bengal, not a road-only detector. The application/deployment baseline below is unchanged. See `research/INDIAN_CIVIC_COVERAGE.md` for the full inventory, source links, rights, coverage gaps and severity design boundaries.
+
+Acquired outside Git: DWSD West Bengal archive with 784 images and 784 matched masks (publisher SHA-256 verified); 62 distinct licensed Commons candidate photos across 13 retrieval topics (42 source-described West Bengal photos); Pune footpath metadata/license and 583 publisher severity labels. The footpath 4.5 GB image archive stalled after 55,574,528 bytes and was stopped, renamed `.zip.partial` and left `INCOMPLETE`; a separate metadata-only snapshot is complete. No transfer remains running. These sources are unpaired and not training-approved.
+
+Added a bounded acquisition CLI and offline tests for download integrity, host/redirect/filename restrictions, no overwrite, incomplete status, licensing gates, metadata-only mode and preservation of pending labels. DWSD CRC/decode/pair checks pass; its paper's conflicting original-image/augmentation descriptions still prevent assuming 784 independent scenes or accepting its train/test split. Commons hashes are distinct across both snapshots; near-duplicate/privacy/location/label review remains. OpenCity raw SHA-256 is unchanged: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`.
+
+No model, metric, severity predictor or new application feature has been implemented. Stage B and the original proposed taxonomy remain unchanged. Next research work is source/scene/privacy curation and an explicitly versioned label-support plan, including genuine paired-data and severity-label gaps.
+
+Final focused regression: **83 research tests pass** (56 existing + 27 acquisition cases). Backend/frontend/builds were not rerun for this research-only change; their last recorded evidence below remains historical.
+
 ## 2026-10-17 — Engineering handoff and deployed beta reality
 
 The repository has a verified fresh-agent entry point at `docs/AGENT_HANDOFF.md`. The public closed beta is deployed at `https://civicai-beta.onrender.com/` using the Issue #14 Render/Supabase/Brevo/Google/MapTiler architecture. The owner reports that public account creation, Google sign-in, complaint submission and maps work. The repository does not yet contain durable evidence that the first beta administrator was provisioned or that the full municipal, staff-invitation, password-recovery and multi-user protocol was completed; those remain the immediate beta-validation task rather than a new product feature.
