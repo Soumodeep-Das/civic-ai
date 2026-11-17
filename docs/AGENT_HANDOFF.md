@@ -292,7 +292,9 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
-Finish the closed-beta validation loop before a new feature issue: verify/provision the first beta administrator, execute the municipal/admin and remaining identity journeys in `BETA_TEST_PROTOCOL.md` with synthetic data, and commit a sanitized beta-results/defect record. This is safer than beginning ML or another feature while the deployed municipal path and tester feedback are not durably evidenced.
+The owner has explicitly selected the research workstream. As of 2026-11-17 the decision specification and targeted source audit are complete: read `ML_DECISION_SPEC.md`, `research/DATASET_AUDIT_2026_11_17.md` and the newest `CURRENT_STATE.md` entry. Next is a reproducible OpenCity curation proposal and label-support/readiness report, not immediate training or chatbot implementation. No human review, model readiness or all-India coverage may be invented.
+
+The earlier beta-validation backlog remains unresolved in repository evidence: municipal/admin and remaining identity journeys still need a sanitized result record. Do not claim the research checkpoint completed those journeys or mutate the live beta as part of dataset work.
 
 ## 17. Deeper references
 

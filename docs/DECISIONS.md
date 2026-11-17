@@ -1,5 +1,14 @@
 # Decision Log
 
+## D031 Separate assessment tasks and introduce AI assistance gradually (2026-11-17, accepted design)
+
+- Adopt `ML_DECISION_SPEC.md` as the detailed decision contract before modeling. Classification, evidenced severity and contextual municipal priority have separate targets, versions, evaluation and uncertainty states; missing context does not imply low priority.
+- Preserve broad reporting while evaluating only supported model categories/languages. Keep the proposed taxonomy JSON unchanged until a versioned reviewed revision is justified. Never fabricate incident pairs, urgency labels or independent review.
+- Begin with offline data curation and simple classification baselines after gates pass; evaluate category-specific severity and transparent priority policy separately. Future contextual learned ranking requires linked incident/context/target data.
+- Keep inference out of submission's critical path, respect existing authorization, and require stale-result/retry checks, staff review and a disable path before rollout.
+- Optional AI assistance should first clarify complaint descriptions with user confirmation. Provider, budget and implementation remain deferred; no general chatbot, paid API, autonomous workflow mutation or external-AI-as-ground-truth decision is approved.
+- Targeted discovery is versioned and bounded. Record unresolved access/provenance and task mismatch rather than claiming all Indian datasets were found. See `research/DATASET_AUDIT_2026_11_17.md` for the current verdict.
+
 ## D030 Broad Indian civic coverage and traceable image acquisition (2026-11-16, accepted)
 
 - User direction: the assistant leads dataset discovery/collection, includes West Bengal where available, and covers civic domains beyond roads. Maintain a coverage/gap matrix rather than forcing every service into road-image classes.

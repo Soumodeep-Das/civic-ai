@@ -1,5 +1,7 @@
 # Indian civic data expansion
 
+Follow-up: [2026-11-17 targeted audit](DATASET_AUDIT_2026_11_17.md) adds discovery evidence and readiness decisions against the [ML decision specification](../docs/ML_DECISION_SPEC.md). The acquisition counts below remain unchanged; broader discovery does not imply training readiness.
+
 Acquisition/research checkpoint: 2026-11-16. This is a coverage inventory, not a trained model or a new approved taxonomy. The user explicitly requires broad Indian civic coverage, with West Bengal representation where available. Road-image availability must not determine CivicAI's entire scope.
 
 ## Data actually held locally

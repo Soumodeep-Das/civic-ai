@@ -1,5 +1,7 @@
 # Research Plan
 
+The 2026-11-17 [ML decision specification](ML_DECISION_SPEC.md) governs current task definitions, evidence provenance, unknown/conflict handling, evaluation gates and staged integration. The [targeted source audit](../research/DATASET_AUDIT_2026_11_17.md) distinguishes source discovery from readiness. Current work is curation before training; the questions below remain research objectives, not completed experiments. The optional complaint assistant is a separate future product component, never independent ground truth for our evaluation.
+
 ## Aim
 
 User requirement: all civic task training and evaluation examples must come from Indian incidents. Verify country at source/subset level. Geographic and language coverage within India must be reported; a single-city dataset cannot establish all-India performance. Foreign civic datasets remain methodological references only. Never manufacture Indian relevance by translating foreign descriptions.

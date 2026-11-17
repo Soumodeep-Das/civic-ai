@@ -1,5 +1,15 @@
 # Current State
 
+## 2026-11-17 — ML decision specification and targeted dataset audit completed
+
+The agreed design is recorded in `ML_DECISION_SPEC.md`: broad Indian civic reporting, evaluated classification support, category-specific severity only when evidence/labels permit it, and a separate transparent contextual priority proposal with municipal review. Unknown/conflicting evidence is explicit and does not become low priority. Optional complaint clarification assistance is a later scoped feature; no AI provider, paid call or integration is configured.
+
+`research/DATASET_AUDIT_2026_11_17.md` records 12 discovery queries, nine additional candidate dispositions and task-readiness gaps. New leads include a large multi-category image page with unverified Indian provenance, a synthetic multilingual civic seed set excluded from real-incident evaluation, request-only text/speech grievance research, and historical West Bengal inundation metadata for possible future context. No new incident dataset, reviewed label, taxonomy change or training release was created.
+
+Local acquisition markers and hashes were rechecked, including all 62 Commons files and their null/unassigned labels, the DWSD archive and footpath metadata. The incomplete footpath archive remains excluded. OpenCity raw SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Existing research regression passes **83 tests**; application suites/builds were not rerun because this checkpoint changes documentation only.
+
+Next scoped research work is the reproducible OpenCity text-curation proposal and label-support/readiness report, preserving real review/approval gates. Image-source and augmentation issues remain explicit. No model or all-India performance is claimed; the original paired-modality study remains conditional on genuine paired data. Existing application and beta-validation limitations below remain unchanged.
+
 ## 2026-11-16 — Broad Indian civic dataset acquisition
 
 The user's current workstream is assistant-led Indian ML data collection across civic domains, including West Bengal, not a road-only detector. The application/deployment baseline below is unchanged. See `research/INDIAN_CIVIC_COVERAGE.md` for the full inventory, source links, rights, coverage gaps and severity design boundaries.

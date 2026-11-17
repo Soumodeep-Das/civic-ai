@@ -60,6 +60,8 @@ Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local 
 
 ### ML pipeline
 
+The planned assessment boundary is specified in [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md): separate classification/evidence, severity and contextual-priority outputs tied to input/model/policy versions. Future inference runs outside complaint persistence, supports unknown/review/failure states and municipal correction, and preserves existing authorization. This is design only; no worker, inference endpoint, model or optional AI assistant exists at this checkpoint.
+
 Training/evaluation code and online inference are separate concerns. Experiments will create versioned model artifacts and reports; the application will eventually call a narrow inference interface. Models must not be trained inside an API request.
 
 Issue #5 adds the pre-training data boundary under `research/`. Restricted text and image files remain outside Git; a JSONL manifest references them with source/provenance metadata, taxonomy and annotation state, group identity, frozen split and SHA-256 hashes. The standalone validator rejects schema drift, unsafe paths and exact group/content leakage before later experiment code reads a dataset. A successful manifest check establishes internal consistency only—not license, consent, representativeness or label correctness.

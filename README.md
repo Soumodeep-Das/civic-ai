@@ -1,5 +1,7 @@
 # CivicAI
 
+Current research checkpoint (2026-11-17): [ML decision specification](docs/ML_DECISION_SPEC.md) and [targeted dataset audit](research/DATASET_AUDIT_2026_11_17.md). Classification, evidence-based severity and contextual priority are separate planned components. Dataset curation is next; no model, chatbot/API integration or validated priority predictor is deployed.
+
 > The closed beta is deployed at `https://civicai-beta.onrender.com/`. Citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification; the remaining municipal/admin beta journey is not yet durably verified. This is a closed-beta checkpoint, not production certification. Fresh agents should start with [the engineering handoff](docs/AGENT_HANDOFF.md).
 
 ## Closed-beta deployment path

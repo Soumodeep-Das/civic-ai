@@ -1,5 +1,7 @@
 # Data Specification
 
+Research design update (2026-11-17): [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md) defines proposed evidence provenance and separate classification/severity/priority assessment fields. These are not implemented complaint fields or migrations. Reported duration, access disruption and external context remain proposed; missing context is unknown. Existing taxonomy/manifests and all live API schemas remain unchanged.
+
 ## Identity additions (`0008`)
 
 `citizen_accounts` stores minimal citizen profile/state and unique normalized email; password hashes, `(provider,issuer,subject)` federation keys, hashed verification/reset tokens and hashed OIDC flow bindings live separately. `complaints.citizen_account_id` is nullable so anonymous reporting remains first-class. `staff_invitations` and its department join record administrator-selected grants, hashed token, expiry, acceptance/revocation and actor. `municipal_sessions` has an exclusive citizen-or-staff principal constraint. Raw passwords, identity tokens, session values and action tokens are never persisted.

@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-11-17 — ML decision contract and targeted source audit
+
+- Recorded the owner's agreed direction in `ML_DECISION_SPEC.md`: classification, observable severity and contextual priority separated; provenance/unknown handling, category boundaries, optional assistant scope, offline/shadow rollout, evaluation gates and 17 future acceptance scenarios specified. These are design requirements, not implemented features or passing new tests.
+- Completed a bounded 12-query discovery pass and recorded nine additional candidate decisions in `research/DATASET_AUDIT_2026_11_17.md`. Distinguished synthetic data, inaccessible/unverified releases, request-only text/speech research, historical geospatial context and actual incident datasets. No paid access, author messages or model calls were made.
+- Retained only public source-card/catalog evidence under ignored `data/external/source-audit-20261117-v1`; no new incident dataset was downloaded. Direct networking initially failed DNS resolution; network permission allowed metadata inspection. India_CIVICS README still returned 401 and the official CPGRAMS guide fetch timed out; both remain unresolved rather than approved.
+- Reverified completed acquisition markers, stored hashes for DWSD/Commons/footpath metadata, all 62 pending/unassigned Commons records and the excluded partial footpath snapshot. Original OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`.
+- Existing research suite: **83 passed in 9.61s**, command `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-ml-spec-20261117`. No application tests/builds rerun for this documentation-only increment. No dependency, application code, API, taxonomy JSON, raw incident data, annotation, split or model changed.
+- Updated source-of-truth links and the handoff's stale immediate-next-step section to reflect the owner-selected research direction while retaining the unverified beta backlog. Next work is OpenCity curation/readiness; training and assistant integration are not started.
+- Final documentation verification: 29 local Markdown links resolved, `git diff --check` passed, and all changed files are Markdown. Public metadata snapshots remain ignored. Fetched `origin` successfully; the earlier acquisition commit was still local-only before this increment.
+- Local commit succeeded. Publication attempt `git push origin main` failed again because the Windows Git credential-manager shell could not start (`NtCreateDirectoryObject`, access denied). Both this checkpoint and the earlier acquisition commit await an owner PowerShell push; no secret was printed or copied into a workaround.
+
 ## 2026-11-16 — Broad Indian civic image acquisition and source audit
 
 - Expanded discovery beyond roads to waste, drains/sewerage, flooding, water supply, streetlights, sanitation, trees/storm damage, debris, pollution, accessibility, public assets, animals and electrical infrastructure. Documented source links, reuse/provenance barriers and category gaps in `research/INDIAN_CIVIC_COVERAGE.md`.

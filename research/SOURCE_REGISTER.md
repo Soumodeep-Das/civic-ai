@@ -2,6 +2,10 @@
 
 No source is approved for model training yet. Candidate records below distinguish possession from suitability.
 
+## 2026-11-17 targeted audit
+
+[Dataset audit](DATASET_AUDIT_2026_11_17.md) records the new discovery queries, additional sources and task-readiness decisions. It includes unresolved Urban_problems/India_CIVICS/Mumbai competition leads, CivicDex's explicitly synthetic scope, request-only grievance research, and historical WB inundation as potential future context. No additional incident corpus or training approval resulted. Read this audit before treating a displayed image count, an Indian-sounding name, a synthetic severity field or a historical map as usable evidence for our model.
+
 ## 2026-11-16 broad Indian image acquisition
 
 See [Indian civic coverage](INDIAN_CIVIC_COVERAGE.md) for the current source-by-source inventory, rights, India/West Bengal evidence, checksums, category gaps and severity limitations. Acquired locally: DWSD West Bengal waste archive (784 images + 784 masks), 62 licensed Commons candidate photos across 13 retrieval topics, and Pune footpath metadata with 583 severity rows. The large footpath image download is incomplete and explicitly excluded. These are auxiliary unpaired sources, not a reviewed multimodal release. No new source has training approval; the existing OpenCity review state is unchanged.
