@@ -1,0 +1,2060 @@
+{
+  "version": "icmyc-family-coverage-draft-v1",
+  "status": "proposed_not_training_labels",
+  "basis_mapping_groups_sha256": "c0d9550d2693be340787f36dd62d7940842d7a97c4bbb62570d19f7d292cab8a",
+  "families": [
+    "roads_and_pedestrian_access",
+    "drainage_and_sewerage",
+    "solid_waste",
+    "public_lighting",
+    "water_services",
+    "sanitation_and_public_health",
+    "mobility_and_traffic_infrastructure",
+    "animals",
+    "parks_trees_and_waterbodies",
+    "pollution_and_nuisance",
+    "electricity_services",
+    "public_assets_and_space"
+  ],
+  "rules": [
+    {
+      "source_category": "Animal Catcher",
+      "source_subcategory": "Dog",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Controlling Of Stray Cattle Or Maintenance Of Cattle Pound",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Controlling Of Stray Pigs",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Dog",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Maintenance Of City Meat Production And Processing Centre",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Rabies Vaccination",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Removal Of Dead Animals",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Animal Husbandry",
+      "source_subcategory": "Stray Dog Sterilisation/Animal Birth Control (ABC)",
+      "proposed_families": [
+        "animals"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Certificates",
+      "source_subcategory": "Birth Or Death Certificate",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Certificates",
+      "source_subcategory": "Certificates - Other",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Certificates",
+      "source_subcategory": "Khata Certificate",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Certificates",
+      "source_subcategory": "Other Certificates",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Certificates",
+      "source_subcategory": "Property Tax",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Crematoriums And Burial ground",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Educational Institutions And Libraries",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Markets",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Residential Quarters",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Shopping And Commercial Complexes",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Construction Of Stadiums",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Fencing Of BBMP/Government Land",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Government Land/Property Encroachment",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Crematoriums And Burial ground",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Educational Institutions And Libraries",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Existing Council Buildings",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Existing Swimming Pools",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Existing Ward & Zonal Offices",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance Of Shopping And Commercial Complexes",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Maintenance/Renovation Of Heritage Sites",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Community Infrastructure and Services",
+      "source_subcategory": "Stop Unauthorised Construction",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Covid 19",
+      "source_subcategory": "Request for Fogging/Sanitation during Covid-19",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Covid 19",
+      "source_subcategory": "Violation of Lockdown during Covid-19",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Covid 19",
+      "source_subcategory": "Violation of Quarantine during Covid-19",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Crime and Safety",
+      "source_subcategory": "Eve Teasing/Public Nuisance",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Crime and Safety",
+      "source_subcategory": "Increase Number Of Beat Patrols",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Crime and Safety",
+      "source_subcategory": "Playing Of Loudspeakers Without Permisson",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Crime and Safety",
+      "source_subcategory": "Shops/Establishments Being Open in Late Hours",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Crime and Safety",
+      "source_subcategory": "Two Wheeler Wheeling",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "EMP Grievance Redressal",
+      "source_subcategory": "Gradation List",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Electricity & Power",
+      "source_subcategory": "Ensure efficient and uninterrupted power supply",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Electricity & Power",
+      "source_subcategory": "Repair of transformers/ electric poles",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Electricity and Power Supply",
+      "source_subcategory": "Installation Of New transformers/Electric Poles",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Electricity and Power Supply",
+      "source_subcategory": "Regular Supply Of Electricity",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Electricity and Power Supply",
+      "source_subcategory": "Relocation Of Transformers/Electric Poles",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Electricity and Power Supply",
+      "source_subcategory": "Repair Of Transformers/Electric Poles",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Fire Pollution",
+      "source_subcategory": "Burning of garbage in open space",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Fire Safety",
+      "source_subcategory": "Fire Exit Blocked",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Fire Safety",
+      "source_subcategory": "Fire Pump is on OFF Mode",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Fire Safety",
+      "source_subcategory": "Fire safety - Others",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Build Dry Waste Collection Centre",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Build Garbage/Waste Composting Units",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Clearance Of Garbage Dump Or Black Spot",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Clearing Of Roadside Dustbin",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Collection Of Door-to-door Garbage",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Dustbins not cleared",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Fogging (Mosquito Menace) Or Pest Control",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Garbage Dump",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Garbage Dumping In Vacant Lot/Land",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Implementation Of Waste Segregation/Garbage",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Improper Disposal Of Feacal Waste Or  Septage",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Maintenance Of Dry Waste Collection Centre",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Open Manholes Or Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Regular Sweeping Of Streets",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Stop/Prevent Burning Of Garbage",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Sweeping Not Done",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Garbage and Unsanitary Practices",
+      "source_subcategory": "Wet Waste Vehicle Not Arrived",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Lakes",
+      "source_subcategory": "Desilting/Remove Blockage In Lakes",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Lakes",
+      "source_subcategory": "Maintenance Of Lake Surrounding",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Lakes",
+      "source_subcategory": "Removal of Encroachment In Lakes",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Lakes",
+      "source_subcategory": "Sidewalls And Fencing For Lake",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Beautification/Maintenance Of Medians Or Circles",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Construction Of Roadside Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Construction Of Skywalk/Flyover/Underpass",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Construction of new footpaths",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Dangling Or Hanging Of OFCs/Cables/Wires",
+      "proposed_families": [
+        "electricity_services",
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Source label spans or ambiguously names multiple asset families; retain all candidates for review."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Desilting Existing Roadside Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Fixing/Reparing Potholes",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Flooding/Waterlogging Of Roads And Footpaths",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Installation Of Surveillance Cameras",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Maintenance Of Surveillance Cameras",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Management Of Hawkers and Vendors",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Need Covering Slabs For Roadside Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Need Lane Markings/Street Name/Road Signages",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Need Roadside Rainwater Harvesting System",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Provision For Parking",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Removal Of Illegal Posters And Hoardings",
+      "proposed_families": [
+        "public_assets_and_space"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Removal Of Roadside Debris (Construction Material)",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Repair Of Existing Footpaths",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Repair Of Roadside Rainwater Harvesting System",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Repair of Bridge and Culverts",
+      "proposed_families": [
+        "roads_and_pedestrian_access",
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Source label spans or ambiguously names multiple asset families; retain all candidates for review."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Tarring Or Asphalting Of Existing Road",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Footpaths and Infrastructure",
+      "source_subcategory": "Tarring Or Asphalting Of Mud/Kutcha/Unpaved Road",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Public transport",
+      "source_subcategory": "Construction of flyovers/ underpass",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Public transport",
+      "source_subcategory": "Construction of skywalks",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Public transport",
+      "source_subcategory": "Installation of traffic lights",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Public transport",
+      "source_subcategory": "Introduction of new bus routes",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Mobility - Roads, Public transport",
+      "source_subcategory": "Repair Of Existing Footpaths",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "NULL",
+      "source_subcategory": "NULL",
+      "proposed_families": [],
+      "disposition": "unresolved",
+      "rationale": "Source label is insufficient to determine a draft family; inspect descriptions."
+    },
+    {
+      "source_category": "NULL",
+      "source_subcategory": "Report A Broken Footpath",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "NULL",
+      "source_subcategory": "Report A Dirty or Unusable Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "NULL",
+      "source_subcategory": "Report A Public Urination or Yellow Spot",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "NULL",
+      "source_subcategory": "Report Garbage or Debris on Footpath",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Others",
+      "source_subcategory": "Others",
+      "proposed_families": [],
+      "disposition": "unresolved",
+      "rationale": "Source label is insufficient to determine a draft family; inspect descriptions."
+    },
+    {
+      "source_category": "Others",
+      "source_subcategory": "Others - Others",
+      "proposed_families": [],
+      "disposition": "unresolved",
+      "rationale": "Source label is insufficient to determine a draft family; inspect descriptions."
+    },
+    {
+      "source_category": "PWD",
+      "source_subcategory": "Repair of Potholes on Roads",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Garden",
+      "source_subcategory": "Cleanliness of public Garden",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Construction Of New Parks",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Construction Of New Public Toilet In Parks",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Installation Of Lights In Parks",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Maintenance Of Existing Public Toilet In Parks",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Maintenance Of Lights In Parks",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Maintenance Of existing Parks",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Parks & Recreation",
+      "source_subcategory": "Plant New Tree Saplings In Parks",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pension",
+      "source_subcategory": "Others",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Playgrounds",
+      "source_subcategory": "Construction Of New Playground",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Playgrounds",
+      "source_subcategory": "Construction Of New Public Toilet In Playground",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Playgrounds",
+      "source_subcategory": "Installation Of Lights In Playground",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Playgrounds",
+      "source_subcategory": "Maintenance Of Existing Playground",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Playgrounds",
+      "source_subcategory": "Maintenance Of Lights In Playground",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pollution",
+      "source_subcategory": "Air Pollution",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pollution",
+      "source_subcategory": "Land Pollution",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pollution",
+      "source_subcategory": "Noise Pollution",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pollution",
+      "source_subcategory": "Pollution - Others",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Pollution",
+      "source_subcategory": "Water Pollution",
+      "proposed_families": [
+        "pollution_and_nuisance"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Power supply",
+      "source_subcategory": "Better maintenance of transformers",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Power supply",
+      "source_subcategory": "Provide 24 hour power supply",
+      "proposed_families": [
+        "electricity_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Proibition & Sale of Tobacco products, Plastic carry bags",
+      "source_subcategory": "Spitting",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Toilets",
+      "source_subcategory": "Cleaning Of Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Toilets",
+      "source_subcategory": "Cleaning Of Septic Tank Of Public Toilets",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Toilets",
+      "source_subcategory": "Construction Of New Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Toilets",
+      "source_subcategory": "Maintenance/Repair Of Toilet Fixtures",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Toilets",
+      "source_subcategory": "Urination In Public Or Open Defecation",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - BMTC",
+      "source_subcategory": "Construction Of New Bus Shelter",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - BMTC",
+      "source_subcategory": "Increase Frequency Of Bus Services",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - BMTC",
+      "source_subcategory": "Issue With Bus Driver Or Conductor",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - BMTC",
+      "source_subcategory": "Maintenance/Repair Of Bus Shelter",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - BMTC",
+      "source_subcategory": "Provide New Bus Routes",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - KSRTC",
+      "source_subcategory": "KSRTC - Driver or Conductor",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - KSRTC",
+      "source_subcategory": "KSRTC - Need new Bus Route",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public Transport - KSRTC",
+      "source_subcategory": "KSRTC - Others",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public transport (BMTC and Metro)",
+      "source_subcategory": "Better quality and maintenance of buses",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public transport (BMTC and Metro)",
+      "source_subcategory": "Build new bus stands or shelters",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Public transport (BMTC and Metro)",
+      "source_subcategory": "Build or improve metro rail network",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Ration Card",
+      "source_subcategory": "Ration Card - Others",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Roads and Footpaths",
+      "source_subcategory": "Build new footpaths and repair broken footpaths",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Safety and Crime",
+      "source_subcategory": "Increase police beat patrolling",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Safety and Crime",
+      "source_subcategory": "Introduce neighbourhood policing",
+      "proposed_families": [],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Sanitation",
+      "source_subcategory": "Construction of sewage lines",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sanitation",
+      "source_subcategory": "Construction of storm water drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sanitation",
+      "source_subcategory": "Desilting of Storm water Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sanitation",
+      "source_subcategory": "Maintanence of sewage lines",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sanitation",
+      "source_subcategory": "Repair  of broken storm water drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Construction of Sewage Lines",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Maintenance And Repair Of Manholes",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Maintenance And Repair Of Sewage Lines",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Maintenance Of Sewage Treatment Plant",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Removal Of Sewer Pipe Blockages and Overflows",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Sewerage Systems",
+      "source_subcategory": "Sewarage Or Storm Water Overflow",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Solid Waste Management",
+      "source_subcategory": "Cleaning Of Drain",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Solid Waste Management",
+      "source_subcategory": "Debris removal or construction material",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Solid Waste Management",
+      "source_subcategory": "Garbage dump",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Solid Waste Management",
+      "source_subcategory": "Garbage vehicle not arrived",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Storm Water Drains",
+      "source_subcategory": "Desilting/Remove Blockage of Storm Water Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Storm Water Drains",
+      "source_subcategory": "Maintenance And Repair Of Storm Water Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Storm Water Drains",
+      "source_subcategory": "Sidewall And Fencing For Storm Water Drains",
+      "proposed_families": [
+        "drainage_and_sewerage"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Street lighting",
+      "source_subcategory": "Installation Of New Streetlights",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Street lighting",
+      "source_subcategory": "Installation/Maintenance Of Streetlight Timer",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Street lighting",
+      "source_subcategory": "Maintenance/Repair Of Streetlights",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Streetlights",
+      "source_subcategory": "Installation Of New Streetlights",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Streetlights",
+      "source_subcategory": "Installation/Maintenance Of Streetlight Timer",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Streetlights",
+      "source_subcategory": "Maintenance/Repair Of Streetlights",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Autorickshaws Meter Issues",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Defective/Fancy Number Plate",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Encroachment of cycle lane",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Installation Of Traffic Sign Boards",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Installation Of Traffic Surveillance Camera",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Installation Of Traffic or Pedestrain Lights",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Jumping Traffic Signal",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Maintenance/Repair Of Traffic or Pedestrain Lights",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "No Parking",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Not wearing seat belt",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "One Way/No Entry",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Parking On Footpath",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Pillion Rider Not Wearing Helmet",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Repair of  mast light at a busy road (main road) junction",
+      "proposed_families": [
+        "public_lighting"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Repair of pedestrian lights",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Riding On Footpath",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Riding Without A Helmet",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Stopped on Zebra Cross",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Stunt Riding",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Taking a U-turn where U-turn is prohibited",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Traffic Jams/Congestion Or Bottlenecks",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Triple Riding",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Using Mobile Phone",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Using black film-other materials",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Violating lane discipline",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "scope_review",
+      "rationale": "Administrative, regulatory, safety or private/service scope requires explicit review; no automatic exclusion."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Wrong Parking",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Traffic and Road Safety",
+      "source_subcategory": "Wrong parking",
+      "proposed_families": [
+        "mobility_and_traffic_infrastructure"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Defacement Of Trees",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Maintenance Of Trees/Saplings",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Plant Saplings/Trees in your locality",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Prevent Unauthorized Tree Cutting",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Remove Unwanted Tree Guards",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Trees and Saplings",
+      "source_subcategory": "Tree Guards required",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Waste Management",
+      "source_subcategory": "Cleaning of litter bins",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply",
+      "source_subcategory": "Increase public taps and borewells-water pumps",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply",
+      "source_subcategory": "Maintain regular water supply",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply",
+      "source_subcategory": "Reduce water leakage and wastage",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply",
+      "source_subcategory": "Regular supply of water",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Illegal Connection",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Illegal Pump",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Installation Of Drinking Water ATMs",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Maintenance Of Existing Water Pipeline",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Maintenance Of Existing Water Tank",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Provision for a New Water Pipeline",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Regular Water Supply",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Stop Water Leakage",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Water Supply and Services",
+      "source_subcategory": "Water Meter",
+      "proposed_families": [
+        "water_services"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "1A- Address Public Urination or Yellow Spots",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "1B- Require New Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "1C- Repair Dirty or Unusable Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "2A- Require New Footpath",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "2B- Repair Broken Footpath",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "2C- Remove Garbage or Debris on Footpath",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "3A- Require Playing and Gym Equipment",
+      "proposed_families": [
+        "parks_trees_and_waterbodies"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Report A Broken Footpath",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Report A Dirty or Unusable Mobile Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Report A Dirty or Unusable Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Report A Public Urination or Yellow Spot",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Report Garbage or Debris on Footpath",
+      "proposed_families": [
+        "solid_waste"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Require A New Footpath",
+      "proposed_families": [
+        "roads_and_pedestrian_access"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    },
+    {
+      "source_category": "Yellow Spot",
+      "source_subcategory": "Require A New Public Toilet",
+      "proposed_families": [
+        "sanitation_and_public_health"
+      ],
+      "disposition": "family_proposal",
+      "rationale": "Named service/asset suggests draft family; this is source metadata, not record-level ground truth."
+    }
+  ]
+}

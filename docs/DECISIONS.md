@@ -1,5 +1,11 @@
 # Decision Log
 
+## D036 Source-family coverage and restricted privacy/duplicate proposals (2026-11-17)
+
+- Audit the 231 source category/subcategory pairs against the draft families using an explicit proposed crosswalk. Permit this source-catalog metadata in Git: category names, draft family/scope decisions and rationale only, without incident descriptions, identities or per-record labels. Keep active taxonomy/mapping v1 unchanged.
+- Create a separate ignored pilot QA artifact with bounded near-text duplicate candidates and offset-based privacy-span proposals. Never treat lexical similarity as verified shared incident identity or pattern masking as anonymization. Preserve original files, existing groups and reviewer decisions; no automatic merge/deletion or training approval.
+- Record all uncertain families, administrative/safety scope gaps and residual privacy limitations. The checkpoint advances proposal evidence, not independent human adjudication.
+
 ## D035 Propose richer taxonomy after complete AI pilot (2026-11-17, draft design)
 
 - Use `research/TAXONOMY_REVISION_PROPOSAL.md` as the review draft: distinguish service family, asset and observed issue kind; retain mixed issues, unclear evidence and public/private ambiguity. Do not automatically map all gaps to other or treat claims as verified severity.

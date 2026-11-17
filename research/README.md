@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Current follow-up: [Source coverage and pilot QA](CURATION_QA_REPORT.md) accounts for all 231 source pairs and records near-text duplicate candidates plus reviewed AI privacy-span proposals. No training/privacy approval or active-taxonomy migration follows from this audit.
+
 Latest research checkpoint: [AI-assisted pilot findings](AI_LABEL_PILOT_FINDINGS.md) covers all 271 tasks, with zero remaining in the assistant pass. [Taxonomy revision draft](TAXONOMY_REVISION_PROPOSAL.md) separates service families, assets and issue kinds. These remain AI proposals, not independent reference annotations, an adopted taxonomy or training approval.
 
 This directory contains version-controlled research definitions and validation code. It does not contain an approved research dataset or measured results.

@@ -50,6 +50,8 @@ For the first eventual baseline, retain a reviewed single-label subset or explic
 
 ## Decisions still needed before adoption
 
+Follow-up: [CURATION_QA_REPORT.md](CURATION_QA_REPORT.md) now supplies the full 231-pair coverage proposal and bounded duplicate/privacy QA evidence. This completes the inventory step below, not the remaining record-level/scope adjudication or adoption gates.
+
 1. Audit all 231 source category/subcategory pairs against these families and document unmapped/mixed cases. Source labels are hints, not record reference truth.
 2. Revisit tentative pilot labels and consistency boundaries. Some provisional water-leak labels include a public-location clue but no confirmed supply source; this is a review requirement, not sufficient training evidence.
 3. Review near-duplicate candidates before splitting. The pilot's distinct template groups do not establish scene independence. Preserve original records and propose links, not automatic deletion.

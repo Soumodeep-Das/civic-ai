@@ -292,6 +292,8 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
+Latest follow-up: `research/CURATION_QA_REPORT.md` completes all-source-pair coverage and pilot duplicate/privacy proposal generation. Read its actual limits: 41 pairs need scope review, three are unresolved; one lexical candidate is not a verified shared incident; 134 AI-flagged pilot records still lack proposed spans. Next resolve scope/record-level annotation and contextual privacy/event decisions before independent adjudication or taxonomy adoption. Do not rerun finished coverage as though it supplied training labels.
+
 Current continuation: `research/AI_LABEL_PILOT_FINDINGS.md` now records actual AI proposals for all 271 tasks; zero remain in that pass. Read `research/TAXONOMY_REVISION_PROPOSAL.md`, then audit source-pair coverage and semantic duplicate/privacy proposals before independent adjudication and adoption. No human judgment or training approval can be inferred. Original reviewer forms remain blank. The assistant has prior source context and is not an independent blinded reviewer.
 
 Latest checkpoint: `research/LABEL_PILOT.md` and the newest current-state entry describe 271 generated, blank, source-label-blinded reviewer tasks. Next obtain independent responses and adjudicate category boundaries/coverage before changing taxonomy or approving training. Do not regenerate this pilot as though annotation had occurred.

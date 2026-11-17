@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-17 — Full source-pair coverage and pilot QA proposals
+
+`research/CURATION_QA_REPORT.md` records the completed coverage pass: all 231 source pairs/16,071 records accounted for by an explicit draft-family crosswalk. 187 pairs (14,883 records) have family proposals, 41 (824) need scope review, and three (364) remain source-label-ambiguous. Counts are source associations, not validated record labels or all-India coverage. Active taxonomy/mapping v1 is unchanged.
+
+The 271-record pilot QA found one cross-group near-text candidate and generated 28 privacy spans in 23 records. Assistant inspection trimmed one overbroad span, retyped one and added nine missed spans: 37 proposed spans in 31 records; 134 AI-flagged records still lack spans. Original text/groups/forms are untouched. Nothing has been merged, physically redacted, independently adjudicated or approved for training.
+
+Local outputs: ignored `data/review/curation-qa-v1` and `data/review/curation-qa-span-review-v1`. **135 research tests pass**; raw OpenCity hash remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. No app changes/tests/builds or deployment activity. Next resolve scope and record-level annotation rules plus contextual privacy/event decisions before adopting a taxonomy or training release; no human approvals inferred.
+
 ## 2026-11-17 — Complete AI pilot pass and taxonomy revision draft
 
 All **271 pilot descriptions** have now been read and assigned explicitly AI-authored proposals: 125 provisional supported cases, 14 multiple-issue cases, 86 taxonomy/scope gaps and 46 unclear cases. Zero remain in this assistant pass; 165 contain proposed privacy-review concerns. These are not independent reference labels, privacy clearance or performance metrics. Read `research/AI_LABEL_PILOT_FINDINGS.md` and `research/TAXONOMY_REVISION_PROPOSAL.md`.

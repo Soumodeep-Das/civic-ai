@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-11-17 — Source coverage, near-text candidates and privacy spans
+
+- Inspected all 231 source category/subcategory names and created a versioned proposed family crosswalk, committing source-catalogue metadata only under D036. Coverage: 187 family-proposal pairs/14,883 records; 41 scope-review pairs/824 records; three unresolved pairs/364 records. Zero unmatched pairs/unused rules. No record-level reference labels inferred.
+- Implemented offline `curation_qa` with indexed input and pilot/proposal binding checks, source membership validation, bounded symmetric token comparison and Unicode offset privacy proposals. No deletion/group merge/redaction/release approval. Existing raw data, forms, taxonomy and application code are unchanged.
+- Ran `.\.venv\Scripts\python.exe -m research.civicai_research.curation_qa --proposal data/processed/icmyc-text-proposal-v2 --pilot data/interim/label-pilot-v1 --responses data/review/ai-pilot-complete-v1/responses.json --output data/review/curation-qa-v1`: exit 0. One near-text candidate (23/66, 0.954704, different existing groups); 28 privacy spans/23 records. Not a semantic recall or incident-identity result.
+- Assistant inspected all 28 matched spans, trimmed one overbroad address span, retyped one residence reference and added nine missed spans. Separate ignored review artifact contains 37 proposals/31 records; 134 AI-flagged records still lack spans. Text hashes/bounds/nonoverlap asserted. No independent privacy clearance or full-corpus privacy review claimed.
+- `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-curation-qa-final`: **135 passed in 14.64s**, including 15 new QA cases. No app-suite/build reruns for isolated research changes. Rehashed raw OpenCity unchanged: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`.
+- Consulted primary Python difflib and Presidio documentation; documented direction/autojunk issues and limits of automated privacy detection. No new dependency or external labeling/NLP service configured. Updated current state, decision and handoff references with actual remaining gates.
+
 ## 2026-11-17 — Finish all pilot AI proposals and synthesize taxonomy draft
 
 - Read full task descriptions 41–271 in four bounded batches, authored 231 per-task decisions/rationales/privacy concerns and preserved the first 40 responses unchanged. No coordinator key consulted during label authorship. No private source prose or per-record labels enter Git.
