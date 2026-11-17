@@ -1,4 +1,33 @@
-# AI-assisted pilot findings — first 40 tasks
+# AI-assisted pilot findings — complete 271-task pass
+
+## Current checkpoint: all descriptions reviewed by the assistant
+
+2026-11-17. Tasks 41–271 have now been read in full and given explicit AI proposals, combined with the preserved first batch. **271/271 covered; zero remaining in this assistant pass.** This completes AI proposal coverage only, not independent annotation, privacy approval or training readiness.
+
+| Provisional decision | Full pilot count |
+|---|---:|
+| Named category supported, sometimes with stated confirmation requirements | 125 |
+| Multiple named issues | 14 |
+| Taxonomy/scope gap or mixed supported/unsupported issue kinds | 86 |
+| Unclear, insufficient or corrupted text | 46 |
+
+These counts sum to 271. They are assistant judgments from a purposively selected pilot, not accuracy, gold labels or population prevalence. Even `supported` includes tentative public-setting/source assumptions recorded in rationales. No such case is automatically approved. Privacy concerns are proposed in 165 records; many concern locations/allegations needing judgment, not definite disclosure violations. No text redactions have been applied in this pass.
+
+The complete output is ignored `data/review/ai-pilot-complete-v1`, with `responses.json`, `summary.json`, output hashes and COMPLETE marker. Combined response SHA-256: `480611baaa909cce2c7dfaba2f5b3be7c7b5df82744027f53cf9218b2ad4ff3c`. Original batches remain at `ai-pilot-batch-v1` (40) and `ai-pilot-batch-v2` (231); per-batch AI attribution/limitations and hashes are preserved. COMPLETE means a validated combination, not human or training approval.
+
+The combiner rejects overlapping tasks rather than choosing a winning label, rejects incomplete coverage when requested, validates every input batch, refuses overwrite and retains interrupted-output markers. Tests: **120 research tests passed in 12.47s**. Raw OpenCity hash rechecked unchanged: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Human-submission count remains zero.
+
+```powershell
+.\.venv\Scripts\python.exe -m research.civicai_research.ai_labels --pilot data/interim/label-pilot-v1 --responses data/review/ai-pilot-complete-v1/responses.json --require-complete
+# Recombine into a NEW directory; this reproduces combination, not semantic AI judgments:
+.\.venv\Scripts\python.exe -m research.civicai_research.ai_labels --pilot data/interim/label-pilot-v1 --responses data/review/ai-pilot-batch-v1/responses.json data/review/ai-pilot-batch-v2/responses.json --output data/review/ai-pilot-complete-v2 --require-complete
+```
+
+One concrete leakage warning: tasks 23 and 66 contain closely similar wording but belong to different proposed containment groups. After authoring labels, the coordinator key was inspected to verify that distinction; a standard-library SequenceMatcher check gave 0.85 text similarity. This is a candidate semantic duplicate, not verified incident identity or a duplicate-detection performance result. Do not treat 271 groups as 271 proven independent incidents or freeze a test split yet.
+
+Next: apply the [taxonomy revision proposal](TAXONOMY_REVISION_PROPOSAL.md) to an explicit source-pair coverage audit, review semantic duplicate candidates and privacy spans, then obtain independent reference decisions. The v1 taxonomy, reviewer forms, application and training gate are unchanged.
+
+## Historical first-40 checkpoint (superseded coverage figures)
 
 2026-11-17. This checkpoint contains actual assistant-authored proposals after reading the full text of tasks 1–40, not additional blank forms. It is **partial: 231 of 271 tasks remain unreviewed by this pass**. No independent human annotation, training release or measured model performance is claimed.
 

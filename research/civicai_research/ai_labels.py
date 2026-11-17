@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 from .manifest import _file_hash, load_taxonomy
+from .text_proposal import write_json
 
 
 def validate(pilot: Path, response: Path):
@@ -65,11 +66,55 @@ def validate(pilot: Path, response: Path):
             'responses_sha256':_file_hash(response)}
 
 
+def combine(pilot: Path, responses: list[Path], output: Path, require_complete=False):
+    """Combine disjoint validated batches, preserving original decisions and provenance."""
+    if output.exists() or output.resolve().is_relative_to(pilot.resolve()):
+        raise ValueError('Use fresh output outside pilot')
+    if not responses: raise ValueError('No batches supplied')
+    batches=[]; rows=[]; seen=set(); sources=[]
+    for path in responses:
+        summary=validate(pilot,path)
+        data=json.loads(path.read_text(encoding='utf-8'))
+        for row in data['responses']:
+            if row['task_id'] in seen: raise ValueError('Overlapping batches require explicit adjudication')
+            seen.add(row['task_id']);rows.append(row)
+        sources.append({'sha256':summary['responses_sha256'], 'author':data['author'],
+                        'model_version':data.get('model_version','not recorded'),
+                        'limitations':data['limitations'], 'records':len(data['responses'])})
+        batches.append(data)
+    if require_complete and len(seen)!=summary['pilot_total']:
+        raise ValueError('Incomplete pilot coverage')
+    first=batches[0]
+    merged={'kind':'ai_assisted_proposals','author':'Combined AI batches; see source_batches',
+            'training_approved':False,'independent_human_review':False,'privacy_approved':False,
+            'pilot_tasks_sha256':first['pilot_tasks_sha256'],'taxonomy_sha256':first['taxonomy_sha256'],
+            'limitations':['AI judgments are unverified; merging does not supply independent review.',
+                           'Source limitations are retained per batch; subset counts describe each original batch.'],
+            'source_batches':sources,'responses':sorted(rows,key=lambda r:r['task_id'])}
+    output.mkdir(parents=True)
+    (output/'INCOMPLETE').write_text('Combined AI proposals, not approved labels.\n',encoding='utf-8')
+    write_json(output/'responses.json',merged)
+    result=validate(pilot,output/'responses.json')
+    write_json(output/'summary.json',result)
+    write_json(output/'artifacts.json',{name:_file_hash(output/name) for name in ('responses.json','summary.json')})
+    (output/'COMPLETE').write_text('Structurally valid AI proposals only.\n',encoding='utf-8')
+    (output/'INCOMPLETE').unlink()
+    return result
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--pilot',type=Path,required=True);p.add_argument('--responses',type=Path,required=True)
+    p.add_argument('--pilot',type=Path,required=True);p.add_argument('--responses',type=Path,nargs='+',required=True)
+    p.add_argument('--output',type=Path)
+    p.add_argument('--require-complete',action='store_true')
     a=p.parse_args()
-    try: result=validate(a.pilot,a.responses)
+    try:
+        if a.output:
+            result=combine(a.pilot,a.responses,a.output,a.require_complete)
+        else:
+            if len(a.responses)!=1: raise ValueError('Output required for multiple batches')
+            result=validate(a.pilot,a.responses[0])
+            if a.require_complete and result['remaining']: raise ValueError('Incomplete pilot')
     except (OSError,ValueError,KeyError,TypeError): p.exit(1,'AI proposal validation failed; inspect local inputs.\n')
     print(json.dumps(result,indent=2))
 

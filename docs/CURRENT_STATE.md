@@ -1,5 +1,15 @@
 # Current State
 
+## 2026-11-17 — Complete AI pilot pass and taxonomy revision draft
+
+All **271 pilot descriptions** have now been read and assigned explicitly AI-authored proposals: 125 provisional supported cases, 14 multiple-issue cases, 86 taxonomy/scope gaps and 46 unclear cases. Zero remain in this assistant pass; 165 contain proposed privacy-review concerns. These are not independent reference labels, privacy clearance or performance metrics. Read `research/AI_LABEL_PILOT_FINDINGS.md` and `research/TAXONOMY_REVISION_PROPOSAL.md`.
+
+The new draft separates service family, asset and issue kind, preserving missing-service, private-property, mixed-issue and uncertain-source cases. It does not replace taxonomy v1 or reclassify application records. A concrete near-duplicate pair crosses current proposed groups, so no independent-incident or split-readiness claim is made.
+
+Ignored `data/review/ai-pilot-complete-v1` combines the original 40 and new 231 responses with input provenance and hashes. `ai_labels` now supports disjoint batch combination and mandatory full-coverage checks, refuses overlaps/overwrite and never grants training approval. **120 research tests passed in 12.47s**; complete-pilot validation passes. Application suites/builds were not rerun for isolated research changes. Raw OpenCity hash was rechecked unchanged: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Human submissions remain zero; Stage B and training remain unapproved.
+
+Next: source-pair coverage audit against the draft families, semantic duplicate and privacy-span proposals, then independent reference adjudication before taxonomy/release adoption. Do not repeat the completed 271-task AI pass or mistake its completion for release readiness.
+
 ## 2026-11-17 — First actual AI-assisted label proposal batch
 
 Read `research/AI_LABEL_PILOT_FINDINGS.md`. The assistant read and proposed decisions for tasks 1–40 of the 271-task pilot: 16 supported named-category cases, one multiple-issue case, 19 taxonomy/scope gaps and four unclear cases. Privacy concerns were recorded for 22 records; no privacy clearance/redaction is claimed. There are **231 tasks remaining** in this pass. Proposals and rationales are retained locally under ignored `data/review/ai-pilot-batch-v1` with text/input hashes; no source text is committed.

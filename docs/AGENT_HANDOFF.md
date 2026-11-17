@@ -292,7 +292,7 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
-Current continuation: `research/AI_LABEL_PILOT_FINDINGS.md` records actual AI proposals for tasks 1–40 only. Finish tasks 41–271 as explicitly AI-assisted proposals and synthesize taxonomy/scope revisions; no human judgment or training approval can be inferred. Original reviewer forms remain blank. The assistant has prior source context and is not an independent blinded reviewer.
+Current continuation: `research/AI_LABEL_PILOT_FINDINGS.md` now records actual AI proposals for all 271 tasks; zero remain in that pass. Read `research/TAXONOMY_REVISION_PROPOSAL.md`, then audit source-pair coverage and semantic duplicate/privacy proposals before independent adjudication and adoption. No human judgment or training approval can be inferred. Original reviewer forms remain blank. The assistant has prior source context and is not an independent blinded reviewer.
 
 Latest checkpoint: `research/LABEL_PILOT.md` and the newest current-state entry describe 271 generated, blank, source-label-blinded reviewer tasks. Next obtain independent responses and adjudicate category boundaries/coverage before changing taxonomy or approving training. Do not regenerate this pilot as though annotation had occurred.
 

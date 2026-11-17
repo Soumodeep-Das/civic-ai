@@ -1,5 +1,11 @@
 # Decision Log
 
+## D035 Propose richer taxonomy after complete AI pilot (2026-11-17, draft design)
+
+- Use `research/TAXONOMY_REVISION_PROPOSAL.md` as the review draft: distinguish service family, asset and observed issue kind; retain mixed issues, unclear evidence and public/private ambiguity. Do not automatically map all gaps to other or treat claims as verified severity.
+- Preserve active taxonomy v1 and source mappings until all-source coverage, privacy/duplicate checks and independent adjudication justify a versioned migration. The 271-task AI pass is complete, but not a human annotation or training release.
+- Combine only disjoint validated AI batches, fail on overlap rather than choosing labels implicitly, and require full coverage explicitly. Current template groups are not proven event identities; investigate semantic near duplicates before any split.
+
 ## D034 Keep AI-authored labels separate from reference annotation (2026-11-17)
 
 - Store actual assistant proposals in ignored `data/review`, with AI attribution, input/text/taxonomy hashes, rationale, uncertainty and privacy observations. Do not fill human reviewer IDs/forms or label the pass independent/blinded when prior context exists.

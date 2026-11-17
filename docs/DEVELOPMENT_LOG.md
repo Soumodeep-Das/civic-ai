@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-11-17 — Finish all pilot AI proposals and synthesize taxonomy draft
+
+- Read full task descriptions 41–271 in four bounded batches, authored 231 per-task decisions/rationales/privacy concerns and preserved the first 40 responses unchanged. No coordinator key consulted during label authorship. No private source prose or per-record labels enter Git.
+- Stored ignored `data/review/ai-pilot-batch-v2` and combined `data/review/ai-pilot-complete-v1`: 271 records, 0 remaining; 125 supported, 14 multiple-issue, 86 gap, 46 unclear. Supported is provisional and may include unresolved public-setting/source assumptions. Proposed privacy concerns: 165; no clearance/redaction performed.
+- Extended `ai_labels` with validated disjoint-batch combination, full-coverage enforcement, source provenance, fresh-output requirements and completion markers. Added three tests for complete combination/input preservation, overlap/incomplete/invalid-output rejection and invalid second batch.
+- `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-ai-pilot-complete`: **120 passed in 12.47s**. `.\.venv\Scripts\python.exe -m research.civicai_research.ai_labels --pilot data/interim/label-pilot-v1 --responses data/review/ai-pilot-complete-v1/responses.json --require-complete`: exit 0, 271/271, training false. No application changes or app tests/build rerun.
+- After proposals were written, checked the coordinator key for tasks 23/66: different proposed groups despite close wording; SequenceMatcher ratio 0.85. Candidate semantic duplicate only, not verified shared incident. No existing group changed.
+- Rehashed raw OpenCity: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`; existing human submission count 0. Blank reviewer forms and original data remain intact.
+- Created `TAXONOMY_REVISION_PROPOSAL.md` with service-family/asset/issue-kind distinctions, v1 compatibility boundaries and staged adoption requirements. Consulted official scikit-learn target definitions and Label Studio prediction guidance. No new dependency, active taxonomy JSON, final labels, split, model, severity/priority target or deployment change.
+- `git diff --check` passed and private outputs are ignored. Fetch succeeded after network permission and main was synchronized before committing. Local commit succeeded; push failed because Git's Windows credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). Owner PowerShell publication is still required; no credentials were printed or bypass attempted.
+
 ## 2026-11-17 — Actual AI-assisted annotation batch and boundary findings
 
 - Read the full description of pilot tasks 1–40 and authored 40 explicit AI proposals locally. No coordinator key consulted; prior source/taxonomy context prevents claiming independent blinding. Recorded AI author and unavailable exact model version honestly. Tasks 41–271 remain unread by this pass.

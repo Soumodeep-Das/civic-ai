@@ -1,7 +1,7 @@
 import hashlib
 import json
 import pytest
-from research.civicai_research.ai_labels import validate
+from research.civicai_research.ai_labels import validate, combine
 from research.civicai_research.label_pilot import build
 from research.civicai_research.manifest import _file_hash
 from research.tests.test_label_pilot import fixture
@@ -54,3 +54,35 @@ def test_invalid_response_rejected(tmp_path,case):
 def test_changed_pilot_rejected(tmp_path):
     p,data=batch(tmp_path);path=p/'reviewer/tasks.json';path.write_bytes(path.read_bytes()+b' ')
     with pytest.raises(ValueError):validate(p,save(tmp_path,data))
+
+
+def test_combine_complete_preserves_batches_and_rejects_overwrite(tmp_path):
+    p,data=batch(tmp_path);first=save(tmp_path,data)
+    before=first.read_bytes()
+    task=json.loads((p/'reviewer/tasks.json').read_text())[1]
+    data['responses'][0].update(task_id=task['task_id'],text_sha256=hashlib.sha256(task['text'].encode()).hexdigest())
+    second=tmp_path/'second.json';second.write_text(json.dumps(data))
+    out=tmp_path/'combined';r=combine(p,[first,second],out,True)
+    assert r['remaining']==0 and r['reviewed_by_ai']==2 and not r['training_approved']
+    assert first.read_bytes()==before
+    saved=json.loads((out/'responses.json').read_text())
+    assert len(saved['source_batches'])==2 and len(saved['responses'])==2
+    assert (out/'COMPLETE').exists() and not (out/'INCOMPLETE').exists()
+    with pytest.raises(ValueError):combine(p,[first,second],out,True)
+
+
+def test_combine_rejects_overlap_and_incomplete_claim(tmp_path):
+    p,data=batch(tmp_path);f=save(tmp_path,data);out=tmp_path/'combined'
+    with pytest.raises(ValueError,match='Overlapping'):combine(p,[f,f],out)
+    with pytest.raises(ValueError,match='Incomplete'):combine(p,[f],out,True)
+    with pytest.raises(ValueError):combine(p,[f],p/'nested')
+    with pytest.raises(ValueError):combine(p,[],out)
+    assert not out.exists()
+
+
+def test_combine_stops_on_invalid_second_batch(tmp_path):
+    p,data=batch(tmp_path);first=save(tmp_path,data)
+    data['training_approved']=True
+    second=tmp_path/'second.json';second.write_text(json.dumps(data))
+    with pytest.raises(ValueError):combine(p,[first,second],tmp_path/'combined')
+    assert not (tmp_path/'combined').exists()
