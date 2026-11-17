@@ -2,6 +2,8 @@
 
 No source is approved for model training yet. Candidate records below distinguish possession from suitability.
 
+The [Bengaluru text-curation proposal](TEXT_CURATION_PROPOSAL.md) records reproducible screening/support for the existing OpenCity source. It introduces no new acquisition, reviewed labels or training approval; all raw/derived incident artifacts remain ignored.
+
 ## 2026-11-17 targeted audit
 
 [Dataset audit](DATASET_AUDIT_2026_11_17.md) records the new discovery queries, additional sources and task-readiness decisions. It includes unresolved Urban_problems/India_CIVICS/Mumbai competition leads, CivicDex's explicitly synthetic scope, request-only grievance research, and historical WB inundation as potential future context. No additional incident corpus or training approval resulted. Read this audit before treating a displayed image count, an Indian-sounding name, a synthetic severity field or a historical map as usable evidence for our model.

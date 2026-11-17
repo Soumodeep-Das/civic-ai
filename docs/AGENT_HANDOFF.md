@@ -292,7 +292,7 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
-The owner has explicitly selected the research workstream. As of 2026-11-17 the decision specification and targeted source audit are complete: read `ML_DECISION_SPEC.md`, `research/DATASET_AUDIT_2026_11_17.md` and the newest `CURRENT_STATE.md` entry. Next is a reproducible OpenCity curation proposal and label-support/readiness report, not immediate training or chatbot implementation. No human review, model readiness or all-India coverage may be invented.
+The owner has explicitly selected the research workstream. Read `ML_DECISION_SPEC.md`, `research/DATASET_AUDIT_2026_11_17.md`, `research/TEXT_CURATION_PROPOSAL.md` and the newest `CURRENT_STATE.md` entry. The automated OpenCity curation proposal now makes mapping, privacy, duplicate-containment and class-support gaps explicit. Next resolve the documented review/release gates and obtain independent reference labels; do not immediately train or implement a chatbot. No human review, model readiness or all-India coverage may be invented.
 
 The earlier beta-validation backlog remains unresolved in repository evidence: municipal/admin and remaining identity journeys still need a sanitized result record. Do not claim the research checkpoint completed those journeys or mutate the live beta as part of dataset work.
 

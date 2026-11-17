@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-11-17 — Full-corpus text-curation proposal
+
+- Added the offline `research.civicai_research.text_proposal` command, preserving raw records and real-review gates. It verifies input integrity/identities, proposes contact masking, retains complete duplicate-containment membership and reports class support without assigning reference labels or splits.
+- Final command: `.\.venv\Scripts\python.exe -m research.civicai_research.text_proposal --snapshot data/raw/icmyc-india-v2 --output data/processed/icmyc-text-proposal-v2`. Exit 0 and COMPLETE observed; derived hashes verified. Earlier development run was stopped and is not final evidence.
+- Assessed 16,071 records: 7,289 candidate review, 8,782 targeted review, 264 contact/URL flags, 15,273 containment groups and 14 category-conflict groups. Approved training records remain zero. See `research/TEXT_CURATION_PROPOSAL.md` for class counts and limitations.
+- Regression command: `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-text-proposal-final-b`: **98 passed in 12.41s**. Includes 15 new cases for deterministic output, tampering, overwrite/interruption, source preservation, duplicate conflicts and Bengali text. Application tests/builds were not rerun because application code is unchanged.
+- Raw OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Raw/derived outputs are ignored; no incident text, credentials, model or fabricated human decisions are included in this commit. Human submissions remain absent.
+- `git diff --check` passed. Remote fetch failed with `getaddrinfo() thread failed to start`, including after network permission; remote synchronization cannot be claimed. Publish this checkpoint from the owner's PowerShell if the push encounters the same environment limitation.
+
 ## 2026-11-17 — ML decision contract and targeted source audit
 
 - Recorded the owner's agreed direction in `ML_DECISION_SPEC.md`: classification, observable severity and contextual priority separated; provenance/unknown handling, category boundaries, optional assistant scope, offline/shadow rollout, evaluation gates and 17 future acceptance scenarios specified. These are design requirements, not implemented features or passing new tests.

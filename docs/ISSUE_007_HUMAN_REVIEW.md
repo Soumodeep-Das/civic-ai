@@ -2,6 +2,8 @@
 
 Status: **Stage A infrastructure complete; awaiting real human review. Stage B has not started.**
 
+2026-11-17 companion: `research/TEXT_CURATION_PROPOSAL.md` records a separate full-corpus automated proposal with contact/URL screening, complete containment groups and class-support counts. It does not fill these forms, supply human decisions or satisfy Stage B. Both candidate-review and targeted-review records remain unapproved; the human-submissions directory was still empty.
+
 Evidence labels: **VERIFIED FACT** is reproduced from retained artifacts; **PROJECT DECISION** is enforced by code; **PROPOSED DECISION** needs human approval; **HUMAN REVIEW DECISION** must come from a validated reviewer submission; **UNRESOLVED** is not treated as accepted.
 
 ## Scope and exclusions

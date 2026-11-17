@@ -1,5 +1,12 @@
 # Decision Log
 
+## D032 Automated text-curation proposals remain separate from approval (2026-11-17)
+
+- Generate reproducible derived text, source-rule proposals, complete duplicate-containment memberships and class-support counts from the frozen OpenCity snapshot. Verify input bytes and identities; refuse overwrite and output inside the raw snapshot.
+- Preserve raw data, the proposed taxonomy, blank Stage A forms and pending/null/unassigned annotation fields. An accepted mapping rule is not an independently verified complaint label. Neither candidate review nor a COMPLETE marker permits training.
+- Mask contact/URL pattern candidates only in restricted derived copies, recording offsets and reasons. Do not claim anonymization: names, addresses and semantic privacy review remain open. Keep every duplicate-group member; template matches can overmerge and do not prove shared incidents.
+- Use this pass to make annotation/support gaps concrete before training. No severity targets, train/test assignments, model, production change or replacement for human reference review is introduced.
+
 ## D031 Separate assessment tasks and introduce AI assistance gradually (2026-11-17, accepted design)
 
 - Adopt `ML_DECISION_SPEC.md` as the detailed decision contract before modeling. Classification, evidenced severity and contextual municipal priority have separate targets, versions, evaluation and uncertainty states; missing context does not imply low priority.

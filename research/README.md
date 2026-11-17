@@ -2,6 +2,10 @@
 
 This directory contains version-controlled research definitions and validation code. It does not contain an approved research dataset or measured results.
 
+## Reproducible text-curation proposal
+
+See [TEXT_CURATION_PROPOSAL.md](TEXT_CURATION_PROPOSAL.md) for the new offline command, provenance, full-corpus support counts and remaining gates. This companion to Issue #7 preserves existing review forms and never assigns human labels or approves training. Raw and derived incident data remain outside Git.
+
 ## Validate a manifest
 
 ## Acquire Indian text data for curation

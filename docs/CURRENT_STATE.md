@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-17 — Reproducible Bengaluru text-curation proposal
+
+The new offline proposal command assesses the frozen 16,071-record OpenCity corpus with integrity checks, source-rule proposals, contact/URL masking candidates, complete duplicate-containment groups and explicit review routes. See `research/TEXT_CURATION_PROPOSAL.md` for reproducible commands, per-class support and remaining gates. Raw data, taxonomy, Stage A forms, application code and existing complaint behavior are unchanged.
+
+Final output `data/processed/icmyc-text-proposal-v2` contains 7,289 candidate-review records and 8,782 targeted-review records, 264 contact/URL flags and 14 category-conflict groups. The smallest nonempty screened class is water leakage (53 records); `other` has no accepted mapping support. These are proposals, not verified labels, anonymized records or independent incidents. All labels remain null/pending, splits unassigned, approved records zero and `training_approved=false`. Human submissions remain absent; Stage B has not started.
+
+Research regression: **98 passed**. Input/derived hashes are verified by the full-corpus run; OpenCity raw SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Application tests/builds were not rerun for this isolated research change. Next resolve mapping/taxonomy, privacy, independent-reference, duplicate/event, rights and split-support gates; no classifier, severity predictor or chatbot has been trained or deployed.
+
 ## 2026-11-17 — ML decision specification and targeted dataset audit completed
 
 The agreed design is recorded in `ML_DECISION_SPEC.md`: broad Indian civic reporting, evaluated classification support, category-specific severity only when evidence/labels permit it, and a separate transparent contextual priority proposal with municipal review. Unknown/conflicting evidence is explicit and does not become low priority. Optional complaint clarification assistance is a later scoped feature; no AI provider, paid call or integration is configured.
