@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-11-17 — Actual AI-assisted annotation batch and boundary findings
+
+- Read the full description of pilot tasks 1–40 and authored 40 explicit AI proposals locally. No coordinator key consulted; prior source/taxonomy context prevents claiming independent blinding. Recorded AI author and unavailable exact model version honestly. Tasks 41–271 remain unread by this pass.
+- Stored ignored `data/review/ai-pilot-batch-v1/responses.json` and aggregate summary. Counts: 16 supported, one multiple-issue, 19 taxonomy-gap, four unclear; 22 proposed privacy-review flags. No human forms, raw text, taxonomy, labels/splits, model or app changed. Names/addresses/identifiers were flagged without copying their values into tracked findings.
+- Added `ai_labels` structural/provenance validator and 13 cases covering valid partial batches, false approval claims, unknown/duplicate task IDs, text changes, unsupported/inconsistent categories, empty responses, extra fields and missing rationale. Validation does not certify semantic correctness.
+- Commands: `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-ai-labels` yielded **117 passed in 11.63s**. `.\.venv\Scripts\python.exe -m research.civicai_research.ai_labels --pilot data/interim/label-pilot-v1 --responses data/review/ai-pilot-batch-v1/responses.json` passed and reported 231 remaining. No app suites/build rerun for isolated research work.
+- Consulted official Label Studio prediction documentation; retained prediction/reference distinction without installing services. Recorded taxonomy/service-kind and privacy findings in `research/AI_LABEL_PILOT_FINDINGS.md`. No real incident prose or responses enter Git; raw checksum binding remains unchanged.
+
 ## 2026-11-17 — Independent-label pilot preparation
 
 - Added `label_pilot` generation and six regression cases: deterministic/blinded/group-distinct output, changed metadata/selected text, incomplete/overwrite/size boundaries and path escape. Initial two test failures targeted unselected duplicate texts; corrected fixtures to tamper selected inputs rather than claim all unselected files are revalidated.

@@ -1,5 +1,11 @@
 # Decision Log
 
+## D034 Keep AI-authored labels separate from reference annotation (2026-11-17)
+
+- Store actual assistant proposals in ignored `data/review`, with AI attribution, input/text/taxonomy hashes, rationale, uncertainty and privacy observations. Do not fill human reviewer IDs/forms or label the pass independent/blinded when prior context exists.
+- Validate provenance/structure and explicitly prohibit training, human-review and privacy approval claims. No automatic promotion to a training manifest or classifier is added.
+- Use taxonomy-gap and multiple-issue outcomes to expose defects in task definitions rather than force source tags or a broad other class. Finish pilot coverage before changing the versioned taxonomy; existing release gates remain unchanged.
+
 ## D033 Blind source labels in the guideline pilot (2026-11-17)
 
 - Sample up to 20 records per proposed-category/review-route stratum, one per proposed containment group, with deterministic selection. Separate reviewer tasks from the coordinator source/proposal key to reduce anchoring.

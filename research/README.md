@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Latest research checkpoint: [AI-assisted pilot findings](AI_LABEL_PILOT_FINDINGS.md). Forty of 271 pilot tasks have actual assistant proposals; 231 remain. These are neither human reference annotations nor training approval.
+
 This directory contains version-controlled research definitions and validation code. It does not contain an approved research dataset or measured results.
 
 ## Reproducible text-curation proposal

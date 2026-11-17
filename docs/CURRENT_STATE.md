@@ -1,5 +1,11 @@
 # Current State
 
+## 2026-11-17 — First actual AI-assisted label proposal batch
+
+Read `research/AI_LABEL_PILOT_FINDINGS.md`. The assistant read and proposed decisions for tasks 1–40 of the 271-task pilot: 16 supported named-category cases, one multiple-issue case, 19 taxonomy/scope gaps and four unclear cases. Privacy concerns were recorded for 22 records; no privacy clearance/redaction is claimed. There are **231 tasks remaining** in this pass. Proposals and rationales are retained locally under ignored `data/review/ai-pilot-batch-v1` with text/input hashes; no source text is committed.
+
+The new structural validator rejects fabricated approval flags, unknown/duplicate tasks, changed input text and inconsistent categories. It cannot verify semantic truth. Human forms, raw data, taxonomy v1 and application behavior are unchanged; training remains unapproved. Next finish the remaining AI-assisted pilot batches and produce a versioned taxonomy recommendation before seeking independent reference review. Do not equate this assistant pass with human annotation or a completed pilot.
+
 ## 2026-11-17 — Source-label-blinded guideline pilot prepared
 
 `research/LABEL_PILOT.md` documents the next label-quality step. The offline generator produced 271 blank reviewer tasks from 271 proposed containment groups in ignored `data/interim/label-pilot-v1`, with at most 20 per category/review-route stratum. Reviewer tasks hide source labels/proposals; a separate coordinator key preserves traceability. Selected input hashes and output hashes are recorded. This is a guideline pilot, not a representative evaluation holdout or an approved training release.
