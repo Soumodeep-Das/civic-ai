@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-17 — Source-label-blinded guideline pilot prepared
+
+`research/LABEL_PILOT.md` documents the next label-quality step. The offline generator produced 271 blank reviewer tasks from 271 proposed containment groups in ignored `data/interim/label-pilot-v1`, with at most 20 per category/review-route stratum. Reviewer tasks hide source labels/proposals; a separate coordinator key preserves traceability. Selected input hashes and output hashes are recorded. This is a guideline pilot, not a representative evaluation holdout or an approved training release.
+
+The guide defines ambiguous/multiple-issue, language and privacy decisions and concrete category boundaries. It records source-family evidence for broader taxonomy work (animals, pollution, traffic, trees and supply/service requests). Taxonomy v1 and Stage A forms remain unchanged. No independent responses exist; annotation agreement, privacy clearance, training and deployment remain unapproved. Next obtain genuine pilot responses/adjudication and revise supported definitions; any assistant-generated labels must be explicitly described as AI-assisted proposals.
+
+Research regression: **104 passed in 9.01s**. No application changes or application-suite reruns. Raw OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac` as bound by the verified proposal; raw acquisition was not rerun.
+
 ## 2026-11-17 — Reproducible Bengaluru text-curation proposal
 
 The new offline proposal command assesses the frozen 16,071-record OpenCity corpus with integrity checks, source-rule proposals, contact/URL masking candidates, complete duplicate-containment groups and explicit review routes. See `research/TEXT_CURATION_PROPOSAL.md` for reproducible commands, per-class support and remaining gates. Raw data, taxonomy, Stage A forms, application code and existing complaint behavior are unchanged.

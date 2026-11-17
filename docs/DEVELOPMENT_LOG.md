@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-11-17 — Independent-label pilot preparation
+
+- Added `label_pilot` generation and six regression cases: deterministic/blinded/group-distinct output, changed metadata/selected text, incomplete/overwrite/size boundaries and path escape. Initial two test failures targeted unselected duplicate texts; corrected fixtures to tamper selected inputs rather than claim all unselected files are revalidated.
+- Ran `.\.venv\Scripts\python.exe -m research.civicai_research.label_pilot --proposal data/processed/icmyc-text-proposal-v2 --output data/interim/label-pilot-v1`: exit 0, 271 records/groups, COMPLETE; no responses or training approval. The existing proposal index provides provenance; selected text is rehashed, unselected text is not.
+- Ran `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-label-pilot-final`: **104 passed in 9.01s**. Application code and data unchanged; no application tests/build repeated.
+- Added boundary/adjudication guidance, local privacy precautions and broad-taxonomy gaps in `research/LABEL_PILOT.md`. Consulted official Label Studio annotation guidance; Open311 guide lookup timed out and is not used as evidence. No external annotation service or model installed.
+- User confirmed the preceding commit was pushed; initial local main/origin status was synchronized. New generated text/key files remain ignored. No independent review has been synthesized and no final evaluation set assigned.
+
 ## 2026-11-17 — Full-corpus text-curation proposal
 
 - Added the offline `research.civicai_research.text_proposal` command, preserving raw records and real-review gates. It verifies input integrity/identities, proposes contact masking, retains complete duplicate-containment membership and reports class support without assigning reference labels or splits.

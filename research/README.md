@@ -4,6 +4,8 @@ This directory contains version-controlled research definitions and validation c
 
 ## Reproducible text-curation proposal
 
+Next label-quality step: [LABEL_PILOT.md](LABEL_PILOT.md) provides the reproducible source-label-blinded pilot, concrete annotation instructions and taxonomy coverage gaps. Generation is complete; independent responses remain pending.
+
 See [TEXT_CURATION_PROPOSAL.md](TEXT_CURATION_PROPOSAL.md) for the new offline command, provenance, full-corpus support counts and remaining gates. This companion to Issue #7 preserves existing review forms and never assigns human labels or approves training. Raw and derived incident data remain outside Git.
 
 ## Validate a manifest

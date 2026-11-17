@@ -1,5 +1,11 @@
 # Decision Log
 
+## D033 Blind source labels in the guideline pilot (2026-11-17)
+
+- Sample up to 20 records per proposed-category/review-route stratum, one per proposed containment group, with deterministic selection. Separate reviewer tasks from the coordinator source/proposal key to reduce anchoring.
+- Preserve blank responses, explicit unclear/multiple-issue/language/privacy decisions and unchanged taxonomy. This purposive pilot is neither a final evaluation holdout nor sufficient for full release approval. Folder separation is not access control; all text remains restricted local data.
+- Require actual independent responses before agreement/reference-label claims. Existing Issue #7 gates remain authoritative; pilot answers have no automatic training importer.
+
 ## D032 Automated text-curation proposals remain separate from approval (2026-11-17)
 
 - Generate reproducible derived text, source-rule proposals, complete duplicate-containment memberships and class-support counts from the frozen OpenCity snapshot. Verify input bytes and identities; refuse overwrite and output inside the raw snapshot.

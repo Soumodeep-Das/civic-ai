@@ -292,6 +292,8 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
+Latest checkpoint: `research/LABEL_PILOT.md` and the newest current-state entry describe 271 generated, blank, source-label-blinded reviewer tasks. Next obtain independent responses and adjudicate category boundaries/coverage before changing taxonomy or approving training. Do not regenerate this pilot as though annotation had occurred.
+
 The owner has explicitly selected the research workstream. Read `ML_DECISION_SPEC.md`, `research/DATASET_AUDIT_2026_11_17.md`, `research/TEXT_CURATION_PROPOSAL.md` and the newest `CURRENT_STATE.md` entry. The automated OpenCity curation proposal now makes mapping, privacy, duplicate-containment and class-support gaps explicit. Next resolve the documented review/release gates and obtain independent reference labels; do not immediately train or implement a chatbot. No human review, model readiness or all-India coverage may be invented.
 
 The earlier beta-validation backlog remains unresolved in repository evidence: municipal/admin and remaining identity journeys still need a sanitized result record. Do not claim the research checkpoint completed those journeys or mutate the live beta as part of dataset work.
