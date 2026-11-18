@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-11-18 — Actual text review of all richer pilot annotations
+
+- Read all 271 full descriptions in four bounded batches, covering all 132 unresolved and 139 transferred records. Authored per-record outcomes, component proposals, evidence offsets and uncertainty rationales in ignored local artifacts; this is not a repeat transfer or independent human annotation.
+- Final v2 outcomes: 190 described issue, 61 clarification, 16 scope review, four unusable. 366 component proposals; 81 records contain multiple components. Refined six first-pass decisions during consistency review; original v1 is preserved. 102 transferred records have changed tuples, including refinement/additional components rather than an independently measured error count.
+- Added `issue_annotations` validation for exact coverage, input/text hashes, evidence spans, allowed fields/family/asset/kind combinations, outcome/context consistency and false approval gates. Preserved source data, prior proposals, privacy review and all application behavior.
+- Actual CLI to `data/review/issue-text-validated-v2` exited 0. All output hashes checked. Rehashed raw OpenCity unchanged (`d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`), prior AI responses unchanged and corrected privacy proposals unchanged.
+- Focused tests: **33 passed in 3.38s**. Full `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-text-annotations-final`: **206 passed in 20.23s**. App suites/builds not rerun for this isolated research change.
+- Consulted primary Label Studio guidance on prediction/review separation. No annotation service or new dependency installed. Updated the report, decisions and handoff; next is baseline readiness and evaluation protocol, not automatic training on AI labels.
+- Confirmed the prior owner push with a successful fetch and `main...origin/main` count `0 0`. Final staged diff check passed; only research code/tests and docs were committed, with private annotations/scripts ignored. Publishing this checkpoint failed because the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). The commit remains local pending the owner's normal `git push origin main`; no credentials or force-push workaround used.
+
 ## 2026-11-18 — Rich issue-description draft and pilot transfer
 
 Implemented the first versioned family/asset/issue-kind draft in `research/civicai_research/issue_draft.py`; see `research/ISSUE_DESCRIPTION_DRAFT.md`. Applied existing proposals to all 271 pilot records: 139 records yield 153 provisional issue descriptions; 132 remain explicitly unresolved. Unknown setting/time/cause are preserved. This is a deterministic transfer, not fresh text annotation, a fully validated annotation schema or a training release. Original data, active taxonomy, privacy recommendations and application behavior are unchanged. Next directly annotate the unresolved texts and verify transferred descriptions against source evidence.

@@ -1,5 +1,7 @@
 # Rich issue-description draft: first transfer
 
+Follow-up completed: [Text-grounded annotation report](TEXT_ISSUE_ANNOTATION_REPORT.md) records fresh AI review of all 132 unresolved and 139 transferred records, with strict evidence validation. The historical transfer below remains immutable and is not counted as fresh annotation.
+
 2026-11-18. Implemented `issue_draft` as a conservative, versioned transfer of existing AI proposals. Active taxonomy v1 and application behavior are unchanged.
 
 The draft represents service family, asset, issue kind, setting, time state and provenance separately, with explicit unknown values and multiple issues. It includes all 12 proposed service families plus unknown. The generated contract is an initial vocabulary/field specification, not a complete validation schema for future manual annotations. No severity, priority, legal jurisdiction or public ownership is inferred.

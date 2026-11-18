@@ -1,5 +1,12 @@
 # Decision Log
 
+## D039 Bind richer AI issue descriptions to text evidence (2026-11-18)
+
+- Store new text-read annotations separately from automatic transfers and original source labels. Require evidence offsets for each proposed component and hash-bind the complete pilot and prior draft. Allow multiple conditions per asset without treating components as independent incidents.
+- Preserve unknown fluid source, fault mechanism, ownership and timing. Separate described issues, clarification needs, scope questions and unusable text; do not force other or derive severity from allegations/urgency words. Populate setting/time later only with separate evidence; neither field was systematically annotated in this pass.
+- Validate structure and evidence location, not semantic truth. Explicitly forbid independent-reference, privacy or training approval in the AI artifact. Keep individual text/judgments private, active taxonomy v1 unchanged and no automatic application migration.
+- Next assess actual candidate/class support and predeclare evaluation before a baseline; independent reference labels and rights/privacy/group/split gates remain unresolved.
+
 ## D038 Preserve provenance during richer annotation transfer (2026-11-18)
 
 Transfer existing AI categories conservatively into a proposal-only family/asset/issue-kind structure. Preserve unknown ownership, timing and causes; retain gaps without forcing other. Mark every transferred issue as unverified against text. Fresh annotation and strict evidence validation must follow before any release. No active taxonomy or application migration.

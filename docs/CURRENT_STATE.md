@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-18 — Complete text-grounded richer pilot annotation
+
+The assistant read and freshly annotated all 271 descriptions, including the 132 unresolved and 139 transferred records. `research/TEXT_ISSUE_ANNOTATION_REPORT.md` records 190 described-issue outcomes, 61 clarification cases, 16 scope-review cases and four unusable texts. There are 366 proposed components across 258 records, with multiple components in 81 records. Family/asset/kind tuples changed for 102 transferred records through refinement, additions or corrected assumptions; this is not a measured error rate.
+
+Exact text evidence is bound by offsets/hashes; all reports remain AI proposals, not verified incidents or independent labels. Setting/time remain unknown in this pass. Privacy holds, source data, original proposals, active taxonomy, groups/splits and application behavior are unchanged. Final ignored artifacts: `data/review/issue-text-authored-v2` and `data/review/issue-text-validated-v2`; v1 is retained history.
+
+**206 research tests passed in 20.23s** (33 new contract tests). Raw OpenCity hash remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. No application tests/builds rerun; no model trained or deployed. Next assess baseline readiness and predeclare evaluation using actual candidate/support counts, retaining independent-reference, rights/privacy and leakage-control gates. Do not redo the completed annotation pass.
+
 ## 2026-11-18 — Rich issue-description draft and pilot transfer
 
 Implemented the first versioned family/asset/issue-kind draft in `research/civicai_research/issue_draft.py`; see `research/ISSUE_DESCRIPTION_DRAFT.md`. Applied existing proposals to all 271 pilot records: 139 records yield 153 provisional issue descriptions; 132 remain explicitly unresolved. Unknown setting/time/cause are preserved. This is a deterministic transfer, not fresh text annotation, a fully validated annotation schema or a training release. Original data, active taxonomy, privacy recommendations and application behavior are unchanged. Next directly annotate the unresolved texts and verify transferred descriptions against source evidence.

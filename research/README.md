@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Current: [Text-grounded pilot annotations](TEXT_ISSUE_ANNOTATION_REPORT.md) completes actual AI review of all 271 descriptions with evidence offsets and uncertainty. 206 research tests pass. Next assess baseline readiness and evaluation design; no independent reference or training approval is implied.
+
 Latest implementation: [Rich issue-description draft](ISSUE_DESCRIPTION_DRAFT.md). Existing pilot proposals transferred; fresh richer text annotation remains outstanding.
 
 Latest: [Contextual review recommendations](CONTEXT_REVIEW_REPORT.md) records the completed AI pass over 41 scope questions, 134 contextual privacy flags and one near-text pair. It includes six additional span proposals and tested validation; it does not grant training/privacy approval. Next implement a versioned proposal-only family/asset/issue-kind annotation contract for the existing pilot.
