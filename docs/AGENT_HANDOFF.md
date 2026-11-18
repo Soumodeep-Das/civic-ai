@@ -292,6 +292,8 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
+Newest checkpoint: `research/ISSUE_DESCRIPTION_DRAFT.md` describes the implemented draft and 271-record transfer (139 provisional, 132 unresolved). Next perform actual richer text annotation and add evidence validation; do not rerun transfer as new annotation. Earlier recommendations below remain context.
+
 Latest, 2026-11-18: read `research/CONTEXT_REVIEW_REPORT.md`. The assistant completed concrete recommendations for all 41 scope pairs, 134 flagged/no-span pilot records (97 retain context, 31 hold, six spans) and one duplicate candidate (future split-containment proposal, retain both, identity unknown). Cumulative privacy proposals: 43 spans in 37 records; no redaction/clearance. 162 research tests pass. Next encode and populate a versioned proposal-only family/asset/issue-kind annotation contract for the existing pilot. Do not redo the completed flag pass or infer human approval; 106 unflagged/no-span records were not reviewed here. Active taxonomy, source text/groups/splits and application are unchanged.
 
 Previous follow-up: `research/CURATION_QA_REPORT.md` completes all-source-pair coverage and pilot duplicate/privacy proposal generation. Its 41 scope and 134 no-span flags were subsequently addressed in the recommendation pass above; three insufficient-source-label pairs remain unresolved. Neither pass supplies training labels or independent adjudication.

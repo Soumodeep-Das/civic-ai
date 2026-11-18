@@ -1,5 +1,10 @@
 # Development Log
 
+## 2026-11-18 — Rich issue-description draft and pilot transfer
+
+Implemented the first versioned family/asset/issue-kind draft in `research/civicai_research/issue_draft.py`; see `research/ISSUE_DESCRIPTION_DRAFT.md`. Applied existing proposals to all 271 pilot records: 139 records yield 153 provisional issue descriptions; 132 remain explicitly unresolved. Unknown setting/time/cause are preserved. This is a deterministic transfer, not fresh text annotation, a fully validated annotation schema or a training release. Original data, active taxonomy, privacy recommendations and application behavior are unchanged. Next directly annotate the unresolved texts and verify transferred descriptions against source evidence.
+
+
 ## 2026-11-18 — Contextual scope/privacy/duplicate recommendation checkpoint
 
 - Confirmed the owner's preceding push: after network access was granted, `git fetch origin` succeeded and `git rev-list --left-right --count main...origin/main` returned `0 0` at `5506b8e`. Initial fetch without that access failed to start name resolution; no credential workaround used.
@@ -346,3 +351,5 @@ Phase A verification passed 147 backend tests, 56 unchanged research tests, 57 f
 After Supabase and Brevo configuration, the Render template was clarified to require `MAPTILER_REQUEST_ORIGIN` alongside the browser build key. Both must be bound to the exact generated Render origin because the current MapTiler plan uses one origin-restricted key for frontend tiles and backend geocoding.
 
 The first Render attempts exposed two configuration defects before application startup: an incorrect Supabase pooler username followed by a malformed replacement `DATABASE_URL`. Review of the build log also found that Docker's non-empty-key assertion expanded the public MapTiler build key into the build command display. The assertion now checks `process.env` at runtime so no credential value is interpolated into Docker build logs. No application behavior or research state changed.
+
+Verification: 173 research tests passed in 20.07s (`--basetemp tmp/pytest-issue-draft-final2`); 11 new transfer tests. An initial test fixture placed output inside its source directory and correctly triggered the guard; the fixture was corrected and the complete suite rerun. Actual transfer exited 0. Application tests/builds were not rerun because runtime code/dependencies are unchanged. `git diff --check` passed.

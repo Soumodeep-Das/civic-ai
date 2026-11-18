@@ -1,5 +1,10 @@
 # Current State
 
+## 2026-11-18 — Rich issue-description draft and pilot transfer
+
+Implemented the first versioned family/asset/issue-kind draft in `research/civicai_research/issue_draft.py`; see `research/ISSUE_DESCRIPTION_DRAFT.md`. Applied existing proposals to all 271 pilot records: 139 records yield 153 provisional issue descriptions; 132 remain explicitly unresolved. Unknown setting/time/cause are preserved. This is a deterministic transfer, not fresh text annotation, a fully validated annotation schema or a training release. Original data, active taxonomy, privacy recommendations and application behavior are unchanged. Next directly annotate the unresolved texts and verify transferred descriptions against source evidence.
+
+
 ## 2026-11-18 — Contextual research recommendations completed
 
 `research/CONTEXT_REVIEW_REPORT.md` records actual AI recommendations for all 41 scope-review source pairs (824 associated records), all 134 remaining flagged/no-span pilot texts, and the one near-text candidate. Scope: 30 pairs/512 records deferred from the initial physical-condition research target, four/33 conditional on public-asset evidence, four/269 requiring record context and three/10 specialist fire-safety review. These are proposals about a research target, not deletion, legal jurisdiction or exclusion from broad CivicAI reporting.

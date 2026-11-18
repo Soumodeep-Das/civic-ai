@@ -1,5 +1,9 @@
 # Decision Log
 
+## D038 Preserve provenance during richer annotation transfer (2026-11-18)
+
+Transfer existing AI categories conservatively into a proposal-only family/asset/issue-kind structure. Preserve unknown ownership, timing and causes; retain gaps without forcing other. Mark every transferred issue as unverified against text. Fresh annotation and strict evidence validation must follow before any release. No active taxonomy or application migration.
+
 ## D037 Record contextual research recommendations without granting release approval (2026-11-18)
 
 - Resolve the flagged source-pair review into explicit research-scope recommendations: administrative/conduct deferral for the first physical-condition experiment, conditional public assets, record-dependent ambiguities and specialist fire safety. Preserve all records and broad product reporting scope; source titles are not individual labels or jurisdiction findings.
