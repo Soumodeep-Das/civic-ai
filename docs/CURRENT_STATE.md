@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-18 — Baseline readiness and evaluation protocol completed
+
+`research/BASELINE_READINESS.md` and `research/protocols/text_baseline_v1.json` specify the first proposed single-family text study. The read-only assessment finds 157 AI annotation candidates (156 conservative containment components), including 28 same-family multi-component reports. Deferred: 33 cross-family, 61 clarification, 16 scope, four unusable. No candidate is automatically training-eligible.
+
+Roads/footpaths, solid waste, lighting and drainage meet the explicit development planning floor of 20 components/family: 134 records/133 components. This floor is an engineering choice, not statistical sufficiency or a restriction on CivicAI's wider reporting scope. Smaller families remain in the inventory. Candidate privacy flags: 21 span proposals, 16 context holds, 55 retention proposals and 65 without that contextual review. Independent reference, privacy and training-approved counts remain zero.
+
+The protocol predeclares a dummy comparator, TF-IDF/logistic regression, grouped development validation, train-only preprocessing, macro/per-class metrics and a future fresh independently reviewed test set. The current pilot is development-only and cannot become an untouched final test. No model, split or performance result was produced. Final local output: ignored `data/review/baseline-readiness-v2`; **228 research tests passed in 21.58s**. Original data/application unchanged; no app suite/build rerun. Next implement the offline baseline runner with synthetic-fixture verification and an explicit real-data release gate, alongside unresolved reference/privacy/rights work.
+
 ## 2026-11-18 — Complete text-grounded richer pilot annotation
 
 The assistant read and freshly annotated all 271 descriptions, including the 132 unresolved and 139 transferred records. `research/TEXT_ISSUE_ANNOTATION_REPORT.md` records 190 described-issue outcomes, 61 clarification cases, 16 scope-review cases and four unusable texts. There are 366 proposed components across 258 records, with multiple components in 81 records. Family/asset/kind tuples changed for 102 transferred records through refinement, additions or corrected assumptions; this is not a measured error rate.

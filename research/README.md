@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Latest: [Baseline readiness and evaluation protocol](BASELINE_READINESS.md) provides actual candidate/group/privacy counts and the versioned first text-study protocol. No model was trained; 228 research tests pass. Next implement the offline runner with synthetic verification and an explicit real-data release gate.
+
 Current: [Text-grounded pilot annotations](TEXT_ISSUE_ANNOTATION_REPORT.md) completes actual AI review of all 271 descriptions with evidence offsets and uncertainty. 206 research tests pass. Next assess baseline readiness and evaluation design; no independent reference or training approval is implied.
 
 Latest implementation: [Rich issue-description draft](ISSUE_DESCRIPTION_DRAFT.md). Existing pilot proposals transferred; fresh richer text annotation remains outstanding.

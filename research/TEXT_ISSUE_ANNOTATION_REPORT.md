@@ -66,4 +66,6 @@ Original OpenCity SHA-256 rechecked: `d951dbb484532421801f6cbd7550edaa6f9ab143da
 
 ## Next intended step
 
+Follow-up completed: [Baseline readiness](BASELINE_READINESS.md) now reports candidate/class/group/privacy support and the predeclared evaluation protocol. Next implement the offline runner with synthetic fixtures and an explicit real-data gate. The annotation pass described here is complete; no training approval follows from it.
+
 Produce a baseline-readiness assessment from these actual annotations: distinguish clear single-component candidates from mixed/ambiguous/scope cases, examine proposed class support and duplicate/privacy exclusions, and predeclare the text-baseline evaluation protocol. Do not repeat this completed 271-record pass as new work. Independent reference adjudication and rights/privacy/split approval remain explicit prerequisites to a validated training/evaluation release; AI-authored labels cannot serve as independent ground truth.

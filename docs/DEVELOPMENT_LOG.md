@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-11-18 — Baseline candidate assessment and predeclared protocol
+
+- Implemented `baseline_readiness`, joining complete text annotations, pilot group keys, contextual privacy proposals and conservative duplicate containment. All input hashes/identities checked; transitive grouping occurs before filtering, with conflicts/uncertainty deferred. No original groups, records or labels changed.
+- Actual run to ignored `data/review/baseline-readiness-v2` exited 0: 157 single-family candidates/156 components; 28 have multiple same-family components. Deferred counts: 33 cross-family, 61 clarification, 16 scope, four unusable. Four proposed development families meet the explicit 20-component engineering floor: 134 records/133 components. All training/reference/privacy eligibility remains unapproved.
+- Recorded candidate privacy flags without clearing them (21 span, 16 hold, 55 retention proposal, 65 not context-reviewed), full 12-family support including zero support, and the absent independent holdout. Preserved v1 output and produced v2 after consistency-check/protocol clarification; counts unchanged.
+- Predeclared versioned target, model/dummy comparator, feature exclusions, grouped folds, train-only preprocessing, hyperparameters, metrics, fresh reference-test requirement, uncertainty method and provenance. Consulted primary scikit-learn guidance. This adds no estimator dependency and trains nothing.
+- Focused tests: **22 passed in 2.03s**. Full `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-baseline-readiness-final`: **228 passed in 21.58s**. No app test/build rerun for isolated research work. Raw OpenCity rehashed unchanged: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`.
+- Updated current state, decisions and handoff. Next build/test the offline runner on synthetic fixtures, retaining explicit real-data gates and separate reference/privacy/rights work. No model accuracy, operational release or all-India coverage claimed.
+- Confirmed prior synchronization with successful fetch and `main...origin/main` count `0 0`; final artifact/code/policy hashes and staged diff check passed. Only research code/tests/protocol/docs committed. Push failed when the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). This checkpoint remains local pending the owner's `git push origin main`; private inventories are ignored and no credential workaround used.
+
 ## 2026-11-18 — Actual text review of all richer pilot annotations
 
 - Read all 271 full descriptions in four bounded batches, covering all 132 unresolved and 139 transferred records. Authored per-record outcomes, component proposals, evidence offsets and uncertainty rationales in ignored local artifacts; this is not a repeat transfer or independent human annotation.

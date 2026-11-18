@@ -1,5 +1,13 @@
 # Decision Log
 
+## D040 Assess single-family baseline support without promoting AI labels (2026-11-18)
+
+- Propose family classification as the first baseline target. Retain multiple conditions within one family as one complaint, defer cross-family/ambiguous/scope cases explicitly, and preserve all records. Full CivicAI reporting remains broader than the initial study.
+- Combine proposed groups and near-text links transitively before filtering; linked uncertainty/conflicts require review. Count containment components, not assumed independent incidents. No original group or split is mutated.
+- Use an explicitly disclosed 20-component/family development planning floor; it is not statistical sufficiency. The observed four-family pilot scope is provisional and must be recomputed after reference/privacy review. Keep all privacy flags and zero release eligibility visible.
+- Freeze `research/protocols/text_baseline_v1.json` before model fitting: dummy/TF-IDF-linear baseline, grouped development validation, train-only transforms, fixed reporting and a new independent test set. The already examined pilot cannot become an untouched test. AI-label weak supervision requires its own disclosed design; no implicit substitute for reference evaluation.
+- Next implement the offline runner with synthetic tests and an explicit release gate. No new model dependency or training/inference capability is introduced by this readiness checkpoint.
+
 ## D039 Bind richer AI issue descriptions to text evidence (2026-11-18)
 
 - Store new text-read annotations separately from automatic transfers and original source labels. Require evidence offsets for each proposed component and hash-bind the complete pilot and prior draft. Allow multiple conditions per asset without treating components as independent incidents.

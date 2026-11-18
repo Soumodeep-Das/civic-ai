@@ -292,7 +292,9 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
-Newest checkpoint: `research/TEXT_ISSUE_ANNOTATION_REPORT.md` completes actual AI text review of all 271 pilot descriptions (190 described, 61 clarification, 16 scope, four unusable). Final local artifacts are `issue-text-authored-v2` and `issue-text-validated-v2`; 366 components, 81 multi-component records, 206 passing research tests. Next assess baseline readiness/class support and predeclare evaluation. Do not redo transfer or this text pass. No independent labels/privacy clearance/training approval; context setting/time remain unknown and existing data/application are unchanged.
+Newest checkpoint: `research/BASELINE_READINESS.md` and `research/protocols/text_baseline_v1.json` complete readiness/protocol work. 157 AI candidates/156 containment components; four proposed development families cover 134 records/133 components. No approved labels/privacy/training release or untouched test set. Final ignored assessment is `baseline-readiness-v2`; 228 research tests pass. Next implement the offline baseline runner and test it on synthetic fixtures, with real-data execution gated on an explicit reviewed release. Do not repeat this assessment as model training; reference/privacy/rights tasks remain outstanding.
+
+Previous checkpoint: `research/TEXT_ISSUE_ANNOTATION_REPORT.md` completed actual AI text review of all 271 pilot descriptions (190 described, 61 clarification, 16 scope, four unusable). Local artifacts are `issue-text-authored-v2` and `issue-text-validated-v2`; 366 components and 81 multi-component records. Do not redo transfer or this text pass. No independent labels/privacy clearance/training approval; context setting/time remain unknown and existing data/application are unchanged.
 
 Previous checkpoint: `research/ISSUE_DESCRIPTION_DRAFT.md` describes the draft and 271-record transfer (139 provisional, 132 unresolved), now reviewed in the text pass above. Earlier recommendations below remain historical context.
 
