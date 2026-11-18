@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-11-18 — Source-audit checkpoint publication status
+
+- Confirmed the completed QA artifact and clean working tree after implementation commit `c40f5dd`. The preceding regression result remains 135 passing research tests; no implementation changes warrant a rerun.
+- Final diff check passed and private QA artifacts/scripts are ignored. Fetch succeeded before the implementation commit, but push failed because Git's Windows credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). The checkpoint is local-only until the owner runs `git push origin main`; no credentials were exposed or alternate credential workaround attempted.
+- Remaining work is substantive review, not more training claims: 41 source pairs need scope decisions, three have insufficient source labels, 134 AI-flagged pilot records still lack proposed privacy spans, and the near-text pair needs event adjudication. All current mappings/spans remain proposals; training and independent review are unapproved.
+
 ## 2026-11-17 — Source coverage, near-text candidates and privacy spans
 
 - Inspected all 231 source category/subcategory names and created a versioned proposed family crosswalk, committing source-catalogue metadata only under D036. Coverage: 187 family-proposal pairs/14,883 records; 41 scope-review pairs/824 records; three unresolved pairs/364 records. Zero unmatched pairs/unused rules. No record-level reference labels inferred.
