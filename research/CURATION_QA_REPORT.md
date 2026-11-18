@@ -71,4 +71,6 @@ Raw OpenCity SHA-256 was rechecked: `d951dbb484532421801f6cbd7550edaa6f9ab143da7
 
 ## Next gate
 
-Use the coverage table to scope a versioned record-level annotation contract, resolve the 41 scope-review pairs, review near-duplicate membership and finish contextual privacy decisions. Maintain a separate AI-proposal trail if the team remains unavailable. Independent reference adjudication, rights/derivative review, actual per-class/language support and leakage-controlled split approval still precede a validated training release. Do not manufacture reviewer approval or call these candidate counts model results.
+Update, 2026-11-18: [Contextual review recommendations](CONTEXT_REVIEW_REPORT.md) completes the subsequent AI recommendation pass over all 41 scope pairs, 134 no-span flags and the lexical candidate. It preserves the outputs described here and supplies six additional span proposals. This closes that assistant recommendation pass, not independent adjudication or privacy/training approval. Next encode and populate the richer proposal-only record annotation contract.
+
+Use the coverage table and subsequent recommendations to scope a versioned record-level annotation contract. Maintain a separate AI-proposal trail if the team remains unavailable. Independent reference adjudication, rights/derivative review, actual per-class/language support and leakage-controlled split approval still precede a validated training release. Do not manufacture reviewer approval or call these candidate counts model results.

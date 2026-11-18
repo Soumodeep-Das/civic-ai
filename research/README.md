@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Latest: [Contextual review recommendations](CONTEXT_REVIEW_REPORT.md) records the completed AI pass over 41 scope questions, 134 contextual privacy flags and one near-text pair. It includes six additional span proposals and tested validation; it does not grant training/privacy approval. Next implement a versioned proposal-only family/asset/issue-kind annotation contract for the existing pilot.
+
 Current follow-up: [Source coverage and pilot QA](CURATION_QA_REPORT.md) accounts for all 231 source pairs and records near-text duplicate candidates plus reviewed AI privacy-span proposals. No training/privacy approval or active-taxonomy migration follows from this audit.
 
 Latest research checkpoint: [AI-assisted pilot findings](AI_LABEL_PILOT_FINDINGS.md) covers all 271 tasks, with zero remaining in the assistant pass. [Taxonomy revision draft](TAXONOMY_REVISION_PROPOSAL.md) separates service families, assets and issue kinds. These remain AI proposals, not independent reference annotations, an adopted taxonomy or training approval.

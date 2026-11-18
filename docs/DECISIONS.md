@@ -1,5 +1,12 @@
 # Decision Log
 
+## D037 Record contextual research recommendations without granting release approval (2026-11-18)
+
+- Resolve the flagged source-pair review into explicit research-scope recommendations: administrative/conduct deferral for the first physical-condition experiment, conditional public assets, record-dependent ambiguities and specialist fire safety. Preserve all records and broad product reporting scope; source titles are not individual labels or jurisdiction findings.
+- Distinguish proposed retention of public context, sensitive-context holds and specific redaction spans. Missing spans do not establish safety; a span does not clear the rest of a record. Keep all per-record recommendations/rationales private and AI-attributed, with input/text hashes and no human/independent approval.
+- Propose conservative future split containment for the inspected near-text pair, preserving both originals and keeping event identity unknown. No automatic group/split changes, merges or deletion.
+- Validate complete review coverage and consistency in a separate offline artifact. Preserve active taxonomy v1, source data and existing gates. Next create a proposal-only record annotation contract; independent reference evaluation cannot be replaced by assistant judgments.
+
 ## D036 Source-family coverage and restricted privacy/duplicate proposals (2026-11-17)
 
 - Audit the 231 source category/subcategory pairs against the draft families using an explicit proposed crosswalk. Permit this source-catalog metadata in Git: category names, draft family/scope decisions and rationale only, without incident descriptions, identities or per-record labels. Keep active taxonomy/mapping v1 unchanged.

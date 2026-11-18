@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-11-18 — Contextual scope/privacy/duplicate recommendation checkpoint
+
+- Confirmed the owner's preceding push: after network access was granted, `git fetch origin` succeeded and `git rev-list --left-right --count main...origin/main` returned `0 0` at `5506b8e`. Initial fetch without that access failed to start name resolution; no credential workaround used.
+- Inspected the 41 flagged source-pair titles and all 134 remaining flagged/no-span pilot descriptions. Authored explicit AI recommendations/rationales in ignored `data/review/context-review-authored-v1`; no source prose, private identifiers or per-record labels committed. Scope counts and research-only deferral rationale are in `research/CONTEXT_REVIEW_REPORT.md`.
+- Contextual privacy outcomes: 97 retain proposals, 31 restricted-context holds, six new span proposals. Cumulative 43 spans/37 records; no actual redaction or privacy clearance. The other 106 unflagged/no-span pilot records were not assessed in this pass. Inspected the near-text pair and proposed future split containment, retaining both and leaving event identity unverified.
+- Implemented offline `review_recommendations` with hash bindings, exact coverage checks, character-offset validation, false approval enforcement, immutable inputs and completion markers. The real CLI run to `data/review/context-review-validated-v1` exited 0. Original raw hash remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`.
+- Focused tests: **27 passed in 4.22s**. Full command `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-context-review-final`: **162 passed in 21.26s**. No application tests/build rerun for this isolated research checkpoint.
+- Consulted primary Presidio and scikit-learn grouped-validation documentation. No new package/API/model dependency. Updated current state, decisions and handoff; next is a concrete proposal-only record annotation contract, not training or release certification.
+- Final staged diff check passed; only research code/tests and documentation were committed. Private authored/validated artifacts and the local authoring script are ignored. `git push origin main` failed because the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). Publication remains pending the owner's normal PowerShell push; no credential workaround or force-push attempted.
+
 ## 2026-11-18 — Source-audit checkpoint publication status
 
 - Confirmed the completed QA artifact and clean working tree after implementation commit `c40f5dd`. The preceding regression result remains 135 passing research tests; no implementation changes warrant a rerun.

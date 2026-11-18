@@ -1,5 +1,15 @@
 # Current State
 
+## 2026-11-18 — Contextual research recommendations completed
+
+`research/CONTEXT_REVIEW_REPORT.md` records actual AI recommendations for all 41 scope-review source pairs (824 associated records), all 134 remaining flagged/no-span pilot texts, and the one near-text candidate. Scope: 30 pairs/512 records deferred from the initial physical-condition research target, four/33 conditional on public-asset evidence, four/269 requiring record context and three/10 specialist fire-safety review. These are proposals about a research target, not deletion, legal jurisdiction or exclusion from broad CivicAI reporting.
+
+Privacy recommendations: 97 retain-context, 31 hold-for-context and six additional spans. Combined proposals now contain 43 spans in 37 records. No text was redacted and nothing is privacy-cleared. The 106 unflagged/no-span records were not reviewed in this contextual pass. Recommend future split containment for the near-text pair while retaining both; event identity remains unverified and existing groups/splits are unchanged.
+
+Ignored authored/validated ledgers preserve input/text hashes and per-record rationales. The new validator refuses incomplete or inconsistent decisions, invalid offsets, false approvals and overwrites. **162 research tests passed in 21.26s**. Raw OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. No application/dependency/deployment changes; app suites/builds not rerun. Training, privacy and independent-review approvals remain false.
+
+Next: implement and populate a versioned proposal-only family/asset/issue-kind annotation contract for the existing pilot. Preserve active taxonomy v1; no independent labels or release approval may be inferred. Rights, full-corpus privacy/duplicate checks and independent reference adjudication remain outstanding.
+
 ## 2026-11-17 — Full source-pair coverage and pilot QA proposals
 
 `research/CURATION_QA_REPORT.md` records the completed coverage pass: all 231 source pairs/16,071 records accounted for by an explicit draft-family crosswalk. 187 pairs (14,883 records) have family proposals, 41 (824) need scope review, and three (364) remain source-label-ambiguous. Counts are source associations, not validated record labels or all-India coverage. Active taxonomy/mapping v1 is unchanged.
