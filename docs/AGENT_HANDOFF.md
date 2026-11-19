@@ -292,6 +292,9 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
+Newest checkpoint (2026-11-19): `research/DEVELOPMENT_RELEASE.md` and `release.py` implement bound review packets and minimal redacted development exports. All 271 real pilot decisions remain pending in ignored `data/review/development-release-review-v1`; export was correctly refused. 277 research tests pass. Next complete substantive review/rights/privacy decisions or explicitly predeclare an AI weak-supervision experiment; do not invent human approvals. Real training remains disabled and the old pilot is not an untouched holdout. Earlier next-step entries below are historical.
+
+
 Newest checkpoint (2026-11-19): `research/OFFLINE_BASELINE_RUNNER.md` describes the completed synthetic-only runner: 160 toy records/80 groups, three folds, six linear candidates plus dummy; 251 research tests pass. Optional research dependencies are installed locally and required by CI, not production. Real-data CLI inputs are always refused; no reviewed-release loader or real model evaluation exists. Next implement the reviewed-release contract and privacy-safe export with explicit provenance/rights/privacy/group/reference gates. Do not repeat the synthetic engine or infer approval from its tests.
 
 Previous checkpoint: `research/BASELINE_READINESS.md` and `research/protocols/text_baseline_v1.json` complete readiness/protocol work. 157 AI candidates/156 containment components; four proposed development families cover 134 records/133 components. No approved labels/privacy/training release or untouched test set. Final ignored assessment is `baseline-readiness-v2`; 228 research tests pass. Next implement the offline baseline runner and test it on synthetic fixtures, with real-data execution gated on an explicit reviewed release. Do not repeat this assessment as model training; reference/privacy/rights tasks remain outstanding.

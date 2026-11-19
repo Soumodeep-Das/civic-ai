@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-11-19 — Reviewed development export contract implemented
+
+Publishing: fetch succeeded after network access was granted and confirmed `main...origin/main` at `0 0` before this commit. Staged diff check passed. Push failed because the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). This checkpoint remains local pending the owner's `git push origin main`. No credential workaround was attempted.
+
+`research/DEVELOPMENT_RELEASE.md` documents the new source-bound review packet and redacted development exporter. Prepared all 271 pilot records at ignored `data/review/development-release-review-v1`, with pending record decisions and false review gates. The actual unreviewed export was refused, exit 1, with no output directory. No real dataset release or model training is claimed.
+
+**277 research tests passed in 26.51s**, including 26 new tests for redaction, Unicode offsets, stale bindings, review gates, coverage, duplicate/group conflicts, minimal exports and failed writes. Original OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Runtime/application dependencies and behavior are unchanged; app tests/builds were not rerun. Real-data baseline execution still refuses every release.
+
+Next complete substantive development review/rights/privacy decisions, preserving AI provenance and unresolved independent review. An assistant-only weak-supervision study needs a separately disclosed protocol, not invented human approvals. The contract is implemented; the review itself is not completed.
+
+Actual commands: `python -m research.civicai_research.release prepare --pilot data/interim/label-pilot-v1 --readiness data/review/baseline-readiness-v2 --context data/review/context-review-validated-v1 --output data/review/development-release-review-v1` succeeded. Corresponding `export` using its pending decisions correctly exited 1. Focused first pass: 25 tests passed in 0.49s; added prepare integration coverage before full `python -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-release-final`: 277 passed. Primary Presidio/scikit-learn sources are linked in the contract document. No private text, decisions or outputs are tracked.
+
+
 ## 2026-11-19 — Synthetic offline baseline implementation
 
 - Added a synthetic-only TF-IDF/logistic-regression runner with grouped validation, a dummy comparator, train-only preprocessing, deterministic selection, provenance hashes, ignored artifacts and incomplete-run markers. Real release inputs fail closed before loading. No real complaint model was trained or deployed.

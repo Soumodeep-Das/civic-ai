@@ -1,5 +1,14 @@
 # Current State
 
+## 2026-11-19 — Reviewed development export contract implemented
+
+`research/DEVELOPMENT_RELEASE.md` documents the new source-bound review packet and redacted development exporter. Prepared all 271 pilot records at ignored `data/review/development-release-review-v1`, with pending record decisions and false review gates. The actual unreviewed export was refused, exit 1, with no output directory. No real dataset release or model training is claimed.
+
+**277 research tests passed in 26.51s**, including 26 new tests for redaction, Unicode offsets, stale bindings, review gates, coverage, duplicate/group conflicts, minimal exports and failed writes. Original OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. Runtime/application dependencies and behavior are unchanged; app tests/builds were not rerun. Real-data baseline execution still refuses every release.
+
+Next complete substantive development review/rights/privacy decisions, preserving AI provenance and unresolved independent review. An assistant-only weak-supervision study needs a separately disclosed protocol, not invented human approvals. The contract is implemented; the review itself is not completed.
+
+
 ## 2026-11-19 — Offline baseline runner verified on synthetic fixtures
 
 Implemented `research/civicai_research/text_baseline.py`; setup, artifacts and boundaries are documented in `research/OFFLINE_BASELINE_RUNNER.md`. Actual smoke run: 160 toy records, 80 artificial groups, four families, three grouped folds, six TF-IDF/logistic-regression candidates and a dummy comparator; 1,120 out-of-fold predictions. This verifies engineering only, not CivicAI accuracy. The selected synthetic model is ignored and is not connected to the application. Real-data CLI execution is always refused before reading input.

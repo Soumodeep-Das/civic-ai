@@ -1,5 +1,10 @@
 # Decision Log
 
+## D042 Bound review packets and minimal development exports (2026-11-19)
+
+Use immutable source-bound packets with a separate editable decision ledger, explicit evidence-backed gates and per-record review. Preserve AI proposals as proposals. Apply only reviewed redaction spans; reject ambiguous offsets and cross-group redacted duplicates. Keep reviewer evidence and original text outside model-facing exports. Local attestations are not identity verification, legal/privacy certification or independent evaluation. Outputs remain private, development-only and not training-authorized; real baseline execution stays disabled. See `research/DEVELOPMENT_RELEASE.md`.
+
+
 ## D041 Implement a synthetic-only offline baseline runner (2026-11-19)
 
 - Implement the predeclared grouped TF-IDF/logistic-regression development workflow and most-frequent dummy comparator on a built-in, explicitly synthetic fixture. Real-release inputs must fail closed; a local approval Boolean cannot substitute for a reviewed release. No research candidate, production complaint or photo is loaded by the command.
