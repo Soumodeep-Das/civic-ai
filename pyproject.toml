@@ -25,6 +25,13 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8,<10"]
+research = [
+  "scikit-learn==1.7.2",
+  "numpy==2.2.6",
+  "scipy==1.15.3",
+  "joblib==1.5.2",
+  "threadpoolctl==3.6.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["backend/src"]

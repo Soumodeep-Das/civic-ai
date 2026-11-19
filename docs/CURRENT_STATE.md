@@ -1,5 +1,13 @@
 # Current State
 
+## 2026-11-19 — Offline baseline runner verified on synthetic fixtures
+
+Implemented `research/civicai_research/text_baseline.py`; setup, artifacts and boundaries are documented in `research/OFFLINE_BASELINE_RUNNER.md`. Actual smoke run: 160 toy records, 80 artificial groups, four families, three grouped folds, six TF-IDF/logistic-regression candidates and a dummy comparator; 1,120 out-of-fold predictions. This verifies engineering only, not CivicAI accuracy. The selected synthetic model is ignored and is not connected to the application. Real-data CLI execution is always refused before reading input.
+
+**251 research tests passed in 28.58s**, including 23 new engine/gate tests. Artifact hashes, ignored outputs and unchanged OpenCity checksum were verified. Optional pinned research dependencies and CI installation were added; base application dependencies, runtime and deployment are unchanged. Application tests/builds were not rerun. No real-data training, independent evaluation, severity model or production inference is complete.
+
+Next implement the reviewed-release contract and privacy-safe export path. Independent reference labels, rights/privacy decisions and approved release remain unresolved; passing this synthetic test does not clear them. Preserve completed pilot/readiness work.
+
 ## 2026-11-18 — Baseline readiness and evaluation protocol completed
 
 `research/BASELINE_READINESS.md` and `research/protocols/text_baseline_v1.json` specify the first proposed single-family text study. The read-only assessment finds 157 AI annotation candidates (156 conservative containment components), including 28 same-family multi-component reports. Deferred: 33 cross-family, 61 clarification, 16 scope, four unusable. No candidate is automatically training-eligible.

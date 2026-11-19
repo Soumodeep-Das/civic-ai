@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-11-19 — Synthetic offline baseline implementation
+
+- Added a synthetic-only TF-IDF/logistic-regression runner with grouped validation, a dummy comparator, train-only preprocessing, deterministic selection, provenance hashes, ignored artifacts and incomplete-run markers. Real release inputs fail closed before loading. No real complaint model was trained or deployed.
+- Added optional pinned research dependencies and CI installation of `.[test,research]`; production/base dependencies and Docker install commands are unchanged. Consulted primary scikit-learn documentation linked in `research/OFFLINE_BASELINE_RUNNER.md`.
+- Editable installation failed twice on this Windows host (temporary-path interpolation, then WinError 3). Installed the five declared research dependencies into the existing virtual environment using the documented binary-wheel fallback. `pip check`: no broken requirements. Early dependency-absent test skips were not treated as successful engine verification.
+- Focused engine/gate tests: **23 passed in 23.41s**. Final full command `.\.venv\Scripts\python.exe -m pytest research/tests -q -p no:cacheprovider --basetemp tmp/pytest-baseline-runner-confirmed`: **251 passed in 28.58s**. A repeat full run was used because the preceding process result was unavailable after context recovery. App suites/builds were not rerun for this offline-only change.
+- Actual `python -m research.civicai_research.text_baseline --synthetic --output research/results/synthetic-baseline-2026-11-19-v1` succeeded: 160 records/80 groups/four labels, three folds, six candidates plus dummy, 1,120 predictions, no convergence warnings. This is not research accuracy evidence. The real-release CLI exited 1 and created no output.
+- Verified all artifact hashes, current implementation binding, ignored model/prediction files and unchanged base dependencies. Raw OpenCity SHA-256 remains `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. No source complaints, keys, private annotations or model binaries are included in this change.
+- Updated current state, handoff, decisions and runner documentation. Next: reviewed-release contract/privacy-safe export, retaining the unresolved independent-reference and rights/privacy gates.
+- Fetch confirmed the preceding checkpoint was synchronized (`main...origin/main`: `0 0`). Staged diff checks passed. Push of this checkpoint failed because the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). The local main commit awaits the owner's `git push origin main`; no credential workaround or force push was used.
+
 ## 2026-11-18 — Baseline candidate assessment and predeclared protocol
 
 - Implemented `baseline_readiness`, joining complete text annotations, pilot group keys, contextual privacy proposals and conservative duplicate containment. All input hashes/identities checked; transitive grouping occurs before filtering, with conflicts/uncertainty deferred. No original groups, records or labels changed.

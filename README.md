@@ -1,5 +1,7 @@
 # CivicAI
 
+Offline ML engineering: [synthetic baseline runner](research/OFFLINE_BASELINE_RUNNER.md) documents the grouped TF-IDF/linear workflow and optional `.[test,research]` setup. Synthetic verification is not real-complaint model performance; real-data execution remains disabled.
+
 Current research checkpoint (2026-11-17): [ML decision specification](docs/ML_DECISION_SPEC.md) and [targeted dataset audit](research/DATASET_AUDIT_2026_11_17.md). Classification, evidence-based severity and contextual priority are separate planned components. Dataset curation is next; no model, chatbot/API integration or validated priority predictor is deployed.
 
 > The closed beta is deployed at `https://civicai-beta.onrender.com/`. Citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification; the remaining municipal/admin beta journey is not yet durably verified. This is a closed-beta checkpoint, not production certification. Fresh agents should start with [the engineering handoff](docs/AGENT_HANDOFF.md).
@@ -193,3 +195,5 @@ Do not use example values in production. Follow the full [deployment checklist](
 - ml and data: reserved for later approved acquisition and experiment milestones.
 
 [Public repository](https://github.com/Soumodeep-Das/civic-ai). Verified Issue #4 history is published on `main`; never rewrite shared history without explicit authorization.
+
+Full offline ML engine tests require the optional `research` extra (`python -m pip install -e ".[test,research]"`). Without it the numerical test module skips; that is not a verified engine run. See [the runner setup and Windows fallback](research/OFFLINE_BASELINE_RUNNER.md). Production installs remain unchanged.

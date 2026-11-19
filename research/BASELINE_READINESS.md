@@ -86,3 +86,5 @@ Raw OpenCity checksum reverified: `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4
 ## Next intended implementation
 
 Implement the reproducible offline baseline runner from this protocol, using synthetic fixtures to verify group separation, training-only preprocessing, metrics and artifact provenance. Keep real-data execution gated on an explicit reviewed release; do not turn this private candidate inventory into a training manifest automatically. Reference/privacy/rights work remains necessary alongside that implementation. No application inference integration starts yet.
+
+Follow-up, 2026-11-19: the synthetic-only runner above is now implemented and verified; see [Offline baseline runner](OFFLINE_BASELINE_RUNNER.md). Next is the reviewed-release/export contract, not automatic training on this candidate inventory.

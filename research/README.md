@@ -1,5 +1,7 @@
 # CivicAI research workspace
 
+Latest engineering checkpoint: [Offline baseline runner](OFFLINE_BASELINE_RUNNER.md) is implemented and verified on synthetic fixtures only (251 research tests). Real-data execution remains disabled; next is the reviewed-release contract and privacy-safe export.
+
 Latest: [Baseline readiness and evaluation protocol](BASELINE_READINESS.md) provides actual candidate/group/privacy counts and the versioned first text-study protocol. No model was trained; 228 research tests pass. Next implement the offline runner with synthetic verification and an explicit real-data release gate.
 
 Current: [Text-grounded pilot annotations](TEXT_ISSUE_ANNOTATION_REPORT.md) completes actual AI review of all 271 descriptions with evidence offsets and uncertainty. 206 research tests pass. Next assess baseline readiness and evaluation design; no independent reference or training approval is implied.

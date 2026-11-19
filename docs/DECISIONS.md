@@ -1,5 +1,12 @@
 # Decision Log
 
+## D041 Implement a synthetic-only offline baseline runner (2026-11-19)
+
+- Implement the predeclared grouped TF-IDF/logistic-regression development workflow and most-frequent dummy comparator on a built-in, explicitly synthetic fixture. Real-release inputs must fail closed; a local approval Boolean cannot substitute for a reviewed release. No research candidate, production complaint or photo is loaded by the command.
+- Pin the optional research numerical stack separately from production dependencies: scikit-learn 1.7.2, NumPy 2.2.6, SciPy 1.15.3, joblib 1.5.2 and threadpoolctl 3.6.0. CI installs the research extra; base application images retain their existing dependency set. Record actual versions in every run.
+- Fit text transforms inside each training fold, validate group/class coverage before fitting, and treat convergence warnings as failed runs. Preserve raw out-of-fold predictions and selection provenance. Synthetic metrics test the machinery and are never model performance claims for India or CivicAI.
+- Save only a clearly named synthetic development model and local run artifacts. No application inference, independent-test evaluator, bootstrap confidence intervals, real-data redaction/release loader or approval bypass is enabled in this checkpoint.
+
 ## D040 Assess single-family baseline support without promoting AI labels (2026-11-18)
 
 - Propose family classification as the first baseline target. Retain multiple conditions within one family as one complaint, defer cross-family/ambiguous/scope cases explicitly, and preserve all records. Full CivicAI reporting remains broader than the initial study.
