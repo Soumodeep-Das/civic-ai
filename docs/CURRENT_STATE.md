@@ -1,5 +1,10 @@
 # Current State
 
+## 2026-11-20 — Owner priority demo rebuild succeeded
+
+Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt backend/migrate/proxy images, healthy database/Mailpit/backend/proxy, completed migration/evidence-init containers and readiness HTTP 200. Current backend readiness requires schema 0010, so successful readiness supports the migration being applied. This is owner-run output, not direct agent Docker inspection. Authenticated priority generation/review/history browser verification remains pending. No further rebuild is needed before that check.
+
+
 ## 2026-11-20 — Priority Docker verification blocked by local access
 
 Attempted the existing backup-first start-ml-demo.ps1 launcher twice, including after granted network permission. Docker Desktop named-pipe permission denied before backup, build, migration or restart. Running stack was not changed. Added exact priority browser checks to ML_DEMO.md. Owner must run the launcher from PowerShell; migration 0010 and priority UI are not yet verified in Docker. Do not repeat completed regression work or claim live completion. Next resume from owner startup output and verify priority history/status preservation.

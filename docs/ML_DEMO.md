@@ -39,3 +39,8 @@ After successful startup, use https://localhost/municipal (not the Vite developm
 Use honestly labelled demonstration facts; do not change a real report merely to exercise these scenarios. No emergency dispatch occurs. Direct citizen context fields are not implemented yet.
 
 Agent execution attempt 2026-11-20: Docker Desktop named-pipe access denied before backup/build/migration, both before and after network permission. No new local-stack verification performed. Previous automated checks remain valid as recorded in CURRENT_STATE.md; owner-run rebuild and browser confirmation are pending.
+
+
+## 2026-11-20 — Owner priority demo rebuild succeeded
+
+Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt backend/migrate/proxy images, healthy database/Mailpit/backend/proxy, completed migration/evidence-init containers and readiness HTTP 200. Current backend readiness requires schema 0010, so successful readiness supports the migration being applied. This is owner-run output, not direct agent Docker inspection. Authenticated priority generation/review/history browser verification remains pending. No further rebuild is needed before that check.
