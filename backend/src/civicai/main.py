@@ -128,7 +128,7 @@ def create_app(url: str | None = None, geocoder: Geocoder | None = None) -> Fast
                 revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one_or_none()
         except Exception:
             return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "database"})
-        if revision != "0008":
+        if revision != "0009":
             return JSONResponse(status_code=503, content={"status": "not_ready", "reason": "schema"})
         return {"status": "ready", "release": request.app.state.runtime_settings.release_id}
 

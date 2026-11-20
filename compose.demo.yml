@@ -1,0 +1,14 @@
+# Explicit local-only experimental overlay; base deployment remains model-free.
+services:
+  backend:
+    build:
+      args:
+        INSTALL_RESEARCH: "true"
+    environment:
+      CIVICAI_EXPERIMENTAL_MODEL_PATH: /opt/civicai-model/experimental-model.joblib
+      CIVICAI_EXPERIMENTAL_MODEL_SHA256: ${CIVICAI_DEMO_MODEL_SHA256:?Run scripts/start-ml-demo.ps1}
+    volumes:
+      - type: bind
+        source: ./research/results/exploratory-ai-labels-v1/experimental-model.joblib
+        target: /opt/civicai-model/experimental-model.joblib
+        read_only: true

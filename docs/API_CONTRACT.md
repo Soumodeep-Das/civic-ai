@@ -101,3 +101,11 @@ Errors use code/message, with details for field-validation errors. Invalid field
 Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 
 Citizen complaint creation remains anonymous. Status retrieval requires the per-complaint capability returned at creation. Complaint-image retrieval and municipal operations require authentication and server-side authorization; account administration additionally requires `municipal_admin`. Never expose evidence through a static directory or public object URL.
+
+## Draft experimental municipal assessment endpoints (not deployment-verified)
+
+`GET /api/v1/admin/complaints/{complaint_id}/assessments`: authorized complaint scope, list of experimental records. `POST /api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews`: municipal session plus CSRF and complaint scope; accept/correct/defer request, actor derived from session. Stale input returns 409; accepting a missing suggestion returns 422. These endpoints require migration 0009, currently unverified due to local test database connection failure. No model generation or UI integration yet.
+
+### Assessment endpoint verification update (2026-11-20)
+
+Migration 0009 is verified locally and owner Docker startup/readiness succeeded. POST on the assessment collection generates a guarded experimental text assessment from an explicitly configured trusted model; absent/invalid model returns 503. GET on `/assessments/{assessment_id}/reviews` returns scoped review history. Reviews never overwrite the original prediction or change complaint status. Automated correction/deferral/staleness/scoping checks pass. Earlier draft notes above describe historical state. No public citizen assessment endpoint or automatic priority/routing exists.

@@ -292,6 +292,9 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
+Latest 2026-11-20: experimental 97-text AI-label model and guarded municipal assessment/review are implemented. Read `ML_DEMO.md`, `research/EXPLORATORY_BASELINE_RESULTS.md` and newest CURRENT_STATE. Owner confirmed Docker generation/acceptance/history after refresh; automated review checks pass. Do not repeat earlier preparation stages below. No independent accuracy, photo analysis or priority model claim. Next contextual-priority prototype; preserve staff control and explicit uncertainty.
+
+
 Newest checkpoint (2026-11-19): `research/DEVELOPMENT_RELEASE.md` and `release.py` implement bound review packets and minimal redacted development exports. All 271 real pilot decisions remain pending in ignored `data/review/development-release-review-v1`; export was correctly refused. 277 research tests pass. Next complete substantive review/rights/privacy decisions or explicitly predeclare an AI weak-supervision experiment; do not invent human approvals. Real training remains disabled and the old pilot is not an untouched holdout. Earlier next-step entries below are historical.
 
 

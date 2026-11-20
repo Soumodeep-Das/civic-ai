@@ -4,7 +4,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend ./
 ARG VITE_MAPTILER_API_KEY
-RUN test -n "$VITE_MAPTILER_API_KEY"
+RUN node -e "if (!process.env.VITE_MAPTILER_API_KEY) { throw new Error('VITE_MAPTILER_API_KEY is required') }"
 ENV VITE_MAPTILER_API_KEY=$VITE_MAPTILER_API_KEY VITE_API_BASE_URL=
 RUN npm run build
 

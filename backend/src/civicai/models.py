@@ -359,3 +359,20 @@ Index("ix_complaints_department_created", Complaint.department_id, Complaint.cre
 Index("ix_complaints_assignee_created", Complaint.assignee_user_id, Complaint.created_at.desc())
 Index("ix_department_memberships_user", MunicipalDepartmentMembership.user_id, MunicipalDepartmentMembership.department_id)
 Index("ix_assignment_events_complaint_time", ComplaintAssignmentEvent.complaint_id, ComplaintAssignmentEvent.occurred_at, ComplaintAssignmentEvent.event_id)
+
+
+class ComplaintAssessment(Base):
+    __tablename__ = "complaint_assessments"
+    assessment_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    complaint_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("complaints.complaint_id", ondelete="RESTRICT"), index=True)
+    payload: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ComplaintAssessmentReview(Base):
+    __tablename__ = "complaint_assessment_reviews"
+    review_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    assessment_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("complaint_assessments.assessment_id", ondelete="RESTRICT"), index=True)
+    actor_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("municipal_users.user_id", ondelete="RESTRICT"))
+    payload: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

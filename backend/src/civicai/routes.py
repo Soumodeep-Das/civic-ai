@@ -406,3 +406,24 @@ def get_image(filename: str, request: Request, session: DatabaseSession):
         raise HTTPException(404, "Complaint image not found.") from None
     return Response(content=content, media_type=media_type,
                     headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, no-store"})
+
+
+from civicai import assessments
+from civicai.assessment_contract import AssessmentRecord, AssessmentReviewRequest
+
+@router.get('/api/v1/admin/complaints/{complaint_id}/assessments', response_model=list[AssessmentRecord])
+def admin_assessments(complaint_id: UUID, session: DatabaseSession, auth: OperatorAuth):
+    return assessments.list_assessments(session, complaint_id, auth.user)
+
+@router.post('/api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews', status_code=201)
+def admin_review_assessment(complaint_id: UUID, assessment_id: UUID, data: AssessmentReviewRequest, session: DatabaseSession, auth: CsrfAuth):
+    return assessments.review_assessment(session, complaint_id, assessment_id, data, auth.user)
+
+
+@router.post('/api/v1/admin/complaints/{complaint_id}/assessments', response_model=AssessmentRecord, status_code=201)
+def admin_generate_assessment(complaint_id: UUID, session: DatabaseSession, auth: CsrfAuth):
+    return assessments.generate_assessment(session, complaint_id, auth.user)
+
+@router.get('/api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews')
+def admin_assessment_reviews(complaint_id: UUID, assessment_id: UUID, session: DatabaseSession, auth: OperatorAuth):
+    return assessments.review_history(session, complaint_id, assessment_id, auth.user)

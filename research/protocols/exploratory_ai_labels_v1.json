@@ -1,0 +1,118 @@
+{
+  "version": "civicai-exploratory-ai-labels-v1",
+  "status": "local_exploratory_fit_authorized_not_operational_release",
+  "training_approved": false,
+  "evaluation_holdout": false,
+  "target": "single_known_service_family_on_described_issue_records",
+  "planning_min_components_per_family": 18,
+  "planning_floor_meaning": "Deadline pilot engineering scope; 18 groups is not statistical sufficiency. Revised before fitting; independent protocol unchanged.",
+  "same_family_multiple_components": "retain_as_one_complaint",
+  "cross_family_or_ambiguous_records": "defer_with_reported_counts_never_force_other",
+  "pilot_role": "development_and_definition_only_never_final_test",
+  "features": "privacy_reviewed_complaint_text_only",
+  "forbidden_features": [
+    "source_labels",
+    "AI_rationales",
+    "annotation_offsets",
+    "record_ids",
+    "source_groups",
+    "coordinates",
+    "outcomes",
+    "privacy_flags"
+  ],
+  "preprocessing": "deterministic_approved_redaction_then_train_fold_only_TFIDF_preserve_negation",
+  "baseline": "DummyClassifier_most_frequent",
+  "model": "TFIDF_word_1_2_grams_plus_LogisticRegression",
+  "tfidf": {
+    "lowercase": true,
+    "strip_accents": null,
+    "stop_words": null,
+    "min_df": 1,
+    "max_df": 1.0,
+    "max_features": 20000,
+    "sublinear_tf": true
+  },
+  "logistic_regression": {
+    "solver": "lbfgs",
+    "C": [
+      0.1,
+      1.0,
+      10.0
+    ],
+    "class_weight": [
+      null,
+      "balanced"
+    ],
+    "max_iter": 2000
+  },
+  "development_validation": {
+    "method": "StratifiedGroupKFold",
+    "n_splits": 3,
+    "shuffle": true,
+    "random_state": 42,
+    "require_all_selected_classes_in_each_train_and_validation_fold": true,
+    "on_infeasibility": "stop_and_revise_protocol_before_fitting"
+  },
+  "selection": "mean_group_fold_macro_F1_then_smaller_C_then_no_class_weight",
+  "metrics": [
+    "macro_F1_fixed_label_order_zero_division_0",
+    "per_class_precision_recall_F1_and_support",
+    "confusion_matrix",
+    "balanced_accuracy",
+    "record_and_group_coverage",
+    "deferred_case_counts"
+  ],
+  "independent_test": "fresh_reference_adjudicated_groups_disjoint_from_all_pilot_and_development_components_frozen_before_fitting_final_model",
+  "test_support_planning_floor_per_class": 20,
+  "test_floor_meaning": "Minimum descriptive pilot-test planning count in independent groups, not a power calculation or production certificate",
+  "test_uncertainty": "reference_class_stratified_group_bootstrap_2000_seed_42_report_95_percent_intervals_not_record_bootstrap",
+  "abstention": "no_probability_or_confidence_claim_initial_baseline_report_closed_set_predictions_only_on_eligible_scope",
+  "challenge_set": "independently_reviewed_mixed_unclear_unsupported_language_and_out_of_scope_records_report_separately_no_forced_ground_truth",
+  "AI_label_experiment": "requires_separate_disclosed_weak_supervision_protocol_cannot_replace_independent_reference_evaluation",
+  "operational_release": "disabled_no_automatic_routing_severity_priority_or_public_predictions",
+  "required_run_record": [
+    "git_revision",
+    "exact_dependency_versions",
+    "input_and_split_hashes",
+    "random_seed",
+    "parameters",
+    "hardware",
+    "runtime",
+    "convergence_warnings",
+    "raw_predictions",
+    "fold_metrics",
+    "exclusion_counts"
+  ],
+  "label_origin": "ai_assistant_proposals_not_independent_reference",
+  "study_question": "Can a bounded text baseline reproduce the disclosed pilot AI family proposals under grouped development validation?",
+  "evaluation_claim": "Agreement with AI proposals only; not independent accuracy or municipal effectiveness",
+  "real_data_scope": {
+    "source": "OpenCity Janaagraha iCMyC Bengaluru 2019-2022",
+    "raw_sha256": "d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac",
+    "candidate_inventory": "baseline-readiness-v2",
+    "candidate_records": 134,
+    "candidate_groups": 133,
+    "families": [
+      "roads_and_pedestrian_access",
+      "solid_waste",
+      "public_lighting",
+      "drainage_and_sewerage"
+    ],
+    "eligibility": "Counts are planning candidates; exclude unresolved privacy/context/label/group cases before fitting and report actual retained support."
+  },
+  "release_requirements": [
+    "document local research-use basis and attribution; no raw/derived redistribution",
+    "inspect every retained text for direct and contextual personal information; record AI review provenance honestly",
+    "bind redacted text and conservative groups to source hashes",
+    "recheck per-class fold support after exclusions",
+    "never claim independent human labels or untouched test data"
+  ],
+  "presentation_constraints": [
+    "experimental staff suggestions only",
+    "unsupported families remain valid complaints requiring review",
+    "no probability calibration claim",
+    "no image severity or West Bengal generalization claim",
+    "no production activation without integration tests and explicit model artifact provenance"
+  ],
+  "local_use_basis": "Publisher resource identifies CC BY-SA 2.0; retain attribution, private local exploration only. AI screening completed; no certified anonymization or redistribution approval."
+}

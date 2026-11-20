@@ -37,3 +37,7 @@ No model metrics, annotator agreement, final class counts or train/test assignme
 ## Issue #7 review state
 
 Stage A generated `issue7-review-v5` locally with blank taxonomy, mapping, privacy, priority-record, duplicate, license and final approval forms. The package is checksum-bound to this snapshot and remains ignored. It contains no human decision, approved label, curated class count or agreement result. Any Stage B derivative must cite validated reviewer/adjudication artifacts and preserve source identity, original labels, redaction state and duplicate group.
+
+## 2026-11-19 resource-specific license evidence
+
+The publisher resource page for `a60abf5c-3a15-4967-af32-c3074248580f` now surfaces `License id: CC BY-SA 2.0`, resolving the earlier version uncertainty at resource-metadata level. Source: https://data.opencity.in/dataset/i-change-my-city-data/resource/a60abf5c-3a15-4967-af32-c3074248580f . It credits Vivek Mathew and Haji Shariefullah, in addition to the retained catalogue attribution above. Record all these credits in derivatives. This is publisher metadata evidence, not privacy clearance or a legal certification. Earlier direct catalogue access failed; indexed resource content was accessible through search. No data/model redistribution has occurred.

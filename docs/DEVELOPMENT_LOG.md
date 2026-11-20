@@ -1,5 +1,80 @@
 # Development Log
 
+## 2026-11-20 — Assessment review regression checkpoint
+
+Frontend regression: **58 passed across five files in 76.06s**. Combined backend/research regression: **469 passed, three known deprecation warnings, 80.59s**. Added correction/deferral persistence, stale-input rejection, no-suggestion acceptance rejection, cross-complaint isolation and unchanged status/update timestamp checks. User Docker acceptance/persistence confirmation remains distinct from automated correction/deferral verification. TypeScript/Vite production build passed. Dataset checksum unchanged; private environment files/model ignored and untracked. No priority or photo analysis implemented. Next milestone: versioned contextual priority prototype with explicit reported facts and staff review, after publishing this experimental assessment checkpoint.
+
+
+## 2026-11-20 — Owner verified Docker assessment and persistent review
+
+Owner reports that Generate experimental assessment returned solid_waste, acceptance with an explanation appeared in review history, and that history remained after refreshing. This is human-reported verification of Docker inference plus review persistence, not direct agent browser inspection. Owner describes the attached photo as a trash can containing solid/semi-solid waste; the model currently consumes description text only, so this is not image classification evidence. The exact submitted description was not supplied in this confirmation; independent correctness is not established. Correction/defer journeys, unchanged-status browser check and broader model generalization remain separate checks. No production certification claimed.
+
+
+## 2026-11-20 — Owner Docker demo startup confirmed healthy
+
+Owner-supplied startup output confirms backup `backups/20261120-093046`, successful backend/migration/proxy image builds, healthy PostgreSQL, Mailpit, backend and proxy, completed migration/evidence-init containers and backend readiness HTTP 200. The corrected key-presence build step no longer expands the MapTiler value into the command. This is owner-run startup evidence, not agent-executed Docker inspection or authenticated end-to-end model verification. Next verify generation, correction/defer and persisted history in the Docker municipal browser; Linux model loading/inference is still unconfirmed until an assessment request succeeds. No public beta rollout or formal certification claimed.
+
+
+## 2026-11-20 — Demo email startup root cause fixed in launcher
+
+Owner logs show email_settings rejecting default capture in production. Local configuration inspection confirmed no production email transport/provider configured (no secrets printed). Launcher omitted the already-established Mailpit override; now includes `compose.production.mailpit.yml`. SMTP stays internal; inbox binds host loopback 8025. Base production settings and fail-closed guard unchanged. This is a launcher correction, not an ML/model/database failure. Owner Docker restart/health verification remains pending due to agent named-pipe access denial. Verified PowerShell parser, merged Compose JSON (values captured without printing secrets), retained migration dependency/read-only model mount, loopback-only inbox, SMTP service construction and continued production capture rejection. No test email sent; no container start performed.
+
+## 2026-11-20 — Owner Docker attempt: backup/build success, backend unhealthy
+
+Owner supplied output confirms backup `backups/20261120-092357` and all three images built. Migration container exited; database healthy; backend unhealthy and proxy not started. Exit details/schema revision not yet independently checked. Backend cause cannot be determined from build output; requested container startup and health logs because agent Docker pipe access remains denied. Fixed proxy Dockerfile key-presence check to avoid expanded browser MapTiler value in future build logs (not yet rebuilt). No keys copied into documentation. No successful demo startup claimed.
+
+## 2026-11-20 — Local Docker demo prepared, execution blocked
+
+Added explicit optional research build argument, `compose.demo.yml` read-only model-file mount and `scripts/start-ml-demo.ps1` (localhost-only, artifact hash check, backup before rebuild, health wait). See `ML_DEMO.md`. Script syntax/diff checks passed. Docker Desktop named-pipe access was denied even after network permission; no Docker backup/rebuild/migration occurred. User-run script required, followed by actual health/browser verification. No model/data committed or baked into images.
+
+## 2026-11-20 — Local demo activated; municipal sign-in needed
+
+Verified local development target at schema 0008; created ignored pg_dump backup `backups/pre-assessment-2026-11-20.dump` (restore not tested), applied 0009 and confirmed revision by query. Set ignored `.env` experimental model path/hash without exposing credentials. Detached start-dev children did not remain reachable after launcher exit in this agent environment; started foreground tool sessions for backend 8001 and Vite 5173 instead. Browser now visibly loads municipal sign-in. No password reset, auth bypass, live-beta mutation or production deployment. Authenticated panel browser verification awaits owner sign-in; existing integration tests do not replace that check.
+
+## 2026-11-20 — Broader integration regression
+
+Full backend/research run: 463 passed, two failed because readiness and schema test still expected 0008. Updated both to 0009; focused schema/readiness rerun: 19 passed, three known warnings. Added unauthorized-operator tests. Frontend initial full run: 57 passed, one failed because assessment request was absent from existing mock; updated mock and rerun initiated. Browser at localhost:5173/admin returned connection refused; no visible workflow verification claimed. Updated outdated no-ML footer. Remaining: finish frontend rerun, start local app with migration/model configuration, browser verification, final diff/commit.
+
+## 2026-11-20 — Real model generation and correction verification
+
+Resumed after prior automatic approval review was unavailable due to usage limit; interrupted edits had not executed. Implemented category correction and review-history panel. TypeScript/Vite build passed. Five assessment API tests passed in 21.04s with three existing warnings, including the actual private local model (not skipped), persisted correction history, preserved original prediction, disabled configuration and invalid-hash failures. Added correction component test. No live browser verification, development model configuration, deployment or final full regression yet. Feature remains incomplete pending those checks and wider authorization/staleness coverage.
+
+## 2026-11-19 — Assessment generation and panel draft
+
+Added CSRF-protected generation and scoped review-history endpoints, operator-configured local model path plus SHA-256 verification before deserialization, and disabled-by-default behavior. Canonical guard now resides in backend; offline import retained. Municipal detail panel can request/list assessments and accept/defer with explanation. TypeScript and Vite production build passed. New endpoints/panel not yet integration/browser tested; correction and review-history display still absent from UI. No environment enabled, model redistributed, development migration or production rollout. Next test generation/failures/permissions, finish review UI and verify real browser workflow before declaring completion.
+
+## 2026-11-19 — Assessment database verification unblocked
+
+Connection failure was Windows network permission denial (10013), resolved by granting network access for this turn. Migration 0009 successfully applied through the isolated PostgreSQL test-schema fixture. Fixed new test submissions to use existing multipart API rather than JSON (415). `pytest backend/tests/test_assessments.py backend/tests/test_api.py -q --tb=short -p no:cacheprovider --basetemp tmp/pytest-assessment-verified`: **48 passed, 3 upstream deprecation warnings in 12.43s**. Verified empty list, anonymous rejection, seeded suggestion retrieval, review persistence with session-derived actor, unchanged complaint status and CSRF rejection. This is not full authorization/concurrency coverage. No development/production migration, model generation or UI activation. Next complete model generation, review-history read/UI and broader permission/staleness tests.
+
+## 2026-11-19 — Assessment persistence/API draft (unverified)
+
+Added migration 0009, assessment/review tables, municipal list/review endpoints using existing complaint access and CSRF dependencies. Reviews preserve original suggestions and do not mutate complaint workflow. Migration not applied to development/production. Backend database tests failed at fixture connection to the dedicated local test database; no passing persistence or permission claim. Syntax compilation passed. No model-generation endpoint or frontend added. Continue by restoring test-database connectivity, testing migration/persistence/scoping/staleness, then completing model generation and UI. Do not deploy this unfinished draft.
+
+## 2026-11-19 — Municipal assessment contract started (integration incomplete)
+
+Added strict internal `assessment_contract.py`: complaint/model/input identity, timestamp, experimental suggestion/review state and bounded reason codes. Review requests allow accept/correct/defer and reject caller-supplied actor identity or workflow-status fields. 13 focused contract tests passed in 0.94s. No migration, persistence, authorized endpoint or municipal UI is implemented by this checkpoint. The intended integration remains unfinished; next implement storage and authorization using existing complaint-access and CSRF patterns. No production behavior changed; no deployment or full regression claimed.
+
+## 2026-11-19 — Offline guarded assessment
+
+Implemented `research/civicai_research/assessment.py`; see `research/GUARDED_ASSESSMENT.md`. Six of seven authored probes deferred; supported drain example suggested with mandatory review. Heuristic scope checks are not validated OOD/language/negation detection. No API/UI integration or production activation. Next durable municipal assessment/review integration.
+
+## 2026-11-19 — First real-text exploratory fit completed
+
+See `research/EXPLORATORY_BASELINE_RESULTS.md`. 97 AI-screened Bengaluru texts, AI-proposed labels, grouped development comparison: selected mean macro-F1 0.8644 versus dummy 0.1434. No independent accuracy or deployment approval. Actual model/predictions remain ignored and local. Next inspect disagreements and harden the fixed experiment loader before application integration.
+
+## 2026-11-19 — Direct screening of exploratory candidates
+
+Read all 134 candidate descriptions in two complete batches. Recorded per-record hash-bound AI screening decisions in ignored `data/review/exploratory-privacy-pass-v1`, conservatively deferring direct/private identifiers, personal incident context, sensitive allegations and existing spans/holds. Original text and human review forms unchanged. No anonymity, rights approval, independent review or training is claimed. Actual aggregate counts are in its summary; next resolve remaining local-use basis and assess post-deferral class/group support before fitting.
+
+## 2026-11-19 — Deadline exploratory experiment predeclared
+
+Added `research/protocols/exploratory_ai_labels_v1.json`, explicitly separating AI-label agreement from independent accuracy. Reused existing grouped baseline parameters and the 134-record/133-group candidate scope; these are not released training counts. Current source catalogue/API verification via web failed (403/inaccessible); retained metadata declares CC-BY-SA with exact version unresolved. No rights/privacy approval, real training or live inference is claimed. Next directly inspect/redact eligible candidate texts with honest AI-review provenance and resolve documented local-use terms.
+
+## 2026-11-19 — Presentation scope reset
+
+Recorded the owner's November 27 minor-presentation deadline in `MINOR_PRESENTATION_PLAN.md` and current state. This planning-only change prioritizes a real integrated experimental workflow and reserves November 26 for freeze/rehearsal. No model training, deployment, provider call or approval claim occurred. `git diff --check` used; no tests rerun for prose-only changes.
+
 ## 2026-11-19 — Reviewed development export contract implemented
 
 Publishing: fetch succeeded after network access was granted and confirmed `main...origin/main` at `0 0` before this commit. Staged diff check passed. Push failed because the Windows Git credential-helper shell could not start (`NtCreateDirectoryObject`, access denied). This checkpoint remains local pending the owner's `git push origin main`. No credential workaround was attempted.
@@ -397,3 +472,7 @@ After Supabase and Brevo configuration, the Render template was clarified to req
 The first Render attempts exposed two configuration defects before application startup: an incorrect Supabase pooler username followed by a malformed replacement `DATABASE_URL`. Review of the build log also found that Docker's non-empty-key assertion expanded the public MapTiler build key into the build command display. The assertion now checks `process.env` at runtime so no credential value is interpolated into Docker build logs. No application behavior or research state changed.
 
 Verification: 173 research tests passed in 20.07s (`--basetemp tmp/pytest-issue-draft-final2`); 11 new transfer tests. An initial test fixture placed output inside its source directory and correctly triggered the guard; the fixture was corrected and the complete suite rerun. Actual transfer exited 0. Application tests/builds were not rerun because runtime code/dependencies are unchanged. `git diff --check` passed.
+
+## 2026-11-19 — Exploratory fold feasibility and license evidence
+
+Resource-specific publisher metadata identifies CC BY-SA 2.0 and additional credits; datasheet updated. Ran actual StratifiedGroupKFold (3 folds, seed 42) on the 97 AI-screened candidates and validated disjoint groups, complete coverage and every class on each side. Saved counts/hashes privately in `exploratory-privacy-pass-v1/fold-feasibility.json`. No estimator was fitted and no independent accuracy was claimed. Two classes are below the original 20-group planning floor; revise the exploratory protocol explicitly before fitting rather than silently borrowing the original eligibility rule.

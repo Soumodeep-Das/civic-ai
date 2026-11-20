@@ -6,7 +6,8 @@ WORKDIR /app
 RUN python -m venv /opt/venv && addgroup --system --gid 10001 civicai && adduser --system --uid 10001 --gid 10001 --home /nonexistent civicai
 COPY pyproject.toml alembic.ini ./
 COPY backend ./backend
-RUN pip install --no-cache-dir .
+ARG INSTALL_RESEARCH=false
+RUN if [ "$INSTALL_RESEARCH" = "true" ]; then pip install --no-cache-dir ".[research]"; else pip install --no-cache-dir .; fi
 
 USER 10001:10001
 EXPOSE 8000
