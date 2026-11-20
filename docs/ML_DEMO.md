@@ -23,3 +23,19 @@ Owner-run output on 2026-11-20 confirms all long-running services healthy and re
 ## Owner workflow confirmation
 
 2026-11-20: owner generated a solid_waste suggestion in Docker, accepted it with an explanation and confirmed review history survives refresh. This verifies the reported generation/acceptance/persistence path. The photo was not used by this text classifier; no independent image or category-accuracy result follows from this check.
+
+## Priority workflow verification (migration 0010)
+
+The municipal detail page now includes Experimental contextual priority in source. It is a separate reported-fact rules policy, not photo analysis. Rebuild with the same backup-first launcher above; do not use the base Compose stack alone.
+
+After successful startup, use https://localhost/municipal (not the Vite development URL). Open a demo complaint and record its current status.
+
+1. In Experimental contextual priority, leave all facts unknown, enter an explanation and save context. Expect Needs municipal review and disabled Accept priority.
+2. Record a new context: immediate danger no, public access blocked yes, essential service unknown. Expect High, with the unknown service fact still displayed.
+3. Enter a priority review explanation and accept. Refresh; confirm context and review history remain and complaint status is unchanged.
+4. Record immediate danger yes. Expect an escalation warning and no automatically assigned priority. Defer with an explanation; confirm persisted history.
+5. For a demo-only correction, select a corrected priority and save an explanation. Confirm history preserves both the original suggestion and correction.
+
+Use honestly labelled demonstration facts; do not change a real report merely to exercise these scenarios. No emergency dispatch occurs. Direct citizen context fields are not implemented yet.
+
+Agent execution attempt 2026-11-20: Docker Desktop named-pipe access denied before backup/build/migration, both before and after network permission. No new local-stack verification performed. Previous automated checks remain valid as recorded in CURRENT_STATE.md; owner-run rebuild and browser confirmation are pending.

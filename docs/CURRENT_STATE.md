@@ -1,5 +1,10 @@
 # Current State
 
+## 2026-11-20 — Priority Docker verification blocked by local access
+
+Attempted the existing backup-first start-ml-demo.ps1 launcher twice, including after granted network permission. Docker Desktop named-pipe permission denied before backup, build, migration or restart. Running stack was not changed. Added exact priority browser checks to ML_DEMO.md. Owner must run the launcher from PowerShell; migration 0010 and priority UI are not yet verified in Docker. Do not repeat completed regression work or claim live completion. Next resume from owner startup output and verify priority history/status preservation.
+
+
 ## 2026-11-20 — Contextual priority persistence and municipal panel
 
 Implemented migration 0010, scoped context/review endpoints and municipal panel. Context retains reported source, explicit unknown/conflict, explanation and policy output; separate review history preserves original suggestions. Superseded snapshots reject review; cross-complaint and operator scope are enforced. No complaint status/assignment mutation. Citizen context collection remains pending.
