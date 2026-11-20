@@ -476,3 +476,7 @@ Verification: 173 research tests passed in 20.07s (`--basetemp tmp/pytest-issue-
 ## 2026-11-19 — Exploratory fold feasibility and license evidence
 
 Resource-specific publisher metadata identifies CC BY-SA 2.0 and additional credits; datasheet updated. Ran actual StratifiedGroupKFold (3 folds, seed 42) on the 97 AI-screened candidates and validated disjoint groups, complete coverage and every class on each side. Saved counts/hashes privately in `exploratory-privacy-pass-v1/fold-feasibility.json`. No estimator was fitted and no independent accuracy was claimed. Two classes are below the original 20-group planning floor; revise the exploratory protocol explicitly before fitting rather than silently borrowing the original eligibility rule.
+
+## 2026-11-20 — Offline contextual priority foundation
+
+Implemented reported-context-v1 in backend/src/civicai/priority_policy.py; rubric and boundaries in docs/CONTEXTUAL_PRIORITY.md. 69 focused tests passed (all 64 fact combinations plus validation/default cases), two existing dependency warnings. Not wired into API/UI; no database or deployment changes. No full regression rerun needed for this currently unimported pure policy. Next: durable attributed context collection and municipal priority review integration. This is experimental rules-based priority, not image severity or validated municipal triage.

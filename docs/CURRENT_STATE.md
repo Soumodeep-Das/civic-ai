@@ -317,3 +317,7 @@ API_CONTRACT.md describes multipart/search contracts and limits. ISSUE_003_EDGE_
 The verified Issue #13 application now has a locally tested closed-beta deployment path: a single Render Docker service serving React and FastAPI, configurable private Supabase S3 evidence storage, Brevo HTTPS transactional email, a closed-beta notice, and a discoverable tracking entry point. Local Docker/Caddy/PostgreSQL/Mailpit behavior remains supported.
 
 External Supabase, Brevo, Render, Google-hostname, first-admin, and live multi-user verification are not complete. Issue #14 is therefore not complete and the project is not formally production-certified. See `docs/ISSUE_014_CLOSED_BETA.md` and `docs/BETA_TEST_PROTOCOL.md`.
+
+## 2026-11-20 — Latest priority checkpoint
+
+Offline contextual priority policy and 69 passing focused tests now exist; see CONTEXTUAL_PRIORITY.md. Existing website is unchanged. Missing/conflicting facts defer; reported danger flags human escalation, never automatic dispatch; explicit access/service disruption can suggest High. No priority API, persistence or UI yet. Next integrate attributed context and authorized staff review; independent operational validation remains open.

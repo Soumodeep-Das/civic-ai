@@ -335,3 +335,7 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 - Run Alembic before Uvicorn startup because Render Free has no interactive shell/one-off job facility.
 - Use the Supabase shared pooler in session mode with a small application pool for IPv4 compatibility and connection-budget safety.
 - Treat beta as fail-closed like production for secure cookies, HTTPS origins, tracking secrets, and real email delivery.
+
+## 2026-11-20 — Experimental reported-context priority v1
+
+Use a pure, offline rules policy before live integration. Preserve unknown/conflict, distinguish reported facts from verification, and require human review. No numeric scoring, duration/traffic inference, Low/Critical assignment or photo severity in v1. See CONTEXTUAL_PRIORITY.md for the predeclared rubric, comparable-system research and limitations.
