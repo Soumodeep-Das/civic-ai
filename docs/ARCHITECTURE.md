@@ -103,3 +103,7 @@ The private network pins Caddy at `172.28.0.10`; Uvicorn trusts forwarded header
 `/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, migration `0008` and writable evidence storage but not optional geocoding/email/OIDC providers. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
 
 The topology intentionally remains platform-neutral and single-host. It does not provide high availability, a distributed rate limiter, legal retention automation, cloud object storage, external metrics/log aggregation or automated deployment. See `DEPLOYMENT.md`, `BACKUP_RESTORE.md` and `OPERATIONS_RUNBOOK.md`.
+
+## Contextual priority integration
+
+The pure priority policy is called by a scoped municipal service, separate from routes and classification. Migration 0010 persists context/suggestion snapshots and subsequent review events. A complaint-row lock serializes writes; stale snapshots cannot be reviewed. The frontend panel displays reasons, missing facts and history. No external provider, model dependency or automatic workflow action is added.

@@ -339,3 +339,8 @@ Only decisions actually made are recorded here. Proposed choices remain in the r
 ## 2026-11-20 — Experimental reported-context priority v1
 
 Use a pure, offline rules policy before live integration. Preserve unknown/conflict, distinguish reported facts from verification, and require human review. No numeric scoring, duration/traffic inference, Low/Critical assignment or photo severity in v1. See CONTEXTUAL_PRIORITY.md for the predeclared rubric, comparable-system research and limitations.
+
+
+## Contextual priority integration decision
+
+Persist reported-context snapshots and separate staff review events under existing municipal authorization. Serialize writes using complaint row locking; reject stale review. Keep staff-transcribed citizen reports explicitly attributed, not independently verified. No direct citizen input, automatic operational priority or emergency dispatch in this checkpoint. See CONTEXTUAL_PRIORITY.md for limitations.

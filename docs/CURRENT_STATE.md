@@ -1,5 +1,12 @@
 # Current State
 
+## 2026-11-20 — Contextual priority persistence and municipal panel
+
+Implemented migration 0010, scoped context/review endpoints and municipal panel. Context retains reported source, explicit unknown/conflict, explanation and policy output; separate review history preserves original suggestions. Superseded snapshots reject review; cross-complaint and operator scope are enforced. No complaint status/assignment mutation. Citizen context collection remains pending.
+
+Verification: 540 backend/research tests passed with three known warnings; subsequent focused priority suite 3 passed including newly added operator denial. Existing frontend suite 58 passed; new panel test 1 passed separately after correcting an ambiguous test selector. TypeScript/production build passed. A mistaken Vitest invocation at repository root lacked frontend configuration and failed; corrected frontend invocation passed. Migration 0010 verified in isolated PostgreSQL schemas only. Live Docker rebuild/migration/browser verification remains pending; no deployed completion claim. Next verify this panel through the backed-up local demo launcher, then add direct citizen context collection.
+
+
 ## 2026-11-20 — Assessment review regression checkpoint
 
 Combined backend/research regression: **469 passed, three known deprecation warnings, 80.59s**. Added correction/deferral persistence, stale-input rejection, no-suggestion acceptance rejection, cross-complaint isolation and unchanged status/update timestamp checks. User Docker acceptance/persistence confirmation remains distinct from automated correction/deferral verification. TypeScript/Vite production build passed. Dataset checksum unchanged; private environment files/model ignored and untracked. No priority or photo analysis implemented. Next milestone: versioned contextual priority prototype with explicit reported facts and staff review, after publishing this experimental assessment checkpoint.

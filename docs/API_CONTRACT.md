@@ -109,3 +109,7 @@ Citizen complaint creation remains anonymous. Status retrieval requires the per-
 ### Assessment endpoint verification update (2026-11-20)
 
 Migration 0009 is verified locally and owner Docker startup/readiness succeeded. POST on the assessment collection generates a guarded experimental text assessment from an explicitly configured trusted model; absent/invalid model returns 503. GET on `/assessments/{assessment_id}/reviews` returns scoped review history. Reviews never overwrite the original prediction or change complaint status. Automated correction/deferral/staleness/scoping checks pass. Earlier draft notes above describe historical state. No public citizen assessment endpoint or automatic priority/routing exists.
+
+## Contextual priority (2026-11-20)
+
+GET `/api/v1/admin/complaints/{complaint_id}/priority` returns scoped chronological context/review events. POST `/priority/context` accepts `{context:{source,immediate_danger,access_blocked,essential_service_interrupted},note}`; source is citizen_report or municipal_report; facts are yes/no/unknown/conflict, default unknown. POST `/priority/reviews` accepts `{snapshot_id,decision,note,corrected_band?}`; decision accepted/corrected/deferred, corrected_band required only for correction. Both writes require staff session and CSRF and return 201. Actor/timestamp and policy output are server-generated. These are reported facts, not verified observations. Latest-snapshot and description fingerprint checks reject stale reviews with 409. No citizen endpoint or automatic workflow mutation.

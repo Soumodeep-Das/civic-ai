@@ -19,3 +19,11 @@ No incident-duration or queue-age weighting until a defensible rubric exists. No
 ## Verification
 
 Scenario tests exercise all 64 input combinations, deterministic output, missing/conflicting facts, invalid values and explicit provenance. These establish software behavior only; independent municipal validity remains unassessed.
+
+## 2026-11-20 integration checkpoint
+
+Migration 0010 adds complaint_priority_events with actor, complaint, timestamp and payload. Municipal-only GET /priority, POST /priority/context and POST /priority/reviews under the existing complaint route enforce complaint scope and CSRF for writes. Context/suggestion snapshots retain source, explanation, policy output and description hash; separate reviews reference a snapshot. Superseded/description-stale snapshots reject review (409); missing cross-complaint references return 404; accepting no suggestion returns 422. Complaint-row locking serializes context/review writes. No update/delete API; database-level immutability trigger and retry idempotency are not implemented. Repeating a successful write creates another event.
+
+Municipal panel supports transcribed citizen or municipal reports, explicit unknown/conflict, preserved fact/history display and accept/correct/defer. Source is reported provenance, not independent verification. Citizen form remains unchanged; direct citizen context collection is still pending. Corrections may record Low/Medium/High/Critical as staff decisions; policy itself emits only Medium/High or needs_review. No queue sorting, automatic status or dispatch changes.
+
+Migration verified in isolated PostgreSQL test schemas only. Live Docker migration/rebuild/browser verification is pending. Do not claim this is already visible in the running Docker app. Use the existing backed-up start-ml-demo.ps1 workflow for local deployment verification.

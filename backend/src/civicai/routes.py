@@ -427,3 +427,17 @@ def admin_generate_assessment(complaint_id: UUID, session: DatabaseSession, auth
 @router.get('/api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews')
 def admin_assessment_reviews(complaint_id: UUID, assessment_id: UUID, session: DatabaseSession, auth: OperatorAuth):
     return assessments.review_history(session, complaint_id, assessment_id, auth.user)
+
+from civicai import priorities
+
+@router.get('/api/v1/admin/complaints/{complaint_id}/priority')
+def admin_priority_history(complaint_id: UUID, session: DatabaseSession, auth: OperatorAuth):
+    return priorities.history(session, complaint_id, auth.user)
+
+@router.post('/api/v1/admin/complaints/{complaint_id}/priority/context', status_code=201)
+def admin_priority_context(complaint_id: UUID, data: priorities.ContextRequest, session: DatabaseSession, auth: CsrfAuth):
+    return priorities.create_context(session, complaint_id, auth.user, data)
+
+@router.post('/api/v1/admin/complaints/{complaint_id}/priority/reviews', status_code=201)
+def admin_priority_review(complaint_id: UUID, data: priorities.ReviewRequest, session: DatabaseSession, auth: CsrfAuth):
+    return priorities.review(session, complaint_id, auth.user, data)

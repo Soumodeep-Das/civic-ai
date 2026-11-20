@@ -50,6 +50,7 @@ function installAdminApi(options: { empty?: boolean; fail?: boolean; conflict?: 
   let history: Array<Record<string, unknown>> = [createdEvent];
   return vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (options.fail) return Promise.reject(new TypeError("offline"));
@@ -198,6 +199,7 @@ test("blocks an unauthenticated admin route and signs in safely", async () => {
   let authenticated = false;
   vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return authenticated ? json(authSession) : json({ message: "Authentication required." }, 401);
     if (url.endsWith("/api/v1/auth/login") && init?.method === "POST") { authenticated = true; return json(authSession); }
@@ -230,6 +232,7 @@ test("shows a generic login error", async () => {
 test("logout invalidates frontend state and sends the CSRF token", async () => {
   const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (url.endsWith("/api/v1/admin/dashboard")) return json({ total: 0, submitted: 0, under_review: 0, in_progress: 0, resolved: 0, rejected: 0, submitted_last_7_days: 0, with_photo: 0, with_location: 0 });
@@ -254,6 +257,7 @@ test("operator cannot open administrator account controls", async () => {
 test("an expired session during protected loading returns to login", async () => {
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (url.endsWith("/api/v1/admin/dashboard")) return json({ message: "Authentication required." }, 401);
@@ -270,6 +274,7 @@ test("administrator sees and manages municipal accounts", async () => {
   const adminSession = { ...authSession, user: { ...authSession.user, role: "municipal_admin" } };
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(adminSession);
     if (url.endsWith("/api/v1/admin/users")) return json([adminSession.user]);
@@ -354,6 +359,7 @@ test("administrator can view department management and membership controls", asy
   const drainage = { department_id: "9a2019ed-27f0-4f67-a57f-13bb895cae55", slug: "drainage", display_name: "Drainage & Sewerage", description: "Handles drainage work", is_active: true, created_at: complaint.created_at, updated_at: complaint.updated_at, members: [] };
   vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(adminSession);
     if (url.includes("/api/v1/admin/departments")) return json([drainage]);
@@ -372,6 +378,7 @@ test("eligible operator can claim an unassigned department complaint", async () 
   let current: Record<string, any> = { ...complaint, department: { department_id: departmentId, slug: "drainage", display_name: "Drainage & Sewerage", is_active: true }, assignee: null };
   vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
     const url = String(input);
+    if (url.endsWith("/priority")) return json([]);
     if (url.endsWith("/assessments")) return json([]);
     if (url.endsWith("/api/v1/auth/me")) return json(authSession);
     if (url.includes("/api/v1/admin/departments")) return json([{ ...current.department, description: null, created_at: complaint.created_at, updated_at: complaint.updated_at, members: [authSession.user] }]);

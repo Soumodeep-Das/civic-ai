@@ -480,3 +480,10 @@ Resource-specific publisher metadata identifies CC BY-SA 2.0 and additional cred
 ## 2026-11-20 — Offline contextual priority foundation
 
 Implemented reported-context-v1 in backend/src/civicai/priority_policy.py; rubric and boundaries in docs/CONTEXTUAL_PRIORITY.md. 69 focused tests passed (all 64 fact combinations plus validation/default cases), two existing dependency warnings. Not wired into API/UI; no database or deployment changes. No full regression rerun needed for this currently unimported pure policy. Next: durable attributed context collection and municipal priority review integration. This is experimental rules-based priority, not image severity or validated municipal triage.
+
+
+## 2026-11-20 — Contextual priority persistence and municipal panel
+
+Implemented migration 0010, scoped context/review endpoints and municipal panel. Context retains reported source, explicit unknown/conflict, explanation and policy output; separate review history preserves original suggestions. Superseded snapshots reject review; cross-complaint and operator scope are enforced. No complaint status/assignment mutation. Citizen context collection remains pending.
+
+Verification: 540 backend/research tests passed with three known warnings; subsequent focused priority suite 3 passed including newly added operator denial. Existing frontend suite 58 passed; new panel test 1 passed separately after correcting an ambiguous test selector. TypeScript/production build passed. A mistaken Vitest invocation at repository root lacked frontend configuration and failed; corrected frontend invocation passed. Migration 0010 verified in isolated PostgreSQL schemas only. Live Docker rebuild/migration/browser verification remains pending; no deployed completion claim. Next verify this panel through the backed-up local demo launcher, then add direct citizen context collection.

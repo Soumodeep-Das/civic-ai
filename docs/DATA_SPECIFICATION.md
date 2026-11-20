@@ -111,3 +111,7 @@ Issue #7 Stage A review records keep reviewer pseudonym, timezone timestamp, tax
 - Who may annotate, and how will disagreements be resolved?
 - What severity and priority definitions can be defended?
 - What minimum class support is feasible without fabricating or over-augmenting data?
+
+## Priority persistence 0010
+
+Complaint priority events store attributed context and policy snapshots separately from human review events. Each row retains complaint/actor UUID, UTC timestamp and JSON text payload. Context facts are explicitly reported, with unknown/conflict preserved. Review points to the latest snapshot and does not overwrite it. No citizen context fields or automatic queue priority exist yet. See CONTEXTUAL_PRIORITY.md.
