@@ -497,3 +497,7 @@ Attempted the existing backup-first start-ml-demo.ps1 launcher twice, including 
 ## 2026-11-20 — Owner priority demo rebuild succeeded
 
 Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt backend/migrate/proxy images, healthy database/Mailpit/backend/proxy, completed migration/evidence-init containers and readiness HTTP 200. Current backend readiness requires schema 0010, so successful readiness supports the migration being applied. This is owner-run output, not direct agent Docker inspection. Authenticated priority generation/review/history browser verification remains pending. No further rebuild is needed before that check.
+
+## 2026-11-21 — Contextual priority browser workflow verified
+
+Used the authenticated local Docker municipal complaint page to exercise the live priority panel. Unknown facts deferred to review; blocked-access context suggested High while displaying unknown service impact; staff acceptance persisted after reload; original context and the review stayed separately visible; complaint status remained Under review. Verification used a clearly labelled demo complaint and demo explanations. No assignment, lifecycle status, citizen evidence, classification review, or external system was changed. Remaining product step: collect the same explicit facts from citizens with truthful attribution and optional/unknown handling.

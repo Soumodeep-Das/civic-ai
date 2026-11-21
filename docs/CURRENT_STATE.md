@@ -1,5 +1,9 @@
 # Current State
 
+## 2026-11-21 — Contextual priority browser workflow verified
+
+Agent-controlled verification through the authenticated local Docker municipal UI passed on demo complaint `cb991f0e-6908-4d7d-9d9f-dc3055ea3529`. An all-unknown context produced `Needs municipal review` and disabled acceptance. A second snapshot with immediate danger `no`, public access blocked `yes`, and essential-service impact `unknown` produced experimental `High`, retained the unknown fact, and allowed an explained staff acceptance. After reload, both context snapshots and the accepted review remained visible; complaint status remained `Under review`. This verifies the local Docker UI/API/database path for this scenario, not policy validity, image severity, emergency dispatch, queue ordering, or production certification. Next add direct citizen-reported context collection without changing the accepted complaint workflow.
+
 ## 2026-11-20 — Owner priority demo rebuild succeeded
 
 Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt backend/migrate/proxy images, healthy database/Mailpit/backend/proxy, completed migration/evidence-init containers and readiness HTTP 200. Current backend readiness requires schema 0010, so successful readiness supports the migration being applied. This is owner-run output, not direct agent Docker inspection. Authenticated priority generation/review/history browser verification remains pending. No further rebuild is needed before that check.

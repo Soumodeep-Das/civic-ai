@@ -44,3 +44,7 @@ Agent execution attempt 2026-11-20: Docker Desktop named-pipe access denied befo
 ## 2026-11-20 — Owner priority demo rebuild succeeded
 
 Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt backend/migrate/proxy images, healthy database/Mailpit/backend/proxy, completed migration/evidence-init containers and readiness HTTP 200. Current backend readiness requires schema 0010, so successful readiness supports the migration being applied. This is owner-run output, not direct agent Docker inspection. Authenticated priority generation/review/history browser verification remains pending. No further rebuild is needed before that check.
+
+## Priority browser result
+
+2026-11-21 agent-controlled local Docker verification passed on the demo drain complaint. All-unknown facts produced `Needs municipal review`; reported blocked access with no reported immediate danger produced `High` while preserving unknown service impact. An explained acceptance persisted after refresh, and the complaint remained `Under review`. This verifies one demonstrator journey, not operational triage validity or image-based severity.
