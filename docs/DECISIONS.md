@@ -344,3 +344,11 @@ Use a pure, offline rules policy before live integration. Preserve unknown/confl
 ## Contextual priority integration decision
 
 Persist reported-context snapshots and separate staff review events under existing municipal authorization. Serialize writes using complaint row locking; reject stale review. Keep staff-transcribed citizen reports explicitly attributed, not independently verified. No direct citizen input, automatic operational priority or emergency dispatch in this checkpoint. See CONTEXTUAL_PRIORITY.md for limitations.
+
+## Citizen-reported priority context
+
+- Date: 2026-11-21
+- Status: implemented; automated verification complete; local Docker/browser verification pending
+- Decision: collect three bounded facts as `yes` / `no` / `unknown`, require all-or-none API submission, and store them atomically as a separate `citizen_report` priority event. Preserve legacy clients that omit the set. Anonymous reports use a null staff actor; this does not imply verification.
+- Safety: a reported immediate danger shows official India 112 guidance and forces policy review, while complaint submission still succeeds. Citizen answers cannot set status, assignment, routing, staff review or operational priority.
+- Consequence: migration 0011 changes priority-event actor nullability only. Direct context is available to the existing municipal review panel without duplicating it into complaint columns.

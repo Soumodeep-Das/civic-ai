@@ -9,7 +9,11 @@ from civicai.domain import (
     ComplaintNotFound, ComplaintStatus, InvalidStatusTransition, StaleComplaintUpdate,
     transition_is_allowed,
 )
-from civicai.models import Complaint, ComplaintStatusEvent, MunicipalDepartmentMembership, MunicipalUser
+from civicai.models import (
+    Complaint, ComplaintPriorityEvent, ComplaintStatusEvent,
+    MunicipalDepartmentMembership, MunicipalUser,
+)
+from civicai.priority_policy import ReportedContext, suggest_priority
 from civicai.schemas import ComplaintCreate, ComplaintStatusUpdate
 
 
@@ -17,7 +21,7 @@ def create_complaint(
     session: Session, data: ComplaintCreate, image_ref: str | None = None,
     citizen_account_id: UUID | None = None,
 ) -> Complaint:
-    complaint = Complaint(**data.model_dump(), image_ref=image_ref, citizen_account_id=citizen_account_id)
+    complaint = Complaint(**data.complaint_values(), image_ref=image_ref, citizen_account_id=citizen_account_id)
     session.add(complaint)
     session.flush()
     session.add(ComplaintStatusEvent(
@@ -27,6 +31,23 @@ def create_complaint(
         new_status=ComplaintStatus.SUBMITTED,
         occurred_at=complaint.created_at,
     ))
+    context_values = data.citizen_priority_context()
+    if context_values is not None:
+        import hashlib
+        import json
+
+        context = ReportedContext.model_validate(context_values)
+        session.add(ComplaintPriorityEvent(
+            complaint_id=complaint.complaint_id,
+            actor_id=None,
+            payload=json.dumps({
+                "kind": "context",
+                "input_sha256": hashlib.sha256(complaint.description.encode()).hexdigest(),
+                "context": context.model_dump(),
+                "note": "Citizen answers submitted with the complaint.",
+                "suggestion": suggest_priority(context).model_dump(),
+            }),
+        ))
     session.refresh(complaint)
     # Load server defaults before commit so a later refresh failure cannot trigger
     # removal of an image whose database row was already successfully committed.

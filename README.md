@@ -2,7 +2,7 @@
 
 Offline ML engineering: [synthetic baseline runner](research/OFFLINE_BASELINE_RUNNER.md) documents the grouped TF-IDF/linear workflow and optional `.[test,research]` setup. Synthetic verification is not real-complaint model performance; real-data execution remains disabled.
 
-Current research checkpoint (2026-11-17): [ML decision specification](docs/ML_DECISION_SPEC.md) and [targeted dataset audit](research/DATASET_AUDIT_2026_11_17.md). Classification, evidence-based severity and contextual priority are separate planned components. Dataset curation is next; no model, chatbot/API integration or validated priority predictor is deployed.
+Current experimental checkpoint (2026-11-21): a small India-sourced text classifier with AI-proposed labels and a transparent reported-context priority policy are integrated into the local municipal review workflow. Citizens can provide three bounded context answers during submission. Neither component is independently validated or production-approved; photos are not classified and no chatbot is integrated. See [current state](docs/CURRENT_STATE.md), [baseline results](research/EXPLORATORY_BASELINE_RESULTS.md) and [contextual priority](docs/CONTEXTUAL_PRIORITY.md).
 
 > The closed beta is deployed at `https://civicai-beta.onrender.com/`. Citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification; the remaining municipal/admin beta journey is not yet durably verified. This is a closed-beta checkpoint, not production certification. Fresh agents should start with [the engineering handoff](docs/AGENT_HANDOFF.md).
 
@@ -14,7 +14,7 @@ The existing local Docker/Caddy/PostgreSQL/Mailpit workflow is unchanged and doe
 
 MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus confirmed location in the citizen frontend. Issues #9–#11 add protected municipal operations, responsive accessibility, departments and accountable queues. Issue #12 adds portable production deployment, private tracking/evidence, recovery and CI. Issue #13 adds [modern citizen identity and invitation-only municipal access](docs/ISSUE_013_MODERN_IDENTITY.md) without removing anonymous reporting. Video, ML, classification, routing recommendations and priority logic remain deferred; see [MVP scope](docs/MVP_SCOPE.md).
+The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus confirmed location in the citizen frontend. Issues #9–#11 add protected municipal operations, responsive accessibility, departments and accountable queues. Issue #12 adds portable production deployment, private tracking/evidence, recovery and CI. Issue #13 adds [modern citizen identity and invitation-only municipal access](docs/ISSUE_013_MODERN_IDENTITY.md) without removing anonymous reporting. Experimental text classification and contextual-priority suggestions now require municipal review and never mutate workflow automatically; video, validated image severity, routing recommendations and general AI assistance remain deferred.
 
 Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
 
@@ -30,7 +30,7 @@ The citizen form and municipal workspace reflow from small phones through large 
 
 ## Municipal authentication
 
-Apply migrations through `0008`, then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
+Apply migrations through the current head (`0011`), then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic upgrade head
@@ -183,7 +183,7 @@ Do not use example values in production. Follow the full [deployment checklist](
 ## Files
 
 - backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and migrations through 0008.
+- backend/migrations: Alembic environment and linear migrations through 0011.
 - backend/tests: API, migration consistency and database constraint tests.
 - frontend/src: React complaint form, accessible location picker, lazy-loaded map, private tracking page, municipal workspace, API client, styles and interaction tests.
 - scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.

@@ -103,6 +103,9 @@ export type ComplaintInput = {
   location_details?: string;
   location_source?: LocationSource;
   location_accuracy_m?: number;
+  immediate_danger?: "yes" | "no" | "unknown";
+  access_blocked?: "yes" | "no" | "unknown";
+  essential_service_interrupted?: "yes" | "no" | "unknown";
 };
 
 type ApiErrorBody = {
@@ -163,6 +166,9 @@ export function createComplaint(input: ComplaintInput): Promise<ComplaintSubmiss
   if (input.location_details !== undefined) body.append("location_details", input.location_details);
   if (input.location_source !== undefined) body.append("location_source", input.location_source);
   if (input.location_accuracy_m !== undefined) body.append("location_accuracy_m", String(input.location_accuracy_m));
+  if (input.immediate_danger !== undefined) body.append("immediate_danger", input.immediate_danger);
+  if (input.access_blocked !== undefined) body.append("access_blocked", input.access_blocked);
+  if (input.essential_service_interrupted !== undefined) body.append("essential_service_interrupted", input.essential_service_interrupted);
   if (input.image) body.append("image", input.image);
   return request<ComplaintSubmission>("/api/v1/complaints", {
     method: "POST",

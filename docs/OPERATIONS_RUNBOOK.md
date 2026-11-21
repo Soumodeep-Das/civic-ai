@@ -19,7 +19,7 @@ The diagnostic command shows service health, migration head, a read-only evidenc
 
 ## API returns 502/503
 
-Check `backend`, then `db`, then the `migrate` one-shot service. `/health` means the process is alive; `/ready` additionally requires PostgreSQL, migration `0008` and writable evidence storage. Readiness deliberately ignores external geocoding, email and OIDC providers. Fix the dependency and let Compose restart; do not create an infinite migration/retry loop.
+Check `backend`, then `db`, then the `migrate` one-shot service. `/health` means the process is alive; `/ready` additionally requires PostgreSQL, the current migration head (`0011`) and writable evidence storage. Readiness deliberately ignores external geocoding, email and OIDC providers. Fix the dependency and let Compose restart; do not create an infinite migration/retry loop.
 
 ## Login fails for everyone
 

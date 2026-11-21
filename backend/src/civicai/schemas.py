@@ -13,6 +13,7 @@ SearchQuery = Annotated[str, StringConstraints(strip_whitespace=True, min_length
 DepartmentName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=100)]
 DepartmentSlug = Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True, min_length=2, max_length=64, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")]
 DepartmentDescription = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+CitizenReportedFact = Literal["yes", "no", "unknown"]
 
 
 class ComplaintCreate(BaseModel):
@@ -26,6 +27,9 @@ class ComplaintCreate(BaseModel):
     location_details: LocationDetails | None = None
     location_source: LocationSource | None = None
     location_accuracy_m: float | None = Field(default=None, ge=0, le=100_000, allow_inf_nan=False)
+    immediate_danger: CitizenReportedFact | None = None
+    access_blocked: CitizenReportedFact | None = None
+    essential_service_interrupted: CitizenReportedFact | None = None
 
     @model_validator(mode="after")
     def validate_location_context(self):
@@ -42,7 +46,29 @@ class ComplaintCreate(BaseModel):
             raise ValueError("Location context requires coordinates, label and precision")
         if self.location_accuracy_m is not None and self.location_source != LocationSource.DEVICE:
             raise ValueError("Location accuracy is valid only for device locations")
+        reported_context = (
+            self.immediate_danger,
+            self.access_blocked,
+            self.essential_service_interrupted,
+        )
+        if any(value is not None for value in reported_context) and any(value is None for value in reported_context):
+            raise ValueError("Citizen priority context requires all three answers")
         return self
+
+    def complaint_values(self) -> dict:
+        return self.model_dump(exclude={
+            "immediate_danger", "access_blocked", "essential_service_interrupted",
+        })
+
+    def citizen_priority_context(self) -> dict[str, str] | None:
+        if self.immediate_danger is None:
+            return None
+        return {
+            "source": "citizen_report",
+            "immediate_danger": self.immediate_danger,
+            "access_blocked": self.access_blocked,
+            "essential_service_interrupted": self.essential_service_interrupted,
+        }
 
 
 class ComplaintRead(BaseModel):

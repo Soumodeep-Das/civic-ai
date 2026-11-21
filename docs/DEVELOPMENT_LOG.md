@@ -501,3 +501,7 @@ Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt 
 ## 2026-11-21 — Contextual priority browser workflow verified
 
 Used the authenticated local Docker municipal complaint page to exercise the live priority panel. Unknown facts deferred to review; blocked-access context suggested High while displaying unknown service impact; staff acceptance persisted after reload; original context and the review stayed separately visible; complaint status remained Under review. Verification used a clearly labelled demo complaint and demo explanations. No assignment, lifecycle status, citizen evidence, classification review, or external system was changed. Remaining product step: collect the same explicit facts from citizens with truthful attribution and optional/unknown handling.
+
+## 2026-11-21 — Citizen-reported context checkpoint
+
+Added optional all-or-none multipart context, atomic anonymous `citizen_report` priority events, migration 0011, accessible citizen questions and official India 112 safety guidance. Staff suggestions/reviews and complaint lifecycle remain separate. Focused verification: 68 backend tests and 29 frontend tests passed after updating older location tests to target their labelled search field rather than assuming only one combobox. Full verification: 547 backend/research tests with three known warnings, 60 frontend tests and successful production build. No Docker rebuild, development migration or browser submission occurred in this checkpoint.

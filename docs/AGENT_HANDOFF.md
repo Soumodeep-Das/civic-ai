@@ -1,5 +1,7 @@
 # CivicAI engineering handoff
 
+Latest implementation checkpoint, 2026-11-21: citizen complaint submission collects three bounded priority-context facts and atomically creates an anonymous `citizen_report` event through migration 0011. Full automated gates pass (547 backend/research; 60 frontend; production build). This is not deployed to the local Docker stack yet. Next use the backup-first ML demo launcher, submit one clearly labelled demo complaint through the citizen UI, and confirm its context/suggestion appears in the municipal panel without status mutation. Preserve the official 112 warning and the classification/priority separation; do not add image-severity claims.
+
 Verified on 2026-10-17 from branch `main` at starting commit `cadb4c590be9ac5fcbc3e11e8fe75c71e58481e0`. This is the central onboarding map, not a replacement for the linked specifications. It records repository evidence, automated verification and explicitly identified human verification separately.
 
 Research update, 2026-11-16: the user has redirected current work to assistant-led, India-only ML dataset acquisition across all civic domains, explicitly including non-road issues and West Bengal. Read the latest `CURRENT_STATE.md` entry and `research/INDIAN_CIVIC_COVERAGE.md` before relying on the older data-possession inventory below. New local image candidates exist, but no model/training approval or beta-validation claim has changed.
@@ -169,7 +171,7 @@ Important modules: `auth.py`, `citizen_auth.py`, `oidc.py`, `ownership.py`, `tra
 
 ## 8. Database and migrations
 
-Alembic is authoritative; application startup does not create schema. Migrations are linear through `0008_modern_identity.py`:
+Alembic is authoritative; application startup does not create schema. Migrations are linear through `0011_citizen_priority_context.py`:
 
 1. complaints;
 2. image reference;
@@ -179,6 +181,9 @@ Alembic is authoritative; application startup does not create schema. Migrations
 6. municipal auth/RBAC/audit;
 7. departments, memberships, ownership and assignment history;
 8. citizen identity, federated identity, tokens, invitation scope and shared sessions.
+9. experimental text assessments and separate municipal reviews;
+10. contextual-priority events and staff review history;
+11. anonymous citizen priority-context attribution.
 
 Apply migrations once before application startup. `Dockerfile.beta` runs `alembic upgrade head` before Uvicorn; production Compose uses a one-shot migration service. Never run concurrent migrations or reset a real database. Back up database and evidence together before destructive/schema work.
 

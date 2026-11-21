@@ -1,5 +1,11 @@
 # Current State
 
+## 2026-11-21 — Citizen-reported priority context implemented
+
+The citizen submission form now records three explicit `Yes` / `No` / `Not sure` facts: immediate danger, blocked public access and essential-service interruption. Submission stores a separate `citizen_report` context/suggestion event atomically with the complaint; anonymous events have no staff actor. Partial or invalid API context is rejected. Reported danger requests review and displays India's official 112 emergency guidance, but never blocks complaint persistence or changes status, assignment, routing or dispatch. Legacy API clients may omit the entire context set. Migration 0011 makes only priority-event actor attribution nullable; staff-created events remain actor-attributed.
+
+Verification: 547 backend/research tests passed with three known dependency warnings; 60 frontend tests passed; TypeScript/Vite production build passed. Migration 0011 was applied only to isolated PostgreSQL test schemas. No local Docker rebuild or browser/database journey for citizen submission has been performed yet. The policy remains an experimental transparent rule system, not validated triage or image severity. Next run the backup-first demo rebuild and verify citizen submission through municipal review.
+
 ## 2026-11-21 — Contextual priority browser workflow verified
 
 Agent-controlled verification through the authenticated local Docker municipal UI passed on demo complaint `cb991f0e-6908-4d7d-9d9f-dc3055ea3529`. An all-unknown context produced `Needs municipal review` and disabled acceptance. A second snapshot with immediate danger `no`, public access blocked `yes`, and essential-service impact `unknown` produced experimental `High`, retained the unknown fact, and allowed an explained staff acceptance. After reload, both context snapshots and the accepted review remained visible; complaint status remained `Under review`. This verifies the local Docker UI/API/database path for this scenario, not policy validity, image severity, emergency dispatch, queue ordering, or production certification. Next add direct citizen-reported context collection without changing the accepted complaint workflow.

@@ -99,6 +99,58 @@ def test_location_context_is_persisted(client):
     assert "latitude" not in tracked and "image_ref" not in tracked
 
 
+def test_citizen_priority_context_is_attributed_and_persisted(client):
+    response = post_complaint(client, {
+        "description": "Drain overflow blocks the footpath",
+        "immediate_danger": "no",
+        "access_blocked": "yes",
+        "essential_service_interrupted": "unknown",
+    })
+    assert response.status_code == 201
+    body = response.json()
+    assert body["status"] == "submitted"
+
+    history = client.get(f'/api/v1/admin/complaints/{body["complaint_id"]}/priority')
+    assert history.status_code == 200
+    assert len(history.json()) == 1
+    event = history.json()[0]
+    assert event["kind"] == "context"
+    assert event["actor_id"] is None
+    assert event["context"] == {
+        "source": "citizen_report",
+        "immediate_danger": "no",
+        "access_blocked": "yes",
+        "essential_service_interrupted": "unknown",
+    }
+    assert event["suggestion"]["band"] == "High"
+    assert event["suggestion"]["unknowns"] == ["essential_service_interrupted"]
+
+
+def test_citizen_reported_danger_does_not_change_status(client):
+    response = post_complaint(client, {
+        "description": "Reported immediate danger near damaged public infrastructure",
+        "immediate_danger": "yes",
+        "access_blocked": "unknown",
+        "essential_service_interrupted": "unknown",
+    })
+    assert response.status_code == 201
+    body = response.json()
+    assert body["status"] == "submitted"
+    event = client.get(f'/api/v1/admin/complaints/{body["complaint_id"]}/priority').json()[0]
+    assert event["suggestion"]["state"] == "needs_review"
+    assert event["suggestion"]["emergency_review"] is True
+
+
+@pytest.mark.parametrize("values", [
+    {"immediate_danger": "no"},
+    {"immediate_danger": "no", "access_blocked": "yes"},
+    {"immediate_danger": "conflict", "access_blocked": "no", "essential_service_interrupted": "no"},
+    {"immediate_danger": "false", "access_blocked": "no", "essential_service_interrupted": "no"},
+])
+def test_invalid_citizen_priority_context(client, values):
+    assert post_complaint(client, {"description": "Issue", **values}).status_code == 422
+
+
 @pytest.mark.parametrize("values", [
     {"location_label": "Baranagar", "location_precision": "broad"},
     {"latitude": 22.641, "longitude": 88.377, "location_label": "Baranagar"},

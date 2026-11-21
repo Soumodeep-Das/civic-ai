@@ -165,3 +165,8 @@ footer { min-height: 4.5rem; padding: var(--space-4) clamp(var(--space-4), 5vw, 
 .member-list button { min-height: 2.5rem; }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 .beta-banner { background: #fff3cd; border-bottom: 1px solid #d6b85f; color: #493b13; padding: .55rem 1rem; text-align: center; }
+.context-questions > label { display: grid; gap: var(--space-2); margin-top: var(--space-4); font-weight: 750; }
+.context-questions select { width: min(100%, 20rem); }
+.emergency-notice { margin-top: var(--space-4); border: 2px solid var(--danger-700); background: #fff5f3; color: var(--danger-700); }
+.emergency-notice p { color: inherit; }
+.emergency-notice a { font-weight: 900; }

@@ -100,10 +100,12 @@ Issue #12 selects a portable single-host Docker Compose topology: Caddy is the o
 
 The private network pins Caddy at `172.28.0.10`; Uvicorn trusts forwarded headers only from that address. Changing the network requires changing this allowlist. Caddy handles backend paths before SPA fallback. It applies a 6 MiB outer body limit, compression, minimal CSP/security headers, no-store HTML and immutable fingerprinted-asset caching. Vite is never a production process.
 
-`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, migration `0008` and writable evidence storage but not optional geocoding/email/OIDC providers. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
+`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, current migration head (`0011`) and writable evidence storage but not optional geocoding/email/OIDC providers. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
 
 The topology intentionally remains platform-neutral and single-host. It does not provide high availability, a distributed rate limiter, legal retention automation, cloud object storage, external metrics/log aggregation or automated deployment. See `DEPLOYMENT.md`, `BACKUP_RESTORE.md` and `OPERATIONS_RUNBOOK.md`.
 
 ## Contextual priority integration
 
 The pure priority policy is called by a scoped municipal service, separate from routes and classification. Migration 0010 persists context/suggestion snapshots and subsequent review events. A complaint-row lock serializes writes; stale snapshots cannot be reviewed. The frontend panel displays reasons, missing facts and history. No external provider, model dependency or automatic workflow action is added.
+
+Citizen priority context enters through the existing multipart complaint transaction. The service creates the complaint, initial lifecycle event and optional `citizen_report` priority snapshot before one commit, so staff never receive a context event for a failed complaint. Existing clients can omit the full context set. Municipal review continues through the separately authorized priority API; citizen submission cannot create a staff review, choose an operational priority, or mutate workflow state.

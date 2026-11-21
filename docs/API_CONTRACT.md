@@ -36,7 +36,7 @@ The Nominatim fallback is country-restricted through configuration, limited to o
 - `GET /api/v1/complaints/{complaint_id}?tracking_token=<capability>` returns only `complaint_id`, description, status and created/updated timestamps. Missing, malformed or wrong capabilities return 404 to avoid existence disclosure. Coordinates, location labels/details, image references, ownership and internal history are excluded.
 - `GET /api/v1/complaint-images/{filename}` requires a valid municipal session and complaint-level permission. Unauthenticated callers receive 401; authenticated but unauthorized callers receive 403; authorized missing files receive 404. Successful evidence uses its explicit raster MIME and `Cache-Control: private, no-store`.
 - `GET /health` returns `{"status":"ok","release":"<safe-release-id>"}` without dependency checks.
-- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at `0008`, and evidence storage is writable; otherwise sanitized 503 JSON is returned.
+- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at the current head (`0011`), and evidence storage is writable; otherwise sanitized 503 JSON is returned.
 - `/docs` and `/openapi.json` describe the multipart endpoint.
 
 ## Municipal operations
@@ -113,3 +113,9 @@ Migration 0009 is verified locally and owner Docker startup/readiness succeeded.
 ## Contextual priority (2026-11-20)
 
 GET `/api/v1/admin/complaints/{complaint_id}/priority` returns scoped chronological context/review events. POST `/priority/context` accepts `{context:{source,immediate_danger,access_blocked,essential_service_interrupted},note}`; source is citizen_report or municipal_report; facts are yes/no/unknown/conflict, default unknown. POST `/priority/reviews` accepts `{snapshot_id,decision,note,corrected_band?}`; decision accepted/corrected/deferred, corrected_band required only for correction. Both writes require staff session and CSRF and return 201. Actor/timestamp and policy output are server-generated. These are reported facts, not verified observations. Latest-snapshot and description fingerprint checks reject stale reviews with 409. No citizen endpoint or automatic workflow mutation.
+
+## Citizen-reported priority context (0011)
+
+`POST /api/v1/complaints` additionally accepts the optional multipart fields `immediate_danger`, `access_blocked` and `essential_service_interrupted`. Each value is `yes`, `no` or `unknown`. Clients must either omit all three for backward compatibility or submit all three; partial sets and the staff-only `conflict` value return 422. The current citizen UI submits all three and labels `unknown` as “Not sure.”
+
+The backend atomically creates the complaint, initial status event and a separate `citizen_report` priority-context event. Anonymous context has a null staff actor; it is still bound to the complaint description hash. The ordinary complaint response and private tracking response do not expose the internal suggestion. A reported emergency does not change complaint status or promise dispatch. Authorized municipal staff inspect and review it through the existing `/priority` endpoints.

@@ -109,6 +109,9 @@ def logout(request: Request, response: Response, auth: CsrfAuth, session: Databa
                                            "location_details": {"type": "string", "maxLength": 500},
                                            "location_source": {"type": "string", "enum": ["search", "device", "map"]},
                                            "location_accuracy_m": {"type": "number", "minimum": 0, "maximum": 100000},
+                                           "immediate_danger": {"type": "string", "enum": ["yes", "no", "unknown"]},
+                                           "access_blocked": {"type": "string", "enum": ["yes", "no", "unknown"]},
+                                           "essential_service_interrupted": {"type": "string", "enum": ["yes", "no", "unknown"]},
                                            "image": {"type": "string", "format": "binary"}}}}}}})
 async def create(request: Request, session: DatabaseSession):
     if not request.headers.get("content-type", "").startswith("multipart/form-data"):
@@ -122,7 +125,7 @@ async def create(request: Request, session: DatabaseSession):
     async def receive():
         return {"type": "http.request", "body": bytes(body), "more_body": False}
     parsed = Request(request.scope, receive)
-    async with parsed.form(max_files=1, max_fields=8, max_part_size=64 * 1024) as form:
+    async with parsed.form(max_files=1, max_fields=11, max_part_size=64 * 1024) as form:
         values = {}
         upload = None
         for key, value in form.multi_items():

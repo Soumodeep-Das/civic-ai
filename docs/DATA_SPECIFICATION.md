@@ -115,3 +115,5 @@ Issue #7 Stage A review records keep reviewer pseudonym, timezone timestamp, tax
 ## Priority persistence 0010
 
 Complaint priority events store attributed context and policy snapshots separately from human review events. Each row retains complaint/actor UUID, UTC timestamp and JSON text payload. Context facts are explicitly reported, with unknown/conflict preserved. Review points to the latest snapshot and does not overwrite it. No citizen context fields or automatic queue priority exist yet. See CONTEXTUAL_PRIORITY.md.
+
+Migration 0011 enables anonymous citizen priority-context attribution by making `complaint_priority_events.actor_id` nullable. It adds no nullable context columns to `complaints`: the three submitted facts, `citizen_report` provenance, description fingerprint, policy result and bounded server explanation are stored together in the append-only priority-event payload. Missing individual answers are not silently converted to `no`; current UI sends `unknown`, while legacy clients may omit the complete context set. A null actor means an anonymous citizen submission event, not a municipal verification.

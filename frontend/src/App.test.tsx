@@ -158,6 +158,29 @@ test("submits photo, device source and browser accuracy", async () => {
   expect(body.get("image")).toBe(file);
   expect(body.get("location_source")).toBe("device");
   expect(body.get("location_accuracy_m")).toBe("12");
+  expect(body.get("immediate_danger")).toBe("unknown");
+  expect(body.get("access_blocked")).toBe("unknown");
+  expect(body.get("essential_service_interrupted")).toBe("unknown");
+});
+
+test("submits citizen-reported impact and shows India emergency guidance", async () => {
+  const fetchMock = installApi();
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByText("Municipal access only");
+  await user.type(screen.getByLabelText(/What is happening/), "Damaged utility box beside a busy footpath");
+  await attachPhoto(user);
+  await confirmCurrentLocation(user);
+  await user.selectOptions(screen.getByLabelText("Is anyone in immediate danger?"), "yes");
+  await user.selectOptions(screen.getByLabelText("Is public access blocked?"), "no");
+  expect(screen.getByRole("alert")).toHaveTextContent("call 112");
+  await user.click(screen.getByRole("button", { name: "Submit complaint" }));
+  await screen.findByText(/was submitted/);
+  const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST" && init.body instanceof FormData);
+  const body = post?.[1]?.body as FormData;
+  expect(body.get("immediate_danger")).toBe("yes");
+  expect(body.get("access_blocked")).toBe("no");
+  expect(body.get("essential_service_interrupted")).toBe("unknown");
 });
 
 test("explicit search selects a result, opens the map and submits search source", async () => {
@@ -165,7 +188,7 @@ test("explicit search selects a result, opens the map and submits search source"
   const user = userEvent.setup();
   render(<App />);
   await screen.findByText("Municipal access only");
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.click(await screen.findByRole("option", { name: /Baranagar/ }));
   expect(await screen.findByRole("button", { name: "Mock move pin" })).toBeInTheDocument();
@@ -183,7 +206,7 @@ test("autocomplete shows suggestions after a short debounce", async () => {
   render(<App />);
   await screen.findByText("Municipal access only");
   await screen.findByText("Suggestions update while you type.");
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   expect(await screen.findByRole("option", { name: /Baranagar/ }, { timeout: 1500 })).toBeInTheDocument();
   expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/api/v1/location-search"))).toHaveLength(1);
 });
@@ -203,7 +226,7 @@ test("an in-flight search cannot show suggestions for an edited query", async ()
   const user = userEvent.setup();
   render(<App />);
   await screen.findByText("Municipal access only");
-  const input = screen.getByRole("combobox");
+  const input = screen.getByLabelText("Search locality, PIN code, street or landmark");
   await user.type(input, "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.clear(input);
@@ -218,7 +241,7 @@ test("keyboard Enter selects the active suggestion", async () => {
   const user = userEvent.setup();
   render(<App />);
   await screen.findByText("Municipal access only");
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   await screen.findByRole("option", { name: /Baranagar/ }, { timeout: 1500 });
   await user.keyboard("{Enter}");
   expect(screen.getByText("Review issue location")).toBeInTheDocument();
@@ -229,7 +252,7 @@ test("short search is rejected locally", async () => {
   const user = userEvent.setup();
   render(<App />);
   await screen.findByText("Municipal access only");
-  await user.type(screen.getByRole("combobox"), "BT");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "BT");
   await user.click(screen.getByRole("button", { name: "Search" }));
   expect(screen.getByText(/Enter at least 3 characters/)).toBeInTheDocument();
   expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/v1/location-search"))).toBe(false);
@@ -241,7 +264,7 @@ test("no results preserves the complaint draft", async () => {
   render(<App />);
   await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), "Draft complaint");
-  await user.type(screen.getByRole("combobox"), "Unknown place");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Unknown place");
   await user.click(screen.getByRole("button", { name: "Search" }));
   expect(await screen.findByText(/No matching locations found/)).toBeInTheDocument();
   expect(screen.getByLabelText(/What is happening/)).toHaveValue("Draft complaint");
@@ -253,7 +276,7 @@ test("provider failure preserves the complaint draft", async () => {
   render(<App />);
   await screen.findByText("Municipal access only");
   await user.type(screen.getByLabelText(/What is happening/), "Draft complaint");
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   expect(await screen.findByText(/could not be reached/)).toBeInTheDocument();
   expect(screen.getByLabelText(/What is happening/)).toHaveValue("Draft complaint");
@@ -304,7 +327,7 @@ test("a late device callback cannot replace a searched location", async () => {
   render(<App />);
   await screen.findByText("Municipal access only");
   await user.click(screen.getByRole("button", { name: "Use my current location" }));
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.click(await screen.findByRole("option", { name: /Baranagar/ }));
   act(() => onSuccess({ coords: { latitude: 21, longitude: 87, accuracy: 10 } } as GeolocationPosition));
@@ -329,7 +352,7 @@ test("reverse lookup failure retains the moved point for confirmation", async ()
   const user = userEvent.setup();
   render(<App />);
   await screen.findByText("Municipal access only");
-  await user.type(screen.getByRole("combobox"), "Baranagar");
+  await user.type(screen.getByLabelText("Search locality, PIN code, street or landmark"), "Baranagar");
   await user.click(screen.getByRole("button", { name: "Search" }));
   await user.click(await screen.findByRole("option", { name: /Baranagar/ }));
   await user.click(screen.getByRole("button", { name: "Mock move pin" }));
