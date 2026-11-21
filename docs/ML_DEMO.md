@@ -48,3 +48,7 @@ Owner-provided launcher output confirms backup backups/20261120-210821, rebuilt 
 ## Priority browser result
 
 2026-11-21 agent-controlled local Docker verification passed on the demo drain complaint. All-unknown facts produced `Needs municipal review`; reported blocked access with no reported immediate danger produced `High` while preserving unknown service impact. An explained acceptance persisted after refresh, and the complaint remained `Under review`. This verifies one demonstrator journey, not operational triage validity or image-based severity.
+
+## Citizen submission result
+
+2026-11-21 owner rebuild applied migration 0011 after backup `backups/20261121-122851`; all services were healthy and readiness returned 200. Agent browser verification submitted demo complaint `64e1b3f3-a550-4a2e-a797-f48cacd64af5` with synthetic evidence and a searched public location. Citizen-reported danger `no`, blocked access `yes` and service impact `unknown` arrived intact in municipal history, produced experimental High, and an explained acceptance persisted after refresh without changing Submitted status. Browser console showed no errors.
