@@ -21,6 +21,8 @@ These are sequencing targets, not background scheduled work or guarantees. Reass
 
 Checkpoint update, November 21: the contextual policy and direct citizen context are implemented and locally browser-verified. The optional photo-assistance assessment is complete and concluded **defer**; see `PHOTO_ASSISTANCE_DECISION.md`. No external provider or local generic vision model will be added before the presentation because the Indian in-domain evaluation, privacy/disclosure, credential, cost and reliability gates are unresolved. Continue with regression, demonstration hardening and feature freeze rather than replacing the agreed research comparison with an unvalidated generic labeler.
 
+Freeze update, November 21: current GitHub Quality gates passed the full database/test/audit/build/container workflow, and the existing local HTTPS demonstration path plus key failure boundaries were rechecked. Feature work is frozen. Use `MINOR_DEMO_RUNBOOK.md` to rehearse on the presentation machine/profile and prepare an honest fallback recording; change code only for a reproducible blocker.
+
 ## Scope cuts and honesty
 
 Do not add a general chatbot, train an all-category image model, fabricate paired text/image incidents, or present a severity predictor as validated without appropriate labels. A pretrained vision API, if selected, is external AI assistance and must be named as such; it is not CivicAI's trained image model. External content cannot change roles/status/priority automatically. No provider is selected or paid service purchased by this plan.

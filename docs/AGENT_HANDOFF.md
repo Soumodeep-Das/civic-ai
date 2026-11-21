@@ -1,6 +1,6 @@
 # CivicAI engineering handoff
 
-Latest implementation checkpoint, 2026-11-21: citizen complaint submission collects three bounded priority-context facts and atomically creates an anonymous `citizen_report` event through migration 0011. Full automated gates pass (547 backend/research; 60 frontend; production build). Owner rebuild and agent-controlled local Docker browser verification passed end to end on demo complaint `64e1b3f3-a550-4a2e-a797-f48cacd64af5`: citizen context reached municipal history, suggested High, retained an unknown, persisted staff acceptance and did not change Submitted status. The optional photo-assistance path was then assessed and deliberately deferred; read `PHOTO_ASSISTANCE_DECISION.md`. Preserve the official 112 warning and the classification/priority separation; no current model consumes photos.
+Latest checkpoint, 2026-11-21: the integrated minor workflow is feature-frozen. GitHub Quality gates at `1980a80` passed full PostgreSQL/migration/Python/frontend/audit/build/container jobs; independent local research, database-free backend, frontend, build, checksum and live HTTPS municipal checks also passed. The stopped local `_test` database prevented a duplicate full local backend run and is recorded rather than bypassed. Read `MINOR_DEMO_RUNBOOK.md` and `PHOTO_ASSISTANCE_DECISION.md`. Preserve the official 112 warning and classification/priority separation; no current model consumes photos.
 
 Verified on 2026-10-17 from branch `main` at starting commit `cadb4c590be9ac5fcbc3e11e8fe75c71e58481e0`. This is the central onboarding map, not a replacement for the linked specifications. It records repository evidence, automated verification and explicitly identified human verification separately.
 
@@ -297,7 +297,7 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 
 ## 16. Immediate next step
 
-Newest 2026-11-21: the core minor demonstration is integrated and browser-verified. The optional photo-assistance assessment concluded that no responsible provider/model can be added before the presentation without unresolved Indian in-domain evaluation, privacy/disclosure, credential, cost and reliability boundaries. Do not reopen that decision casually or pretend generic labels are severity. Next run the full regression gates, verify the presentation journey and failure cases, then freeze features and prepare the fallback demo/rehearsal evidence.
+Newest 2026-11-21: the presentation regression gate and runbook are complete; features are frozen. Do not reopen photo assistance or add dependencies/providers before November 27. Next the owner should rehearse `MINOR_DEMO_RUNBOOK.md` in the exact Chrome profile/display/network used for the presentation and capture one honest local fallback recording. Fix only a reproducible blocking defect; otherwise preserve the passing commit.
 
 Latest 2026-11-20: experimental 97-text AI-label model and guarded municipal assessment/review are implemented. Read `ML_DEMO.md`, `research/EXPLORATORY_BASELINE_RESULTS.md` and newest CURRENT_STATE. Owner confirmed Docker generation/acceptance/history after refresh; automated review checks pass. Do not repeat earlier preparation stages below. No independent accuracy, photo analysis or priority model claim. Next contextual-priority prototype; preserve staff control and explicit uncertainty.
 
