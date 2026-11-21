@@ -1,5 +1,9 @@
 # Development Log
 
+## 2026-11-21 — Bounded photo-assistance decision
+
+Reviewed the current protected evidence path and official documentation for Google Cloud Vision, Hugging Face zero-shot image classification/CLIP, OpenAI API data controls and FixMyStreet's evidence workflow. Deliberately added no provider, credential, runtime dependency, model or API call. Generic labels are not validated civic defect/severity evidence; CivicAI lacks an approved representative Indian image release, independent photo labels and the required external-processing disclosure/consent, budget and failure boundary. `PHOTO_ASSISTANCE_DECISION.md` records the decision and major-project re-entry gates. This prose-only checkpoint changes no application behavior; `git diff --check` is the verification gate. Next run full regression and freeze the existing demonstrable workflow.
+
 ## 2026-11-20 — Assessment review regression checkpoint
 
 Frontend regression: **58 passed across five files in 76.06s**. Combined backend/research regression: **469 passed, three known deprecation warnings, 80.59s**. Added correction/deferral persistence, stale-input rejection, no-suggestion acceptance rejection, cross-complaint isolation and unchanged status/update timestamp checks. User Docker acceptance/persistence confirmation remains distinct from automated correction/deferral verification. TypeScript/Vite production build passed. Dataset checksum unchanged; private environment files/model ignored and untracked. No priority or photo analysis implemented. Next milestone: versioned contextual priority prototype with explicit reported facts and staff review, after publishing this experimental assessment checkpoint.

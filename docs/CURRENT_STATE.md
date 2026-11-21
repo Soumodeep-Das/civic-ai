@@ -1,5 +1,9 @@
 # Current State
 
+## 2026-11-21 — Photo-assistance path assessed and deferred
+
+The optional pre-presentation photo-assistance path was assessed against privacy, cost, reliability and research-validity requirements. No external vision API or generic zero-shot model is being added: generalized cloud labels do not establish civic defects/severity, protected citizen photos would reach a new processor without an implemented disclosure/consent and budget boundary, and the reviewed CLIP model card requires in-domain testing that CivicAI cannot perform without an approved representative Indian image release. Existing photo evidence remains privately stored and visible to authorized staff; no model consumes it. See `PHOTO_ASSISTANCE_DECISION.md`. This is an intentional minor-project scope cut, not a completed image experiment. Next run the full regression and freeze the demonstrable text/context/human-review workflow.
+
 ## 2026-11-21 — Citizen-reported priority context implemented
 
 The citizen submission form now records three explicit `Yes` / `No` / `Not sure` facts: immediate danger, blocked public access and essential-service interruption. Submission stores a separate `citizen_report` context/suggestion event atomically with the complaint; anonymous events have no staff actor. Partial or invalid API context is rejected. Reported danger requests review and displays India's official 112 emergency guidance, but never blocks complaint persistence or changes status, assignment, routing or dispatch. Legacy API clients may omit the entire context set. Migration 0011 makes only priority-event actor attribution nullable; staff-created events remain actor-attributed.

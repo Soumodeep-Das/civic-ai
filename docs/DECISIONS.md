@@ -1,5 +1,14 @@
 # Decision Log
 
+## D043 Defer unvalidated photo AI before the minor demonstration (2026-11-21, accepted)
+
+- Keep citizen photographs as protected evidence for authorized human inspection; no current model consumes them.
+- Do not add a generic cloud-label API, multimodal API or zero-shot CLIP classifier before the November 27 demonstration. Current options lack CivicAI-specific Indian evaluation, and external processing lacks an implemented disclosure/consent, credential, budget and operational boundary.
+- Do not substitute upload-quality heuristics or generic labels for the agreed image-only/multimodal research experiment, visible-defect evidence or severity.
+- Reconsider in the major project only with a versioned image task, rights-reviewed Indian data, independent labels, genuine paired evaluation, privacy/provider controls, abstention and authorized human review.
+
+Consequences: the minor demonstration remains a complete protected-evidence workflow with experimental text classification and separate reported-context priority. Photo classification, photo-derived severity and multimodal performance remain explicitly unperformed. Rationale and primary sources are in `PHOTO_ASSISTANCE_DECISION.md`.
+
 ## D042 Bound review packets and minimal development exports (2026-11-19)
 
 Use immutable source-bound packets with a separate editable decision ledger, explicit evidence-backed gates and per-record review. Preserve AI proposals as proposals. Apply only reviewed redaction spans; reject ambiguous offsets and cross-group redacted duplicates. Keep reviewer evidence and original text outside model-facing exports. Local attestations are not identity verification, legal/privacy certification or independent evaluation. Outputs remain private, development-only and not training-authorized; real baseline execution stays disabled. See `research/DEVELOPMENT_RELEASE.md`.
