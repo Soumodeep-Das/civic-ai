@@ -1,6 +1,6 @@
 # Contextual priority prototype v1
 
-2026-11-20. Offline policy foundation; not connected to the API or UI. This is an experimental rule system, not a trained severity model or municipal SLA.
+Current as of 2026-11-22: the policy is connected to citizen submission and municipal review through migrations 0010–0011 and was exercised in the local Docker browser. It is an experimental rule system without independent municipal validity or SLA evidence. The dated foundation/integration checkpoints below preserve their original scope.
 
 ## Rubric declared before implementation
 
@@ -10,7 +10,7 @@ In order: any conflict -> needs_review; reported immediate danger -> needs_revie
 
 Road/pedestrian example: reported blocked access can suggest High; a pothole photograph alone cannot. Waste: reported blocked access can suggest High; ordinary waste presence does not establish danger. Drainage: reported essential-service interruption can suggest High; water in a photo does not prove sewage. Lighting: a reported interruption can suggest High; daytime lamp appearance cannot establish failure. The same explicit-fact rules apply without forcing unsupported issues into the four classifier families. These examples are synthetic logic cases, not validated urgency labels.
 
-No incident-duration or queue-age weighting until a defensible rubric exists. No automatic assignment/status change. No public endpoint, migration, citizen fields or deployment in this checkpoint. Next integrate durable attributed context and scoped municipal review with input fingerprints, keeping citizen claims distinct from municipal verification.
+No incident-duration or queue-age weighting until a defensible rubric exists. No automatic assignment/status change. The original offline checkpoint had no API or persistence. Subsequent sections document the implemented attributed context, review endpoints and citizen fields.
 
 ## Comparable-system research
 
@@ -26,7 +26,7 @@ Migration 0010 adds complaint_priority_events with actor, complaint, timestamp a
 
 Municipal panel supports transcribed citizen or municipal reports, explicit unknown/conflict, preserved fact/history display and accept/correct/defer. Source is reported provenance, not independent verification. Corrections may record Low/Medium/High/Critical as staff decisions; policy itself emits only Medium/High or needs_review. No queue sorting, automatic status or dispatch changes.
 
-Migration verified in isolated PostgreSQL test schemas only. Live Docker migration/rebuild/browser verification is pending. Do not claim this is already visible in the running Docker app. Use the existing backed-up start-ml-demo.ps1 workflow for local deployment verification.
+Historical integration verification initially covered isolated PostgreSQL schemas. The November 21 local Docker citizen-to-municipal context/review journey subsequently passed; see `CURRENT_STATE.md`. Use the backup-first `start-ml-demo.ps1` workflow for recreation.
 
 ## Citizen context collection
 

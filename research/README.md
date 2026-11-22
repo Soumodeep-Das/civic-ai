@@ -1,30 +1,28 @@
 # CivicAI research workspace
 
-Latest: [Reviewed development export](DEVELOPMENT_RELEASE.md) prepares bound review packets and validates minimal redacted exports. All 271 actual pilot decisions remain pending; no real training release exists.
+## Current study — November 22, 2026
 
-Latest engineering checkpoint: [Offline baseline runner](OFFLINE_BASELINE_RUNNER.md) is implemented and verified on synthetic fixtures only (251 research tests). Real-data execution remains disabled; next is the reviewed-release contract and privacy-safe export.
+A local exploratory TF-IDF/logistic-regression model was fitted on 97 Bengaluru descriptions with AI-proposed labels. It is integrated as optional municipal text assistance. [Results and limitations](EXPLORATORY_BASELINE_RESULTS.md) report development-fold AI-label agreement, not independent accuracy. The original reviewed-release gate remains incomplete.
 
-Latest: [Baseline readiness and evaluation protocol](BASELINE_READINESS.md) provides actual candidate/group/privacy counts and the versioned first text-study protocol. No model was trained; 228 research tests pass. Next implement the offline runner with synthetic verification and an explicit real-data release gate.
+| Read first | Purpose |
+|---|---|
+| [Exploratory results](EXPLORATORY_BASELINE_RESULTS.md) | Actual fit, support, metrics and limitations |
+| [Exploratory protocol](protocols/exploratory_ai_labels_v1.json) | Separately disclosed AI-label experiment |
+| [Guarded assessment](GUARDED_ASSESSMENT.md) | Review/abstention logic and limits |
+| [Source register](SOURCE_REGISTER.md) and [Indian coverage](INDIAN_CIVIC_COVERAGE.md) | Acquired versus candidate sources, including West Bengal |
+| [Reviewed development export](DEVELOPMENT_RELEASE.md) | Independent review/release gates still outstanding |
+| [Offline runner](OFFLINE_BASELINE_RUNNER.md) | Synthetic engineering verification; its real-data path remains disabled |
+| [Research plan](../docs/RESEARCH_PLAN.md) | Original questions and unfinished modality comparison |
 
-Current: [Text-grounded pilot annotations](TEXT_ISSUE_ANNOTATION_REPORT.md) completes actual AI review of all 271 descriptions with evidence offsets and uncertainty. 206 research tests pass. Next assess baseline readiness and evaluation design; no independent reference or training approval is implied.
+The eight-class proposed taxonomy, broader taxonomy drafts and four-family exploratory model are distinct artifacts. No image/severity model or paired multimodal result exists. Raw records, images, review ledgers, predictions and model binaries remain ignored locally; public clones contain code, protocols and aggregate result notes.
 
-Latest implementation: [Rich issue-description draft](ISSUE_DESCRIPTION_DRAFT.md). Existing pilot proposals transferred; fresh richer text annotation remains outstanding.
-
-Latest: [Contextual review recommendations](CONTEXT_REVIEW_REPORT.md) records the completed AI pass over 41 scope questions, 134 contextual privacy flags and one near-text pair. It includes six additional span proposals and tested validation; it does not grant training/privacy approval. Next implement a versioned proposal-only family/asset/issue-kind annotation contract for the existing pilot.
-
-Current follow-up: [Source coverage and pilot QA](CURATION_QA_REPORT.md) accounts for all 231 source pairs and records near-text duplicate candidates plus reviewed AI privacy-span proposals. No training/privacy approval or active-taxonomy migration follows from this audit.
-
-Latest research checkpoint: [AI-assisted pilot findings](AI_LABEL_PILOT_FINDINGS.md) covers all 271 tasks, with zero remaining in the assistant pass. [Taxonomy revision draft](TAXONOMY_REVISION_PROPOSAL.md) separates service families, assets and issue kinds. These remain AI proposals, not independent reference annotations, an adopted taxonomy or training approval.
-
-This directory contains version-controlled research definitions and validation code. It does not contain an approved research dataset or measured results.
+The commands below document acquisition/curation tools. Run them deliberately into new output directories; they are not required to start the app and do not grant training approval. Earlier stage reports retain their dated findings and should not be read as the latest implementation status.
 
 ## Reproducible text-curation proposal
 
 Next label-quality step: [LABEL_PILOT.md](LABEL_PILOT.md) provides the reproducible source-label-blinded pilot, concrete annotation instructions and taxonomy coverage gaps. Generation is complete; independent responses remain pending.
 
 See [TEXT_CURATION_PROPOSAL.md](TEXT_CURATION_PROPOSAL.md) for the new offline command, provenance, full-corpus support counts and remaining gates. This companion to Issue #7 preserves existing review forms and never assigns human labels or approves training. Raw and derived incident data remain outside Git.
-
-## Validate a manifest
 
 ## Acquire Indian text data for curation
 

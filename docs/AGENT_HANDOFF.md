@@ -1,6 +1,8 @@
 # CivicAI engineering handoff
 
-Latest checkpoint, 2026-11-21: the integrated minor workflow is feature-frozen. GitHub Quality gates at `1980a80` passed full PostgreSQL/migration/Python/frontend/audit/build/container jobs; independent local research, database-free backend, frontend, build, checksum and live HTTPS municipal checks also passed. The stopped local `_test` database prevented a duplicate full local backend run and is recorded rather than bypassed. Read `MINOR_DEMO_RUNBOOK.md` and `PHOTO_ASSISTANCE_DECISION.md`. Preserve the official 112 warning and classification/priority separation; no current model consumes photos.
+> **Reading guide, 2026-11-22:** [Documentation index](README.md), root README and [architecture](ARCHITECTURE.md) describe the current product. The dated inventories and previous checkpoints below are retained as historical evidence; they do not override the latest state. The local exploratory model is implemented, while independent validation and public-beta ML deployment remain unverified.
+
+Latest checkpoint, 2026-11-21: the integrated minor workflow is feature-frozen. GitHub Quality gates at `1980a80` passed full PostgreSQL/migration/Python/frontend/audit/build/container jobs; independent local research, database-free backend, frontend, build, checksum and live HTTPS municipal checks also passed. Sandbox connection failures interrupted the duplicate local database test run; server shutdown was not established. CI success does not include the private artifact test when the model is absent. Read `MINOR_DEMO_RUNBOOK.md` and `PHOTO_ASSISTANCE_DECISION.md`. Preserve the official 112 warning and classification/priority separation; no current model consumes photos.
 
 Verified on 2026-10-17 from branch `main` at starting commit `cadb4c590be9ac5fcbc3e11e8fe75c71e58481e0`. This is the central onboarding map, not a replacement for the linked specifications. It records repository evidence, automated verification and explicitly identified human verification separately.
 
@@ -49,7 +51,7 @@ Onboarding checklist:
 
 CivicAI is the MCA project **“AI-Based Urban Civic Complaint Classification and Prioritization System.”** The implemented product is already useful without ML: citizens can report Indian civic issues with evidence and location, privately track them, optionally use an account, and municipal staff can process authorized work through an audited lifecycle. The research objective remains a controlled comparison of text-only, image-only, and text+image classification, with Macro-F1 as the primary metric. Classification (what the issue is) and prioritization (how urgent it is) are distinct concerns.
 
-No classifier, prioritizer, ML inference path or defensible model result exists yet. Do not describe the current product as AI-enabled.
+Current local implementation includes experimental text inference and a transparent contextual-priority policy with municipal review. Results are exploratory AI-label agreement; image analysis and independent model/triage validation are unfinished. See `../research/EXPLORATORY_BASELINE_RESULTS.md`.
 
 ## 2. Verified current state
 
@@ -252,7 +254,7 @@ Research is offline and independent of production complaint data. The current Op
 d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac
 ```
 
-`civicai-category-v1` remains proposed pending human approval. Source labels are retained separately and are not CivicAI truth. Audit/mapping outputs are proposals, not human annotations. Stage A generated blank, checksum-bound review forms; Stage B is paused awaiting genuine reviewers. `training_approved=false`. No model, final split, metric, experiment or novelty result exists.
+`civicai-category-v1` remains proposed pending human approval. Source labels are retained separately and are not CivicAI truth. Audit/mapping outputs are proposals, not human annotations. Stage A generated blank, checksum-bound review forms; Stage B is paused awaiting genuine reviewers. The original reviewed-release gate remains `training_approved=false`. A separate, disclosed 97-text AI-label exploratory experiment has since produced a local model and development-fold metrics; it does not satisfy the independent reference gate or establish novelty.
 
 Non-negotiable constraints: India-only provenance; no translated foreign substitution; documented licensing/provenance without invented approvals; privacy review/redaction; duplicate/event grouping before split; no train/evaluation leakage; no fabricated review; no random/synthetic image presented as paired evidence. A valid text/image comparison requires genuine aligned Indian records. Do not train or modify datasets without explicit, documented gate completion.
 
@@ -270,7 +272,7 @@ Repository-backed items:
 | Low | TECHNICAL DEBT | Login throttling is process-local; no distributed abuse-control layer exists. |
 | Low | TECHNICAL DEBT | Python dependencies have ranges but no resolved lock; three upstream deprecation warnings remain. |
 | Product gap | PLANNED | Citizen status notifications, richer communication, map visual polish and broader logged-in status UX are deferred. |
-| Research blocker | PARTIAL | No approved labels and no genuine paired Indian text-image dataset; Stage B and ML remain paused. |
+| Research blocker | PARTIAL | Independent reference labels and genuine paired Indian text-image evaluation remain unavailable. Stage B is incomplete; the separate experimental text model is implemented locally. |
 
 Resolved deployment incidents retained for context: Supabase pooler/URL configuration initially prevented startup; Google initially returned `redirect_uri_mismatch`; MapTiler origin formatting/geocoding caused 403/503 behavior; and an early Docker build exposed a Vite key in build-command output. Current code/config addresses these (exact URLs/origins, provider-specific adapters, and a non-interpolating build validation). Never reintroduce secret values into Docker `RUN` text or a public storage bucket.
 
@@ -290,7 +292,7 @@ Do not commit environment files, credentials, uploads, private feedback, raw/der
 - Preserve opaque database sessions, CSRF/origin checks, secure cookies and fail-closed production config.
 - Do not expose backend/Supabase/Brevo/Google credentials to Vite. Treat only the MapTiler Vite key as deliberately public and origin-restricted.
 - Do not make the evidence bucket public or return provider object URLs.
-- Do not add ML inference before a versioned, reviewed, leakage-controlled research release exists.
+- Preserve the explicitly experimental local inference boundary. Independent research release and operational rollout require further review and evaluation.
 - Do not mix workflow status, category and priority concepts.
 - Do not silently “fix” historical data, labels or audit events.
 - Do not claim formal production certification, all-India representativeness, accessibility conformance or model performance without evidence.

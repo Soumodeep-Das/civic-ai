@@ -8,7 +8,7 @@ Owned complaints: `GET /api/v1/citizen/complaints` is server-paginated and sessi
 
 Staff provisioning: administrators use `GET|POST /api/v1/admin/staff-invitations` and `POST /api/v1/admin/staff-invitations/{id}/revoke`; invitees use `POST /api/v1/staff/accept-invite`. Public callers never choose role/departments. Existing municipal session and admin API contracts remain compatible.
 
-Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds optional location context and selection quality to that compatible multipart contract, plus provider-neutral search/reverse/capability endpoints. JSON complaint creation still returns 415. Issue #12 deliberately replaces anonymous list/detail/evidence reads with a private status capability and municipal-only evidence access.
+Issue #3 changed POST /api/v1/complaints to multipart/form-data. Issue #4 adds optional location context and selection quality to that compatible multipart contract, plus provider-neutral search/reverse/capability endpoints. JSON complaint creation still returns 415. Issue #12 deliberately replaces anonymous list/detail/evidence reads with a private status capability and protected evidence access, subsequently extended to the owning authenticated citizen by Issue #13.
 
 ## Submission
 
@@ -28,15 +28,15 @@ Success returns up to five normalized results with provider_id, label, latitude,
 
 `POST /api/v1/location-reverse` accepts latitude and longitude using the same coordinate bounds. It returns one normalized result or null when no label is available. Provider timeout/failure uses the same sanitized 503 behavior; the frontend retains the moved coordinates when label refresh fails.
 
-The Nominatim fallback is country-restricted through configuration, limited to one upstream request per second and cached in memory for 15 minutes; it never advertises autocomplete. The MapTiler adapter advertises autocomplete and supports optional configured proximity bias. Provider keys stay server-side. Providers receive public-place search text or selected coordinates; users should not enter private information. No search query or coordinates are intentionally written to CivicAI application logs.
+The Nominatim fallback is country-restricted through configuration, limited to one upstream request per second and cached in memory for 15 minutes; it never advertises autocomplete. The MapTiler adapter advertises autocomplete and supports optional configured proximity bias. The geocoding credential is configured server-side; when reused for frontend tiles, the shared MapTiler value is publicly observable. The Vite tile key always is browser-public. Providers receive public-place search text or selected coordinates; users should not enter private information. No search query or coordinates are intentionally written to CivicAI application logs.
 
 ## Citizen reads and evidence
 
 - `GET /api/v1/complaints` is intentionally disabled and returns 404. There is no anonymous enumeration feed.
-- `GET /api/v1/complaints/{complaint_id}?tracking_token=<capability>` returns only `complaint_id`, description, status and created/updated timestamps. Missing, malformed or wrong capabilities return 404 to avoid existence disclosure. Coordinates, location labels/details, image references, ownership and internal history are excluded.
-- `GET /api/v1/complaint-images/{filename}` requires a valid municipal session and complaint-level permission. Unauthenticated callers receive 401; authenticated but unauthorized callers receive 403; authorized missing files receive 404. Successful evidence uses its explicit raster MIME and `Cache-Control: private, no-store`.
+- `GET /api/v1/complaints/{complaint_id}?tracking_token=<capability>` returns only `complaint_id`, description, status and created/updated timestamps. A well-formed but wrong capability returns 404. Missing or malformed query values return 422 through FastAPI validation. Coordinates, location labels/details, image references, ownership and internal history are excluded.
+- `GET /api/v1/complaint-images/{filename}` allows a valid municipal session with complaint-level permission or the authenticated citizen who owns the complaint. A missing image reference returns 404; an existing reference without a session returns 401; unauthorized staff receive 403 and non-owning citizens receive 404; missing storage objects return 404. Successful evidence uses its explicit raster MIME and `Cache-Control: private, no-store`.
 - `GET /health` returns `{"status":"ok","release":"<safe-release-id>"}` without dependency checks.
-- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at the current head (`0011`), and evidence storage is writable; otherwise sanitized 503 JSON is returned.
+- `GET /ready` returns 200 only when PostgreSQL responds, Alembic is exactly at the current head (`0011`), and evidence storage passes its adapter readiness check (local read/write access or S3 bucket access); otherwise sanitized 503 JSON is returned.
 - `/docs` and `/openapi.json` describe the multipart endpoint.
 
 ## Municipal operations
@@ -100,11 +100,11 @@ Errors use code/message, with details for field-validation errors. Invalid field
 
 Images: 5 MiB input and re-encoded output; 20 million pixels; single frame only. Total multipart body: 5 MiB + 256 KiB. Non-file multipart parts: 64 KiB. One image maximum. MIME must match decoded JPEG/PNG format. Files are re-encoded without source metadata, preserving orientation. Original filenames are ignored. Storage unavailability returns 503.
 
-Citizen complaint creation remains anonymous. Status retrieval requires the per-complaint capability returned at creation. Complaint-image retrieval and municipal operations require authentication and server-side authorization; account administration additionally requires `municipal_admin`. Never expose evidence through a static directory or public object URL.
+Citizen complaint creation supports anonymous reporting or optional authenticated citizen ownership. Anonymous status retrieval requires the per-complaint capability returned at creation; signed-in owners can also use their protected complaint endpoints. Complaint-image retrieval and municipal operations require authentication and server-side authorization; account administration additionally requires `municipal_admin`. Never expose evidence through a static directory or public object URL.
 
-## Draft experimental municipal assessment endpoints (not deployment-verified)
+## Experimental municipal assessments (locally integrated)
 
-`GET /api/v1/admin/complaints/{complaint_id}/assessments`: authorized complaint scope, list of experimental records. `POST /api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews`: municipal session plus CSRF and complaint scope; accept/correct/defer request, actor derived from session. Stale input returns 409; accepting a missing suggestion returns 422. These endpoints require migration 0009, currently unverified due to local test database connection failure. No model generation or UI integration yet.
+`GET /api/v1/admin/complaints/{complaint_id}/assessments`: authorized complaint scope, list of experimental records. `POST /api/v1/admin/complaints/{complaint_id}/assessments/{assessment_id}/reviews`: municipal session plus CSRF and complaint scope; accept/correct/defer request, actor derived from session. Stale input returns 409; accepting a missing suggestion returns 422. These endpoints require migration 0009 or later. Generation, review and municipal UI are integrated and locally verified; public-beta activation is not established.
 
 ### Assessment endpoint verification update (2026-11-20)
 

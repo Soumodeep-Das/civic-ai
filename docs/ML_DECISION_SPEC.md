@@ -1,5 +1,7 @@
 # ML decision specification v1
 
+> **Historical design specification, November 17.** Subsequent text inference and contextual-priority integration are implemented through migration 0011; see [architecture](ARCHITECTURE.md), [current state](CURRENT_STATE.md) and [priority](CONTEXTUAL_PRIORITY.md). Proposed severity/image/multimodal fields below are not shipped functionality.
+
 Date: 2026-11-17. Status: agreed direction, documented design; **not implemented, trained or deployment-approved**. This specification records the owner's discussion and authorization to begin specification and targeted source audit. It does not override dataset review gates or introduce a new application issue.
 
 ## Purpose and boundaries

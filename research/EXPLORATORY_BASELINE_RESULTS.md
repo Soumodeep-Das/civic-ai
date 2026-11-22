@@ -6,9 +6,9 @@ Three grouped development folds, six TF-IDF/logistic-regression configurations a
 
 The exploratory planning floor was explicitly revised from 20 to 18 groups before fitting; the original independent-reference protocol remains unchanged. Source-specific publisher metadata identifies CC BY-SA 2.0. Attribution: OpenCity/Janaagraha iCMyC; retained catalogue author Vaidyanathan R.; resource credits Vivek Mathew and Haji Shariefullah. Local restricted exploration only; no raw data, derived text or model distribution. Privacy screening is not anonymity certification.
 
-Command: `python -m research.civicai_research.exploratory_fit`. Fixed input snapshot and output: ignored `research/results/exploratory-ai-labels-v1`. Raw predictions, folds, protocol, versions, input hashes, timings and selected model saved. Failed writes retain INCOMPLETE; existing output refused. The synthetic runner and human-reviewed export gate are unchanged. No live inference enabled.
+Command: `python -m research.civicai_research.exploratory_fit`. Fixed input snapshot and output: ignored `research/results/exploratory-ai-labels-v1`. Raw predictions, folds, protocol, versions, input hashes, timings and selected model saved. Failed writes retain INCOMPLETE; existing output refused. The synthetic runner and human-reviewed export gate are unchanged. Live inference was not enabled at the original fit checkpoint; subsequent optional local municipal integration is documented in `../docs/ML_DEMO.md`.
 
-Next: inspect out-of-fold disagreements and unsupported-input behavior, harden/test the dedicated experiment loader, then integrate a guarded experimental assessment with municipal review. The fixed experiment script is not a general approved-release loader.
+Follow-up completed: disagreement/probe inspection, loader hardening and guarded local municipal assessment/review integration. Independent reference evaluation remains outstanding. The fixed experiment script is not a general approved-release loader.
 
 Selected configuration has 13 out-of-fold disagreements among 97 records; these are disagreements with AI proposals, not confirmed model errors.
 

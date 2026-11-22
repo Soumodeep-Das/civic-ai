@@ -1,6 +1,10 @@
 # Research Plan
 
-The 2026-11-17 [ML decision specification](ML_DECISION_SPEC.md) governs current task definitions, evidence provenance, unknown/conflict handling, evaluation gates and staged integration. The [targeted source audit](../research/DATASET_AUDIT_2026_11_17.md) distinguishes source discovery from readiness. Current work is curation before training; the questions below remain research objectives, not completed experiments. The optional complaint assistant is a separate future product component, never independent ground truth for our evaluation.
+## Current result versus planned evaluation
+
+Updated 2026-11-22: a separate [97-text exploratory experiment](../research/EXPLORATORY_BASELINE_RESULTS.md) has been fitted and integrated locally. Its three grouped development folds measure agreement with AI-proposed labels, with no untouched independent test result. The original reviewed-release gates and modality comparison below remain open. The [major-project roadmap](ROADMAP.md) records the required follow-up.
+
+The 2026-11-17 [ML decision specification](ML_DECISION_SPEC.md) governs current task definitions, evidence provenance, unknown/conflict handling, evaluation gates and staged integration. The [targeted source audit](../research/DATASET_AUDIT_2026_11_17.md) distinguishes source discovery from readiness. The questions below define the intended independent study; the separate exploratory text fit does not complete them. The optional complaint assistant is a separate future product component, never independent ground truth for our evaluation.
 
 ## Aim
 
@@ -40,11 +44,11 @@ A later major-project study may ask whether learned spatial, temporal, severity,
 
 ## Experimental controls
 
-Issue #6 adds file-verified split proposals and has acquired/audited one Bengaluru text source. It is not an approved training release: all labels remain pending, mappings are proposals, privacy/duplicates require review, accepted-proposal support is highly imbalanced, and Bengaluru cannot establish all-India performance. The primary modality comparison still requires genuine paired Indian records; label-derived text and arbitrary same-category pairings are ineligible. Source-specific visual style is a confound to audit. No model training or final evaluation split has been produced.
+Issue #6 adds file-verified split proposals and has acquired/audited one Bengaluru text source. It is not an approved training release: all labels remain pending, mappings are proposals, privacy/duplicates require review, accepted-proposal support is highly imbalanced, and Bengaluru cannot establish all-India performance. The primary modality comparison still requires genuine paired Indian records; label-derived text and arbitrary same-category pairings are ineligible. Source-specific visual style is a confound to audit. No final independent evaluation split has been produced. A separate disclosed exploratory text model has been fitted.
 
 Issue #5 establishes `civicai-category-v1`, its annotation/adjudication rules and a validated manifest contract before training. Its current machine-readable status is `proposed_pending_human_approval`; it must be versioned rather than silently edited if source review changes boundaries.
 
-Issue #7 Stage A supplies offline, checksum-bound human review forms and conflict/adjudication validation. It creates no annotations itself. Taxonomy, mapping, privacy, record quality/language, duplicate grouping, license and final dataset approval remain independent gates. Split selection and modeling remain blocked until actual Stage B curation resolves them.
+Issue #7 Stage A supplies offline, checksum-bound human review forms and conflict/adjudication validation. It creates no annotations itself. Taxonomy, mapping, privacy, record quality/language, duplicate grouping, license and final dataset approval remain independent gates. The independent-reference release remains blocked until Stage B curation resolves these gates; the separate AI-label exploration does not grant that approval.
 
 - Freeze a versioned label taxonomy and inclusion criteria before the final experiments.
 - Create one group-aware or source-aware split where needed to prevent near-duplicate or location leakage.

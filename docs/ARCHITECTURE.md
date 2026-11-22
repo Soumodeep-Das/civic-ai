@@ -1,111 +1,120 @@
-# Architecture
+# System architecture
+Updated November 22, 2026. This page describes implemented components; the [roadmap](ROADMAP.md) describes future work.
 
-## Issue #13 identity boundary
+## Runtime boundaries
 
-Citizen authentication uses `citizen_accounts` plus separate password and federated credentials. Municipal authorization remains explicit in `municipal_users` and department memberships; email matching never grants authority. The existing PostgreSQL opaque-session table now represents exactly one citizen or municipal principal per row, preserving revocation, CSRF, Secure/HttpOnly/SameSite cookies and existing staff sessions. Complaint ownership is a nullable citizen foreign key assigned only from a validated session. See `ISSUE_013_MODERN_IDENTITY.md`.
+CivicAI is a React client and one FastAPI application backed by PostgreSQL. Request schemas, application services and persistence are separate modules. Research acquisition/training stays offline; the optional inference service loads a trusted local model artifact.
 
-## Status and principles
-
-This document defines a deliberately small architecture. The design favors clear component boundaries, replaceable future ML models, testability, and a vertical-slice delivery sequence.
-
-Issue #1 implementation lives in backend/src/civicai: routes.py delegates to service.py; schemas.py handles HTTP validation/serialization; models.py and database.py handle SQLAlchemy persistence. domain.py defines complaint status and missing-record semantics. main.py owns application lifecycle and error handlers. Alembic migrations are separate from app startup. The backend, migration and persistence flow are locally verified; see CURRENT_STATE.md.
-
-Issue #11 keeps ownership rules in `ownership.py`: routes authenticate/validate, ownership/service code enforces membership/concurrency/lifecycle rules, and SQLAlchemy/PostgreSQL atomically update current assignment plus immutable business history. Authentication role and organizational membership remain separate. Queues are parameterized database views over complaints, never copied records. Citizen schemas continue to exclude internal ownership.
-
-## Intended system
-
-```text
-Citizen/Admin browser
-        |
-        v
-    React web app
-        |
-        v
-   FastAPI application
-     |      |       |
-     |      |       +--> ML inference adapter (later milestone)
-     |      +----------> image/file storage adapter (later milestone)
-     +-----------------> PostgreSQL
+```mermaid
+flowchart TB
+    subgraph Clients["Browser"]
+        C["Citizen portal"]
+        M["Municipal workspace"]
+    end
+    subgraph Runtime["Same-origin application"]
+        P["Caddy or development Vite proxy"]
+        A["FastAPI routes and auth dependencies"]
+        S["Complaint, identity and ownership services"]
+        E["Assessment and priority services"]
+        P --> A
+        A --> S
+        A --> E
+    end
+    C --> P
+    M --> P
+    S --> DB[("PostgreSQL")]
+    E --> DB
+    S --> F["Private local or S3 evidence adapter"]
+    E --> MODEL["Trusted local text artifact"]
+    E --> RULES["reported-context-v1 rules"]
+    S --> PROVIDERS["Geocoding, email and Google OIDC adapters"]
 ```
 
-The browser will communicate with the backend through a versioned JSON API. The backend will own validation, application rules, authorization when introduced, persistence, and orchestration of ML inference. React must not connect directly to the database or model files.
+For the beta topology, FastAPI serves the built SPA directly; Caddy/Vite are not part of that runtime. Map tiles are requested directly by Leaflet using a browser-public MapTiler key. Geocoding stays behind the API.
 
-## Planned components
+## Module map
 
-### Frontend
+| Responsibility | Implementation |
+|---|---|
+| Startup, errors, health and headers | `backend/src/civicai/main.py` |
+| HTTP contracts and routes | `schemas.py`, `routes.py`, `identity_routes.py` |
+| Complaint lifecycle and ownership | `service.py`, `domain.py`, `ownership.py` |
+| Sessions, citizen identity, federation | `auth.py`, `citizen_auth.py`, `oidc.py` |
+| SQLAlchemy persistence | `models.py`, `database.py`; Alembic in `backend/migrations/` |
+| Image validation and private storage | `uploads.py`, `evidence.py` |
+| Experimental assessment | `assessments.py`, `assessment_contract.py`, `assessment_policy.py` |
+| Contextual priority | `priorities.py`, `priority_policy.py` |
+| Citizen and municipal UI | `frontend/src/App.tsx`, `frontend/src/admin/` |
+| Offline study | `research/civicai_research/` and versioned protocols |
 
-Issue #2 implements a single-page React and TypeScript interface for anonymous complaint submission. Issue #12 removes the earlier anonymous recent-complaint feed and adds a private capability status page. `frontend/src/api/complaints.ts` owns HTTP access; React owns the small amount of form and request state. Vite proxies `/api`, `/health` and `/ready` to local FastAPI only during development, avoiding a backend CORS change.
+## Submission and persistence
 
-Issue #4 adds a bounded location-selection component. Text search and current-device capture both produce one selected candidate; confirmation is separate from map adjustment. The lazy-loaded Leaflet renderer consumes normalized coordinates and never calls the geocoder directly. Desktop click, marker drag and touch interaction converge on the same location state, and every coordinate change invalidates prior confirmation. Raster rendering was selected after the WebGL vector canvas stayed blank in the actual in-app browser despite loading its style and attribution. Production tiles use MapTiler Streets v4 through browser-public, origin-restricted `VITE_MAPTILER_API_KEY`. A one-key plan may reuse `MAPTILER_API_KEY`; Compose supports that current deployment while retaining a distinct frontend override for future plans. No anonymous raster service is a production fallback.
+```mermaid
+sequenceDiagram
+    actor Citizen
+    participant UI as React form
+    participant API as FastAPI service
+    participant Files as Private evidence
+    participant DB as PostgreSQL
+    Citizen->>UI: Description, photo, confirmed location, context
+    UI->>API: Multipart submission
+    API->>API: Validate fields and decode/re-encode photo
+    API->>Files: Save generated image reference
+    API->>DB: Complaint + initial event + optional citizen context
+    DB-->>API: Transaction committed
+    API-->>UI: UUID, Submitted status, private tracking capability
+    Note over API,DB: Model inference is not part of this transaction
+```
 
-Issue #8 keeps one React application with citizen (`/`) and municipal (`/admin`, `/admin/complaints`, `/admin/complaints/:id`) routes. The detail map reuses the lazy Leaflet component in read-only mode, preserving submitted location evidence. Components leave room for later AI sections but render no prediction placeholders or fake values.
+Database records commit atomically. File storage is a separate resource: ordinary database failures clean up newly stored evidence, but a process crash can leave an orphan. The media audit reports inconsistency without deleting files.
 
-### Backend
+## Logical data relationships
 
-A FastAPI service will expose API endpoints, validate input, apply complaint workflow rules, and coordinate persistence and later inference. Domain logic should remain separate from HTTP handlers and database-specific code.
+```mermaid
+erDiagram
+    CITIZEN_ACCOUNT o|--o{ COMPLAINT : owns
+    COMPLAINT ||--o{ STATUS_EVENT : records
+    COMPLAINT ||--o{ ASSIGNMENT_EVENT : records
+    COMPLAINT ||--o{ ASSESSMENT : has
+    ASSESSMENT ||--o{ ASSESSMENT_REVIEW : receives
+    COMPLAINT ||--o{ PRIORITY_EVENT : has
+    MUNICIPAL_USER ||--o{ ASSESSMENT_REVIEW : authors
+    DEPARTMENT o|--o{ COMPLAINT : handles
+```
 
-Issue #4 adds provider-neutral search, reverse-geocoding and capability endpoints. Provider response parsing, throttling and caching stay outside route handlers. A Nominatim-compatible adapter supplies policy-limited explicit search; a server-configured MapTiler adapter supplies autocomplete and reverse geocoding. The browser receives only CivicAI's normalized geocoding contracts, but its MapTiler tile key is intentionally compiled into the frontend. When one account key supplies both functions, that shared credential is public and must be origin/usage restricted. Because MapTiler rejects origin-restricted requests that omit origin identification, the backend sends the configured CivicAI `MAPTILER_REQUEST_ORIGIN`; production Compose derives it from the public site address. Neither provider is treated as a CivicAI-owned SLA.
+This is a logical overview, not a full physical schema. Original evidence, model suggestions and staff reviews remain distinct. Status/assignment histories have database immutability protection; do not infer the same trigger guarantees for assessment/priority events. See [data specification](DATA_SPECIFICATION.md) and migrations through `0011`.
 
-Issue #8 adds a small domain state machine and municipal query/update services. Routes validate transport parameters; service code owns pagination, escaped search, real aggregates, transition rules and compare-and-set status updates. Repeating the current state is idempotent; stale `updated_at` fails with a sanitized conflict.
+## Experimental decision support
 
-### Database
+The text service checks complaint access, verifies the operator-configured artifact SHA-256, loads its pipeline and applies versioned heuristics. It records description fingerprint, model identity, state, reasons and mandatory review. Missing/invalid configuration returns 503. Reviews preserve the original output; description-stale reviews fail. Inference is synchronous, with no job queue or background worker. Repeated successful generation/review requests can create additional history; global retry idempotency is not implemented.
 
-PostgreSQL will store complaint records and workflow state. Geospatial extensions are not required for the first vertical slice; PostGIS may be evaluated later if context-aware location queries justify it.
+The priority service uses three explicit facts: immediate danger, blocked access and service interruption. Citizen values are yes/no/unknown; staff may also record conflict. It keeps provenance and unknowns, serializes writes with a complaint-row lock and rejects reviews of superseded/description-stale context. The policy emits Medium, High or needs-review. Staff corrections may use Low/Medium/High/Critical. No suggestion automatically mutates operational workflow. See [priority specification](CONTEXTUAL_PRIORITY.md).
 
-Migration 0005 expands the status constraint and creates append-only `complaint_status_events`. Existing rows receive creation events at their original timestamps. A database trigger rejects event update/delete; indexes support newest-first pagination, status filtering and per-complaint history. No municipal endpoint edits original citizen evidence/location.
+## Identity and privacy
 
-### Media storage
+- Citizen and municipal identities are distinct. Google/email matching never grants staff authority.
+- Opaque session cookies map to hashed PostgreSQL session records. Protected writes enforce CSRF/origin checks.
+- Staff evidence access is complaint-scoped; the owning signed-in citizen can also retrieve their evidence. Anonymous tracking exposes a restricted status view.
+- Evidence remains private in filesystem/S3 storage and is served through authorized API routes.
+- Photos are validated JPEG/PNG, at most 5 MiB and 20 million pixels, re-encoded without source metadata.
+- Precise coordinates, photos, tokens and internal notes must not be copied into public documentation.
+- The browser MapTiler key is publicly observable; if shared with geocoding, that shared value is also public.
 
-Issue #3 uses uploads.py for bounded JPEG/PNG validation, re-encoding and local storage under data/uploads/complaints (UPLOAD_DIR override). PostgreSQL stores a nullable image_ref. Multipart creation coordinates validation, file storage and complaint persistence. Issue #12 places production evidence in a private persistent volume and requires municipal authentication plus complaint authorization on the API image route. A read-only audit reports reference/file inconsistency; legal retention and automatic deletion remain unresolved.
+## Deployment designs
 
-### ML pipeline
+| Design | Public entry | Storage and optional services |
+|---|---|---|
+| Development | Vite 5173 → FastAPI 8000 by default | Local PostgreSQL/files; ignored JSON email capture |
+| Production Compose | Caddy HTTPS → private Uvicorn | Private PostgreSQL and evidence volumes; configured email |
+| Local ML demo overlay | Same Compose entry | Read-only single-model mount; research dependency extra; loopback Mailpit |
+| Closed beta | Render FastAPI serves SPA + API | Supabase PostgreSQL/private S3-compatible storage; Brevo HTTPS email |
 
-The planned assessment boundary is specified in [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md): separate classification/evidence, severity and contextual-priority outputs tied to input/model/policy versions. Future inference runs outside complaint persistence, supports unknown/review/failure states and municipal correction, and preserves existing authorization. This is design only; no worker, inference endpoint, model or optional AI assistant exists at this checkpoint.
+Caddy routes API paths before SPA fallback, enforces a 6 MiB outer body limit and serves fingerprinted assets with immutable caching. Compose publishes neither backend nor database ports. Vite never runs in production.
 
-Training/evaluation code and online inference are separate concerns. Experiments will create versioned model artifacts and reports; the application will eventually call a narrow inference interface. Models must not be trained inside an API request.
+`/health` indicates process liveness. `/ready` checks database connectivity, exact migration head and evidence-storage readiness; it does not certify model, map, email or Google availability. S3 readiness checks bucket access, whereas local evidence checks filesystem access.
 
-Issue #5 adds the pre-training data boundary under `research/`. Restricted text and image files remain outside Git; a JSONL manifest references them with source/provenance metadata, taxonomy and annotation state, group identity, frozen split and SHA-256 hashes. The standalone validator rejects schema drift, unsafe paths and exact group/content leakage before later experiment code reads a dataset. A successful manifest check establishes internal consistency only—not license, consent, representativeness or label correctness.
+## Operational limits
 
-Issue #6 adds an India-only source boundary. `opencity.py` performs bounded, checksum-pinned acquisition into an ignored immutable snapshot; `audit.py` emits aggregate diagnostics and privacy-conscious review references; `prepare.py` admits only explicitly reviewed Indian source identifiers and builds leakage-aware split proposals. Source labels remain separate from CivicAI annotations throughout. `COMPLETE`/`INCOMPLETE` markers prevent interrupted acquisition or preparation directories from being treated as releases. None of these gates authorizes training by itself.
+The system has no automatic failover, distributed rate limiting, inference job queue, learned routing or validated capacity/SLA claim. Backups coordinate PostgreSQL and evidence, with disposable restore verification documented separately. The local artifact's hash establishes integrity, not trust in pickle/joblib deserialization. Public clones and base deployment images do not contain the private model.
 
-Issue #7 Stage A adds an offline review boundary. `review.py` generates checksum-bound local CSV forms, validates partial independent submissions, merges matching decisions and quarantines conflicts for adjudication. `curate.py` contains deterministic derived-text redaction and a fail-closed readiness report; it does not yet publish a curated dataset. Review artifacts remain under ignored data directories. Only a later Stage B may convert validated human decisions into a new versioned derivative.
-
-Issue #9 adds a security boundary around the Issue #8 municipal surface. `municipal_users`, `municipal_sessions` and `security_audit_events` remain separate from anonymous citizen complaints. The browser receives an opaque HttpOnly cookie; PostgreSQL stores only its SHA-256 digest plus expiry, revocation and a session-bound CSRF secret. Authentication dependencies load the current active user on every protected request, so disable and role changes take effect without trusting frontend state. Operator and administrator authorization is enforced in FastAPI; `/admin/users` is administrator-only. Complaint history retains a nullable municipal-user foreign key so pre-authentication history is not rewritten.
-
-The frontend calls `/api/v1/auth/me` on every municipal startup or refresh. It keeps the returned CSRF token only in React memory, sends it on authenticated mutations, and shows login after 401 or expiry. It never stores bearer credentials in localStorage. Citizen and administrative response schemas remain distinct: citizen responses omit immutable history and internal operator notes.
-
-Issue #10 keeps that boundary and adds a presentation architecture rather than a service layer. The root route eagerly loads only the citizen shell; `AdminApp` is a route-level lazy chunk, while `LocationMap` remains a separate lazy chunk. Shared `StatusBadge` and `ConfirmDialog` primitives plus CSS tokens standardize semantics and interactions without a component framework. Native routes remain intentionally small: exact citizen/admin matches render their views and unknown paths render contextual 404 recovery pages.
-
-Responsive behavior is content-driven. Citizen work is single-column first and becomes a bounded split workspace on wide screens. Municipal results have two representations over the same API data: an accessible desktop table and task-focused mobile cards selected by CSS at the layout breakpoint. This avoids duplicating fetch/state logic while preventing page-level horizontal scrolling. Textual place evidence is authoritative when map tiles fail. Evidence images reserve dimensions and load lazily; original stored bytes are never transformed by the frontend.
-
-## MVP vertical slice
-
-Issue #6's offline `research.civicai_research.prepare` consumes a local manifest and immutable raw files. It emits a new proposal manifest/report under ignored processed data, with verified hashes, duplicate components and support counts. This tooling does not connect to the complaint database or grant training approval. Acquisition and source-specific import mappings remain outstanding.
-
-Issue #1 established the tested backend persistence flow and Issue #2 completed the smallest browser-to-database product. Issues #3 and #4 add bounded image evidence and accurate issue-location capture without introducing accounts, prioritization, department routing or ML. The original MVP boundary and acceptance criteria remain documented in `MVP_SCOPE.md`.
-
-## Cross-cutting requirements
-
-- Validate all external input and handle errors consistently.
-- Keep secrets in environment configuration and outside Git.
-- Use migrations for database changes once persistence begins.
-- Record timestamps in UTC and define display-time conversion separately.
-- Use stable identifiers rather than user-visible sequence assumptions.
-- Log operational events without recording sensitive complaint text or coordinates unnecessarily.
-- Add authorization before exposing administrative or personally identifying data.
-
-## Production deployment
-
-Issue #12 selects a portable single-host Docker Compose topology: Caddy is the only public service and terminates HTTPS, serves the immutable Vite build and proxies API/health paths; private Uvicorn serves FastAPI; private PostgreSQL and separate evidence storage use named volumes. A one-shot Alembic service gates backend startup. Caddy state is persistent. Neither the source tree, Git metadata, secrets nor research data enters runtime images/volumes.
-
-The private network pins Caddy at `172.28.0.10`; Uvicorn trusts forwarded headers only from that address. Changing the network requires changing this allowlist. Caddy handles backend paths before SPA fallback. It applies a 6 MiB outer body limit, compression, minimal CSP/security headers, no-store HTML and immutable fingerprinted-asset caching. Vite is never a production process.
-
-`/health` is process liveness with a safe release identifier. `/ready` checks database connectivity, current migration head (`0011`) and writable evidence storage but not optional geocoding/email/OIDC providers. Production configuration rejects insecure cookies, non-HTTPS allowed origins, weak/default tracking secrets and unsafe evidence paths. Compose rotates JSON logs and exposes neither PostgreSQL nor Uvicorn host ports.
-
-The topology intentionally remains platform-neutral and single-host. It does not provide high availability, a distributed rate limiter, legal retention automation, cloud object storage, external metrics/log aggregation or automated deployment. See `DEPLOYMENT.md`, `BACKUP_RESTORE.md` and `OPERATIONS_RUNBOOK.md`.
-
-## Contextual priority integration
-
-The pure priority policy is called by a scoped municipal service, separate from routes and classification. Migration 0010 persists context/suggestion snapshots and subsequent review events. A complaint-row lock serializes writes; stale snapshots cannot be reviewed. The frontend panel displays reasons, missing facts and history. No external provider, model dependency or automatic workflow action is added.
-
-Citizen priority context enters through the existing multipart complaint transaction. The service creates the complaint, initial lifecycle event and optional `citizen_report` priority snapshot before one commit, so staff never receive a context event for a failed complaint. Existing clients can omit the full context set. Municipal review continues through the separately authorized priority API; citizen submission cannot create a staff review, choose an operational priority, or mutate workflow state.
+[API contract](API_CONTRACT.md) · [Deployment](DEPLOYMENT.md) · [Recovery](BACKUP_RESTORE.md) · [Research boundary](RESEARCH_PLAN.md)

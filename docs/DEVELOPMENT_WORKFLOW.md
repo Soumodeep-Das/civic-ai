@@ -12,9 +12,9 @@ Use one narrowly scoped issue at a time. Before implementation, read `CURRENT_ST
 
 User direction (2026-09-19): show progress during work, opening relevant artifacts or a running preview when available. After each coherent task, update documentation, commit with a clear explanation, and push incremental progress when access and repository history permit. Record testing or publishing blockers explicitly; never label unverified work complete or force-push to solve divergent history without authorization.
 
-- Keep the default branch releasable and avoid direct experimental work on it once collaboration begins.
-- Use short-lived branches named by purpose, such as `feat/complaint-create` or `docs/data-guideline`.
-- Rebase or merge according to the repository's eventual hosting policy; no policy is selected yet.
+- Current owner-directed workflow publishes reviewed, scoped commits directly to `main`; do not create a branch unless requested.
+- Keep `main` releasable. Check remote changes, inspect the diff, run appropriate gates, then commit and push without rewriting shared history.
+- A future collaborative branch/PR policy can be adopted explicitly when the team resumes work.
 - Never rewrite shared history without explicit agreement.
 - Do not commit secrets, real personal data, unrestricted datasets, uploads, large model artifacts, or generated experiment runs.
 

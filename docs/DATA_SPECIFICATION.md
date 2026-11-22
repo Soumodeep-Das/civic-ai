@@ -1,6 +1,10 @@
 # Data Specification
 
-Research design update (2026-11-17): [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md) defines proposed evidence provenance and separate classification/severity/priority assessment fields. These are not implemented complaint fields or migrations. Reported duration, access disruption and external context remain proposed; missing context is unknown. Existing taxonomy/manifests and all live API schemas remain unchanged.
+## Implemented assessment data (current through 0011)
+
+Migration 0009 stores experimental text assessments and separate staff reviews. Migration 0010 stores reported-context priority snapshots and reviews. Migration 0011 permits a null staff actor on citizen-reported context created atomically at submission. These are separate event records, not a category/severity/priority column on the complaint. Citizen identity is linked through nullable `citizen_account_id`. See [API contract](API_CONTRACT.md) and [architecture](ARCHITECTURE.md).
+
+Research design update (2026-11-17): [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md) defines the original proposed evidence provenance and assessment fields. Subsequent migrations implement the text-assessment and reported-context subset described above. Incident duration, image assessments and external context remain proposed; missing context is unknown. The original research taxonomy/manifests are separate from the implemented API schemas.
 
 ## Identity additions (`0008`)
 
@@ -8,9 +12,9 @@ Research design update (2026-11-17): [ML_DECISION_SPEC.md](ML_DECISION_SPEC.md) 
 
 ## Status
 
-The broad canonical record below includes future proposals. The implemented application fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at and updated_at; no research dataset is claimed.
+The broad canonical record below includes future proposals. The implemented complaint fields are complaint_id, description, latitude, longitude, image_ref, location_label, location_precision, location_details, location_source, location_accuracy_m, status, department_id, assignee_user_id, citizen_account_id, created_at and updated_at. Internal ownership fields are not all exposed in citizen responses. Runtime complaints are not automatically a research dataset.
 
-Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are runtime evidence files; only an internal relative API reference is stored in PostgreSQL. In production the files live in a private persistent volume and require municipal complaint authorization for retrieval. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only and excluded from the current text/image/multimodal classification experiment. No reporter_id field is implemented.
+Migration 0002 adds nullable VARCHAR(200) image_ref to migration 0001. Existing records remain with null image_ref. Images are runtime evidence files; only an internal relative API reference is stored in PostgreSQL. In production the files live in a private persistent volume and require complaint-scoped staff authorization or the owning citizen's authenticated session for retrieval. Coordinates remain independently optional DOUBLE PRECISION values with range constraints. They are metadata only and excluded from the current text/image/multimodal classification experiment. No reporter_id field is implemented.
 
 Migration 0003 adds nullable location_label VARCHAR(300), location_precision VARCHAR(20) and location_details VARCHAR(500). Precision is controlled to exact, approximate or broad. New context requires both coordinates plus a label and precision; legacy coordinate-only rows remain valid. `exact` means the citizen confirmed a device position or map point, not a surveyed measurement. These fields are application metadata and remain excluded from the current classification experiment.
 
@@ -39,9 +43,9 @@ Migration 0007 adds nullable `department_id` and `assignee_user_id` to complaint
 | Audit | `previous_status`, `new_status` | nullable/required controlled status | Transition evidence |
 | Audit | `event_type` | created/status_changed | Event meaning |
 | Audit | `operator_note` | nullable string, max 1,000 | Internal operational context; never citizen-visible by default |
-| Audit | `actor_id` | nullable UUID | Future authenticated actor; currently null |
+| Audit | `actor_id` | nullable UUID | Municipal actor for authenticated status changes; null for creation/legacy events |
 | Audit | `occurred_at` | UTC timestamp | Immutable event time |
-| Application | `reporter_id` | nullable identifier | Account link; excluded from research by default |
+| Application | `citizen_account_id` | nullable UUID | Implemented optional account link; excluded from research by default |
 | Annotation | `category_label` | controlled value | Human reference label for classification |
 | Annotation | `severity_label` | nullable controlled value | Human assessment under a written rubric |
 | Annotation | `priority_label` | nullable controlled value | Operational target under a written rubric |

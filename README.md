@@ -1,199 +1,176 @@
 # CivicAI
+### AI-Based Urban Civic Complaint Classification and Prioritization System
 
-Offline ML engineering: [synthetic baseline runner](research/OFFLINE_BASELINE_RUNNER.md) documents the grouped TF-IDF/linear workflow and optional `.[test,research]` setup. Synthetic verification is not real-complaint model performance; real-data execution remains disabled.
+[![Quality gates](https://github.com/Soumodeep-Das/civic-ai/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/Soumodeep-Das/civic-ai/actions/workflows/quality.yml)
 
-Current experimental checkpoint (2026-11-21): a small India-sourced text classifier with AI-proposed labels and a transparent reported-context priority policy are integrated into the local municipal review workflow. Citizens can provide three bounded context answers during submission. Neither component is independently validated or production-approved; photos are not classified and no chatbot is integrated. See [current state](docs/CURRENT_STATE.md), [baseline results](research/EXPLORATORY_BASELINE_RESULTS.md) and [contextual priority](docs/CONTEXTUAL_PRIORITY.md).
+**An MCA project for reporting Indian civic issues and supporting accountable municipal review.**
 
-> The closed beta is deployed at `https://civicai-beta.onrender.com/`. Citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification; the remaining municipal/admin beta journey is not yet durably verified. This is a closed-beta checkpoint, not production certification. Fresh agents should start with [the engineering handoff](docs/AGENT_HANDOFF.md).
+Citizens submit a description, photo, issue location and reported impact. Municipal staff review protected evidence, manage responsibility and status, and inspect experimental classification and priority suggestions with recorded explanations.
 
-## Closed-beta deployment path
+[Project guide](docs/README.md) · [System design](docs/ARCHITECTURE.md) · [Research results](research/EXPLORATORY_BASELINE_RESULTS.md) · [Limitations & major scope](docs/ROADMAP.md) · [Demo guide](docs/MINOR_DEMO_RUNBOOK.md)
 
-`Dockerfile.beta` and `render.yaml` define a single-origin Render Free deployment: React is compiled into the image and served by FastAPI alongside the API. Beta PostgreSQL and private evidence storage are supplied by Supabase; transactional identity email uses the Brevo HTTPS API. Start with the placeholder-only `.env.beta.example`, then follow [Issue #14 deployment notes](docs/ISSUE_014_CLOSED_BETA.md). Never commit a populated beta environment file or expose Supabase/Brevo/Google server credentials to Vite.
+> **Current scope — November 22, 2026:** the local demonstration integrates a small text classifier and a transparent context-based priority policy. Photos remain evidence for human inspection. Image classification, validated severity and the planned multimodal comparison are unfinished research objectives. The November 27 presentation build is feature-frozen.
 
-The existing local Docker/Caddy/PostgreSQL/Mailpit workflow is unchanged and does not require Render, Supabase, or Brevo.
+## What the product does
 
-MCA project: AI-Based Urban Civic Complaint Classification and Prioritization System.
+| Citizen experience | Municipal experience |
+|---|---|
+| Report anonymously or through an optional account | Sign in with explicit staff roles and department permissions |
+| Attach a JPEG/PNG and confirm a searched, device or map location | Inspect protected photos, location and original description |
+| Report danger, access blockage and service disruption, including “Not sure” | Review separate category and priority suggestions |
+| Save a private tracking link or use My Complaints | Accept, correct or defer suggestions with explanations |
+| Verify email, reset a password or use configured Google sign-in | Assign work and update status with recorded history |
 
-The MVP supports anonymous civic complaints persisted through FastAPI in PostgreSQL. Issue #4 adds an accessible issue-location picker and requires a photo plus confirmed location in the citizen frontend. Issues #9–#11 add protected municipal operations, responsive accessibility, departments and accountable queues. Issue #12 adds portable production deployment, private tracking/evidence, recovery and CI. Issue #13 adds [modern citizen identity and invitation-only municipal access](docs/ISSUE_013_MODERN_IDENTITY.md) without removing anonymous reporting. Experimental text classification and contextual-priority suggestions now require municipal review and never mutate workflow automatically; video, validated image severity, routing recommendations and general AI assistance remain deferred.
+The citizen form requires photo and location; the API preserves legacy submissions that omit them. Google sign-in grants citizen access only. Staff access is provisioned by administrators.
 
-Issue #5 establishes the research-data contract before model development. It versions the proposed `civicai-category-v1`, documents human annotation/adjudication, and validates provenance manifests for identity, annotation state, safe file references, SHA-256 hashes and split leakage. It does not claim an approved dataset or any model result. See [the research workspace](research/README.md) and [Issue #5 scope](docs/ISSUE_005_RESEARCH_DATA_FOUNDATION.md).
+## One report, three separate decisions
 
-## Issue #4: accessible issue-location selection
+```mermaid
+flowchart LR
+    C["Citizen report"] --> P["Persist complaint and evidence"]
+    P --> W["Municipal workspace"]
+    W -->|Staff requests assessment| T["Description → experimental text classifier"]
+    P --> R["Reported context → priority rules"]
+    T --> H["Staff review: accept / correct / defer"]
+    R --> H
+    H --> W
+    W --> S["Explicit assignment and status action"]
+    S --> V["Citizen status view"]
+```
 
-Issue #6 is in progress: [India-only dataset audit and preparation](docs/ISSUE_006_DATA_PREPARATION.md) adds checksum-pinned OpenCity/IChangeMyCity acquisition, deterministic source auditing and leakage-aware split proposals. The local source has 16,071 Bengaluru text complaints but no images or approved CivicAI labels. A suitable paired Indian research dataset has not been acquired and ML training has not started. Commands are in [research/README.md](research/README.md).
+**Category** identifies the type of issue. **Severity** would describe its evidenced condition and is not predicted here. **Priority** suggests attention based on reported context. Suggestions do not automatically change complaint status, assignment or routing.
 
-Issue #7 Stage A is implemented: [offline human review](docs/ISSUE_007_HUMAN_REVIEW.md) generates ignored, checksum-bound CSV forms for taxonomy, mapping, privacy, record, duplicate, license and final approval decisions. No decision is prefilled, Stage B is waiting for real reviewers, and training remains prohibited.
+## What the ML currently demonstrates
 
-Issue #8 adds the [municipal operations vertical slice](docs/ISSUE_008_MUNICIPAL_OPERATIONS.md), and Issue #9 adds [municipal authentication and RBAC](docs/ISSUE_009_AUTH_RBAC.md). The visible staff entry is `/staff/sign-in` and the role-neutral workspace is `/municipal`; legacy `/admin` bookmarks remain compatible. Operators manage authorized complaints while administrators additionally manage departments and municipal staff invitations.
+| Item | Actual scope |
+|---|---|
+| Source | OpenCity/Janaagraha IChangeMyCity, Bengaluru; 16,071 acquired text records |
+| Exploratory fit | 97 screened descriptions with **AI-proposed labels** |
+| Supported families | Roads/pedestrian access, solid waste, drainage/sewerage, public lighting |
+| Method | TF-IDF + logistic regression; three grouped development folds |
+| Selected mean macro-F1 | **0.8644**, versus **0.1434** for the majority-class comparator |
+| Meaning of the result | Agreement with AI labels on folds also used for model selection |
+| Review behavior | Heuristic guards defer some unsupported, conflicting or insufficient inputs; staff review is mandatory |
 
-The citizen form and municipal workspace reflow from small phones through large desktops. Narrow municipal screens use complaint cards and a compact keyboard-operable menu; wider screens use the data table and full navigation. Every route has a meaningful title and unknown citizen/admin routes have contextual recovery pages. Accessibility work follows selected GIGW/WCAG patterns but is not a formal conformance claim.
+These scores are **not independent test accuracy**. There is no demonstrated West Bengal, all-India, Bengali/Hindi, image or severity performance. The application accepts broader civic complaints than this four-family model supports.
 
-## Municipal authentication
+The original eight-category taxonomy remains a proposal. The exploratory four-family experiment is separately documented and does not approve the original human-reviewed release. See the [experiment report](research/EXPLORATORY_BASELINE_RESULTS.md), [protocol](research/protocols/exploratory_ai_labels_v1.json) and [research workspace](research/README.md).
 
-Apply migrations through the current head (`0011`), then create the first administrator interactively. The command uses `getpass`, validates a 12–128 character password, hashes it with Argon2id and refuses to run when an active administrator already exists. Do not put the password in a command argument or tracked file.
+**A fresh clone does not include the private dataset or trained model.** Core complaint features work without the model. Experimental generation returns a clear unavailable response until a trusted local artifact and its SHA-256 are configured. Follow [ML demo setup](docs/ML_DEMO.md); never load an arbitrary uploaded joblib file.
+
+## System at a glance
+
+```mermaid
+flowchart TB
+    UI["React + TypeScript<br/>Citizen and municipal views"] --> API["FastAPI<br/>Identity, authorization and application services"]
+    API --> DB[("PostgreSQL<br/>Complaints, sessions and history")]
+    API --> MEDIA["Private evidence<br/>Local files or S3-compatible storage"]
+    API --> ML["Optional local text inference"]
+    API --> POLICY["Versioned context rules"]
+    API --> GEO["MapTiler geocoding"]
+    UI --> TILES["MapTiler raster tiles via Leaflet"]
+    API --> ID["Configured Google OIDC and email adapters"]
+```
+
+| Layer | Stack |
+|---|---|
+| Browser | React, TypeScript, Vite, Leaflet |
+| API and persistence | Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, Alembic, PostgreSQL |
+| Experimental ML | scikit-learn, TF-IDF, logistic regression, joblib |
+| Verification | pytest, isolated PostgreSQL schemas, Vitest/Testing Library, GitHub Actions |
+| Deployment | Docker Compose + Caddy; alternative Render/Supabase/Brevo beta path |
+
+See [architecture](docs/ARCHITECTURE.md) for request sequences, data relationships and trust boundaries.
+
+## Run locally on Windows
+
+Prerequisites: **Python 3.12**, **Node.js 22.12+**, and a running PostgreSQL instance (CI uses 18.1). Commands below run from a new checkout in PowerShell.
+
+```powershell
+git clone https://github.com/Soumodeep-Das/civic-ai.git
+Set-Location civic-ai
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[test,research]"
+Copy-Item .env.example .env
+Set-Location frontend
+npm ci
+Set-Location ..
+```
+
+Copy the environment example only for initial setup; preserve any populated environment file. Using PostgreSQL administration tools, create separate `civicai` and `civicai_test` databases. The test role needs permission to create schemas. Populate the ignored `.env`:
+
+| Configuration | Purpose |
+|---|---|
+| `DATABASE_URL` | Development database, using `postgresql+psycopg://` |
+| `TEST_DATABASE_URL` | Different disposable database with a name ending in `_test` |
+| `GEOCODING_PROVIDER=maptiler`, `MAPTILER_API_KEY` | Autocomplete/reverse geocoding |
+| `VITE_MAPTILER_API_KEY` | Browser-visible map tile key; restrict allowed origins and usage |
+| `MAPTILER_REQUEST_ORIGIN` | Actual CivicAI origin when the shared key is origin-restricted |
+| Google OAuth settings | Optional; needed only for Google sign-in |
+
+A one-key MapTiler plan can reuse the same key for backend and frontend. That value becomes publicly observable. Separate keys remain supported. Without a tile key the UI shows a configuration message; it does not use an anonymous tile fallback.
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic upgrade head
 .\.venv\Scripts\python.exe -m civicai.bootstrap_admin
-```
-
-Municipal sessions use a random opaque cookie and PostgreSQL session record. Only a SHA-256 digest of the authentication token is stored. The cookie is HttpOnly and SameSite=Strict; authenticated mutations also require a session-bound CSRF token and permitted browser Origin. Sessions expire absolutely after eight hours by default. Set `AUTH_COOKIE_SECURE=true` with `APP_ENV=production`; production startup refuses an insecure cookie. CivicAI intentionally enables no backend CORS middleware because the supported browser deployment is same-origin (Vite proxy locally, reverse proxy in production).
-
-## Citizen accounts and development email
-
-Accounts are optional. Email/password citizens verify ownership before sign-in; Google OIDC is available when configured. Signed-in submissions are saved to `/my-complaints`; guest submissions keep their Issue #12 capability link and can later be claimed only with that capability. Citizen passwords require 15–128 characters and use Argon2id. Municipal authority is never inferred from citizen signup, Google identity or email.
-
-Local `EMAIL_TRANSPORT=capture` writes verification/reset/invitation messages to ignored `tmp/dev-mail/*.json`; open the newest file privately and use its link. Automated tests use their own per-test temporary mail directories and never populate the developer inbox. Production must configure SMTP or explicitly disable delivery. Google needs an OAuth web client and exact callback `http://127.0.0.1:5173/api/v1/citizen-auth/google/callback` for the Vite same-origin development flow (or the real HTTPS-domain callback in production). Keep client secrets in ignored `.env` files.
-
-For production-like Docker verification without a real SMTP provider, add the explicitly local `compose.production.mailpit.yml` override. It routes backend SMTP to Mailpit and exposes the debug inbox only at `http://127.0.0.1:8025`; SMTP is not published to the host. Do not use this override for a real deployment.
-
-Citizens can explicitly search by locality, PIN code, street, address or landmark, use their current device position, and optionally refine the selected point on a map. Search results can be selected and confirmed without operating the map. The form identifies the selected location as exact, approximate or broad and requires confirmation after any map adjustment.
-
-The frontend requires one valid JPEG/PNG photo and one confirmed location before submitting. This is a user-experience rule for the citizen form, not a breaking backend constraint: old location-free records and trusted direct API clients remain supported. A selected location describes the civic issue, not necessarily the reporter's current position. Nearby details should help municipal staff identify the site but must not contain private personal information.
-
-With the default public-Nominatim fallback, search is sent only when the user presses Search or Enter. When `GEOCODING_PROVIDER=maptiler` and `MAPTILER_API_KEY` are configured, the frontend enables debounced search-as-you-type suggestions. If that same key is browser-origin restricted, `MAPTILER_REQUEST_ORIGIN` identifies the CivicAI origin on backend geocoding calls; production Compose derives it from `CIVICAI_SITE_ADDRESS`. The backend also supports reverse geocoding after the pin moves. Provider capabilities are discovered at runtime, so public Nominatim never receives autocomplete traffic. Both public geocoding modes are external dependencies without a CivicAI SLA.
-
-The street map is lazy-loaded and uses Leaflet with MapTiler Streets v4 raster tiles. It supports desktop left-click, marker drag, touch pan/zoom and marker drag; the old directional controls are removed. Tiles use browser-public `VITE_MAPTILER_API_KEY`; there is no anonymous tile fallback. A one-key MapTiler account may use the same value for `MAPTILER_API_KEY` and `VITE_MAPTILER_API_KEY`; once compiled into JavaScript it is publicly observable and must be protected with MapTiler Allowed HTTP Origins/usage restrictions rather than secrecy. Separate values remain supported when the plan permits them. MapTiler and OpenStreetMap attribution remain visible. See `frontend/.env.example`, `.env.example` and `docs/ISSUE_004_LOCATION_SELECTION.md`.
-
-## Issue #3: photos and location
-
-After pulling, install updated backend dependencies with `python -m pip install -e ".[test]"` using the project virtual environment, run `python -m alembic upgrade head`, and run `npm install` in `frontend`. Restart both servers. Migrations 0002–0004 preserve existing complaints while adding nullable image, location-context, selection-source and device-accuracy fields.
-
-POST now uses multipart/form-data, including for text-only submissions. JSON clients must migrate; see docs/API_CONTRACT.md. The frontend handles this automatically.
-
-The citizen frontend requires one JPEG/PNG (5 MiB maximum); the backward-compatible API keeps it optional. Images must decode successfully and match their declared MIME, be at most 20 million pixels and have one frame. Re-encoding preserves orientation while removing EXIF/text metadata. Total multipart body is bounded to 5 MiB + 256 KiB, while Caddy rejects production requests above 6 MiB. Stored filenames are generated and original names ignored.
-
-Files are stored under data/uploads/complaints locally and a private named evidence volume in production. `UPLOAD_DIR` can override the directory; the backend needs write permission. PostgreSQL stores only relative image references. Back up files and database together. Ordinary persistence failures clean up newly saved files; process crashes may leave orphan files. Issue #12 removes anonymous evidence access: the image route now requires a municipal session and complaint-level authorization. `python -m civicai.media_audit` reports missing/orphan evidence without deleting it.
-
-Use “Use my current location” while near the issue. Permission is requested on demand. The browser may use a device fix from the last five minutes and waits up to 30 seconds for one. Browser location requires a secure context (HTTPS or trusted localhost), operating-system Location Services and an available location provider; on Windows, keep Location Services and Wi-Fi enabled. A failure preserves the draft and lets the citizen search for the issue instead. Location remains optional in the backward-compatible API but is required by the citizen form; it does not enter the current classification experiment.
-
-Video and manual coordinate entry are not offered. Issue #4 provides a street map for refining a searched or device-derived location. Avoid real private evidence in the demonstration database.
-
-## Setup on Windows
-
-Run from this repository folder in PowerShell. Use Python 3.12 and PostgreSQL (18 is installed on this computer). Dependencies are managed with standard pip and pyproject.toml; uv is not needed.
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -e ".[test]"
-Copy-Item .env.example .env
-```
-
-If the Python launcher is unavailable, use the full path to Python 3.12 instead of py -3.12. On this computer the bundled interpreter is:
-
-```powershell
-& 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m venv .venv
-```
-
-Use PostgreSQL's administration tools to create two empty databases: civicai and civicai_test. Give the test role permission to create schemas in civicai_test. Edit the ignored .env with your database URLs and geocoder configuration. Replace the placeholders; URL-encode special characters in credentials. Never share the password in chat. Environment variables take precedence over .env.
-
-## Migrate and run
-
-```powershell
-.\.venv\Scripts\python.exe -m alembic upgrade head
-.\.venv\Scripts\python.exe -m alembic current
-.\.venv\Scripts\python.exe -m uvicorn civicai.main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-Open http://127.0.0.1:8000/docs for the interactive API. Expand POST /api/v1/complaints, choose Try it out, enter a description and optional coordinates, and Execute. Save both the returned `complaint_id` and `tracking_token`; the status endpoint requires both. There is no anonymous global complaint list. `GET /health` reports process liveness and the safe release identifier; `GET /ready` checks PostgreSQL, migration head and evidence storage.
-
-Schema creation uses Alembic, never automatic startup table creation. Complaint submission may be anonymous or linked from the server-authenticated citizen session; anonymous status access requires its bearer capability. Every municipal operation is authenticated server-side; staff management additionally requires `municipal_admin`.
-
-### Start the complete local MVP with one command
-
-After completing the backend and frontend setup once, run this from the repository root:
-
-```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 ```
 
-The helper checks the backend and frontend first, starts only the service that is missing, waits for both ports, and verifies that the Vite API proxy returns JSON. Services are started as hidden local processes so closing this PowerShell window does not immediately stop the site. Runtime output is written to the ignored `logs` directory. Re-run the same command whenever http://127.0.0.1:5173 cannot be reached.
+Bootstrap prompts privately and refuses when an active administrator already exists. Run it only for initial provisioning. Open [citizen portal](http://127.0.0.1:5173/), [staff sign-in](http://127.0.0.1:5173/staff/sign-in) or [API docs](http://127.0.0.1:8000/docs). Backend port defaults to 8000; `BACKEND_PORT` changes both the launcher and Vite proxy after restart.
 
-The backend defaults to port `8000`. If that port is already occupied by a stale or unrelated local process, set `BACKEND_PORT=8001` (or another free port) in the ignored root `.env` before starting. The startup helper and Vite proxy read the same setting, so browser API requests continue to reach the intended backend. Restart both affected development processes after changing the value. Do not add the MapTiler key or any other credential to a tracked file.
+Development email capture writes private verification/reset/invitation JSON messages to ignored `tmp/dev-mail`. Production/beta reject capture and disabled email modes; configure SMTP or Brevo as appropriate. The local Docker demo uses a loopback-only Mailpit inbox. Details: [deployment](docs/DEPLOYMENT.md).
 
-## Tests
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest
-```
-
-TEST_DATABASE_URL must point to a separate PostgreSQL database whose name ends in _test. Missing or unsafe configuration fails loudly. Tests create a uniquely named schema, apply the real Alembic migration, roll back each API test, and remove that schema at completion. No developer tables are truncated. A forcibly terminated test may leave its generated schema in the test database.
-
-Health and database-unavailable tests need dependencies but no live PostgreSQL:
+## Test and build
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest backend/tests/test_api.py -k "health or unavailable"
-```
-
-Dependency ranges are in pyproject.toml; no resolved lock file is claimed yet. The current non-blocking dependency deprecation warnings are recorded in `docs/DEVELOPMENT_LOG.md`.
-
-## Frontend setup and run
-
-Use Node.js 22.12 or newer. In a second PowerShell window, while the backend is running on port 8000:
-
-```powershell
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -m pytest backend/tests research/tests -q -p no:cacheprovider --basetemp tmp/pytest-local
 Set-Location frontend
-npm install
-npm run dev
-```
-
-Open http://127.0.0.1:5173. Vite proxies API calls to the local FastAPI server, so no backend CORS change is required. A separately hosted frontend may set `VITE_API_BASE_URL` using `frontend/.env.example` as a guide.
-
-Run the frontend tests and production build with:
-
-```powershell
 npm test
 npm run build
+Set-Location ..
 ```
 
-Frontend dependencies are captured in `frontend/package-lock.json`.
+Tests require the dedicated test database and apply real migrations in isolated schemas. Never point them at the normal application database. The private-model integration test skips when its artifact is absent, including a normal CI checkout; a green CI build does not prove that artifact ran. Research tests use fixtures and do not retrain the private model.
 
-`VITE_MAPTILER_API_KEY` selects no provider: it supplies the browser-public credential for the fixed MapTiler Streets v4 raster endpoint. The map displays a configuration message rather than silently using an anonymous service when the key is absent; the production image build fails closed. In MapTiler, allow `localhost` for local verification (without scheme or port) and the actual CivicAI domain for deployment. The map code is loaded only after a location is selected. Do not add offline prefetching or bulk tile download. On this computer the global `npm` wrapper may fail because its roaming `npm-cli.js` is missing; the repository-local commands used for verification were `node .\node_modules\vitest\vitest.mjs run`, `node .\node_modules\typescript\bin\tsc -b`, and `node .\node_modules\vite\bin\vite.js build`.
+[Verification history](docs/CURRENT_STATE.md) distinguishes local tests, CI, owner reports and browser checks. Test counts are dated evidence, not a permanent coverage or security guarantee.
 
-### If the local frontend reports 404 or cannot reach the API
+## Choose the right deployment
 
-Run the repository startup helper first:
+| Environment | Purpose and boundary |
+|---|---|
+| Local Vite + FastAPI | Development; `.env`; frontend 5173 |
+| Local Docker demonstration | HTTPS at localhost; `start-ml-demo.ps1` adds the private model and local Mailpit; needs existing private artifacts |
+| Base production Compose | Caddy, private backend/PostgreSQL and evidence volume; default build has no experimental model |
+| Closed beta | Render serves UI/API; Supabase supplies database/private storage; Brevo supplies email |
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
+The [closed-beta URL](https://civicai-beta.onrender.com/) has previously reported citizen-flow verification. Current local ML verification does not establish what is deployed there or guarantee availability. Follow [beta notes](docs/ISSUE_014_CLOSED_BETA.md) before using it.
+
+For deployment and recovery, read [deployment](docs/DEPLOYMENT.md), [backup/restore](docs/BACKUP_RESTORE.md) and [operations](docs/OPERATIONS_RUNBOOK.md). A created backup is not a proven restore. Keep all populated environment files, evidence, backups and model artifacts outside Git.
+
+## Repository map
+
+```text
+backend/          API, application services, database models, migrations, tests
+frontend/         Citizen and municipal React views, map, API clients, tests
+research/         Protocols, acquisition/curation tools, experiments, result notes
+docs/             Architecture, API contract, setup/operations and academic scope
+docs/reference/   Approved synopsis and original template
+deploy/           Caddy and container deployment support
+scripts/          Development, deployment, backup and verification helpers
+data/             Ignored local datasets and evidence; placeholders only in Git
+ml/               Reserved directory; active experiment code lives in research/
+.github/          CI test, audit and build workflow
 ```
 
-For a frontend that is already running but serving a stale proxy configuration, stop that frontend process and start it again from the `frontend` directory:
+## Limitations and major-project direction
 
-```powershell
-npm run dev
-```
+The minor deliverable is an integrated experimental system. Independent labels and evaluation, image/multimodal classification, category-specific severity, broader Indian coverage and contextual ranking remain substantial research work. Product gaps include status notifications, richer communication and broader accessibility/device validation. Operational gaps include a Python lockfile, shared abuse controls, monitoring and formal recovery/scale validation.
 
-The development proxy is loaded when Vite starts. Restarting is required after a stale development process or proxy-configuration change. A healthy proxy returns JSON from http://127.0.0.1:5173/health rather than the frontend HTML page. The anonymous complaint-list route is intentionally disabled.
+The [major-project roadmap](docs/ROADMAP.md) connects each gap to an acceptance criterion. It makes no promise of image-severity accuracy, emergency response, municipal adoption or novel algorithms.
 
-## Production-like deployment
+## Academic provenance and reuse
 
-Production uses Docker Compose, Caddy HTTPS, the built React bundle, private FastAPI/PostgreSQL networking and persistent named volumes. It never runs Vite or exposes PostgreSQL/Uvicorn publicly. Start and stop with:
+The [approved synopsis](docs/reference/project-synopsis.docx) records the original intent; [project context](docs/PROJECT_CONTEXT.md) explains the delivered minor scope and unfinished comparison. Dataset attribution and use boundaries are recorded in the [experiment report](research/EXPLORATORY_BASELINE_RESULTS.md) and [source register](research/SOURCE_REGISTER.md). Runtime citizen submissions are excluded from research by default.
 
-```powershell
-Copy-Item .env.production.example .env.production
-# Replace every placeholder, then:
-.\scripts\start-production.ps1
-.\scripts\stop-production.ps1
-```
-
-Do not use example values in production. Follow the full [deployment checklist](docs/DEPLOYMENT.md), [backup/restore procedure](docs/BACKUP_RESTORE.md) and [operations runbook](docs/OPERATIONS_RUNBOOK.md). `.env.production` and runtime backups are ignored by Git.
-
-## Files
-
-- backend/src/civicai: schemas, routes, service logic, persistence, configuration.
-- backend/migrations: Alembic environment and linear migrations through 0011.
-- backend/tests: API, migration consistency and database constraint tests.
-- frontend/src: React complaint form, accessible location picker, lazy-loaded map, private tracking page, municipal workspace, API client, styles and interaction tests.
-- scripts/start-dev.ps1: checks and starts both local development services, then verifies the API proxy.
-- compose.production.yml, Dockerfile and deploy/: portable Caddy/FastAPI/PostgreSQL production topology.
-- scripts/backup-production.ps1 and verify-backup-restore.ps1: coordinated runtime backup and disposable restore verification.
-- docs: project context, [current state](docs/CURRENT_STATE.md), and [development log](docs/DEVELOPMENT_LOG.md).
-- docs/reference/project-synopsis.docx: approved synopsis.
-- research: proposed taxonomy, Indian-source acquisition/audit, annotation/data documentation and manifest/preparation validation; no approved training dataset or results yet.
-- ml and data: reserved for later approved acquisition and experiment milestones.
-
-[Public repository](https://github.com/Soumodeep-Das/civic-ai). Verified Issue #4 history is published on `main`; never rewrite shared history without explicit authorization.
-
-Full offline ML engine tests require the optional `research` extra (`python -m pip install -e ".[test,research]"`). Without it the numerical test module skips; that is not a verified engine run. See [the runner setup and Windows fallback](research/OFFLINE_BASELINE_RUNNER.md). Production installs remain unchanged.
+This repository currently has **no software license file**. Public visibility does not establish an open-source reuse license. Dataset and third-party dependency licenses are separate; no license is invented by this documentation review.

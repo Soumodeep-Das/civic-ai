@@ -1,5 +1,11 @@
 # Project Context
 
+## Delivered scope and original intent
+
+As of November 22, 2026, the application includes citizen identity/private tracking, municipal authentication, department ownership, status history, experimental text assessment and reported-context priority review. The minor presentation uses this integrated local workflow. The synopsis originally proposed text/image/multimodal comparison; only the bounded text experiment has been performed. Image classification, severity and paired comparison remain unfinished objectives carried into the [major-project roadmap](ROADMAP.md).
+
+The sections below retain the original milestone and taxonomy context. The eight proposed categories are not the four families used by the current experimental classifier.
+
 ## Purpose
 
 CivicAI addresses the delay and inconsistency that can occur when urban civic complaints are manually interpreted, categorized, and ordered for attention. Citizens need a simple way to report issues, while municipal or campus-style administrative users need structured records that support triage and follow-up.
@@ -21,11 +27,11 @@ No real municipal deployment, integration, service-level agreement, or productio
 
 ## Core scope
 
-The first software milestone will be a narrow vertical slice:
+The first software milestone was the following narrow vertical slice:
 
 `citizen complaint form -> FastAPI endpoint -> PostgreSQL persistence -> administrative complaint list`
 
-The locally verified application now implements anonymous complaint persistence, bounded JPEG/PNG evidence, accurate searched/device location and map refinement. Authentication, status workflows and ML inference remain separate milestones. Issue #5 begins the research track with taxonomy, annotation and dataset-manifest controls; it does not yet provide a dataset or model.
+The locally verified application now implements anonymous complaint persistence, bounded JPEG/PNG evidence, accurate searched/device location and map refinement. Authentication and status workflows are implemented; experimental text inference is integrated into the local municipal demonstration. Issue #5 begins the research track with taxonomy, annotation and dataset-manifest controls; it does not yet provide a dataset or model.
 
 ## Initial complaint categories
 
@@ -52,7 +58,7 @@ Severity describes the apparent magnitude or danger of an issue. Priority is an 
 
 ## Minor and major directions
 
-The minor-project research focus is a controlled comparison of text-only, image-only, and text-image multimodal classification. The minor software deliverable should remain a demonstrable, student-scale web system.
+The original minor-project research objective was a controlled comparison of text-only, image-only, and text-image multimodal classification. That comparison remains unperformed; the delivered exploratory study is text-only. The minor software deliverable should remain a demonstrable, student-scale web system.
 
 The approved prototype includes a transparent priority engine that combines documented factors such as reported severity, location significance, and repeated reports to assign Low, Medium, High, or Critical priority, with human verification. The likely major-project research direction is learned priority ranking and richer spatial-temporal context. Possible later extensions such as duplicate clustering, hotspot analysis, and explainable AI are not current commitments.
 
