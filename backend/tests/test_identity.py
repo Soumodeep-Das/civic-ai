@@ -115,11 +115,18 @@ def test_citizen_session_logout_password_change_and_reset(anonymous_client):
 def test_authenticated_submission_my_complaints_and_cross_account_denial(anonymous_client):
     _signup_and_verify(anonymous_client)
     _login(anonymous_client)
+    anonymous_client.app.state.email_service.messages.clear()
     created = anonymous_client.post("/api/v1/complaints", files={
         "description": (None, "Broken drain owned by citizen"),
     })
     assert created.status_code == 201, created.text
     complaint_id = created.json()["complaint_id"]
+    receipt = anonymous_client.app.state.email_service.messages[-1]
+    assert receipt.recipient == "Citizen@Example.COM"
+    assert "received complaint" in receipt.subject
+    assert complaint_id in receipt.text
+    assert f"http://testserver/complaints/{complaint_id}" in receipt.text
+    assert "Broken drain" not in receipt.text
     listing = anonymous_client.get("/api/v1/citizen/complaints")
     assert listing.status_code == 200
     assert listing.json()["items"][0]["complaint_id"] == complaint_id
@@ -134,7 +141,9 @@ def test_authenticated_submission_my_complaints_and_cross_account_denial(anonymo
 
 
 def test_anonymous_submission_and_secure_claim(anonymous_client):
+    anonymous_client.app.state.email_service.messages.clear()
     created = anonymous_client.post("/api/v1/complaints", files={"description": (None, "Anonymous issue")})
+    assert anonymous_client.app.state.email_service.messages == []
     complaint_id = created.json()["complaint_id"]
     tracking = created.json()["tracking_token"]
     assert anonymous_client.get(f"/api/v1/complaints/{complaint_id}?tracking_token={tracking}").status_code == 200
@@ -143,6 +152,25 @@ def test_anonymous_submission_and_secure_claim(anonymous_client):
     claim = anonymous_client.post(f"/api/v1/citizen/complaints/{complaint_id}/claim", json={"token": tracking})
     assert claim.status_code == 200
     assert anonymous_client.post(f"/api/v1/citizen/complaints/{complaint_id}/claim", json={"token": tracking}).status_code == 200
+
+
+def test_email_provider_failure_does_not_undo_authenticated_submission(anonymous_client):
+    _signup_and_verify(anonymous_client)
+    _login(anonymous_client)
+
+    class FailingEmailService:
+        def send(self, message):
+            raise RuntimeError("provider unavailable with sensitive diagnostics")
+
+    anonymous_client.app.state.email_service = FailingEmailService()
+    created = anonymous_client.post("/api/v1/complaints", files={
+        "description": (None, "Submission survives notification failure"),
+    })
+    assert created.status_code == 201
+    complaint_id = created.json()["complaint_id"]
+    listing = anonymous_client.get("/api/v1/citizen/complaints")
+    assert listing.status_code == 200
+    assert listing.json()["items"][0]["complaint_id"] == complaint_id
 
 
 def test_staff_invitation_role_and_departments_are_admin_controlled(admin_client):

@@ -9,7 +9,7 @@ from starlette.datastructures import UploadFile
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from civicai import ownership, service
+from civicai import notifications, ownership, service
 from civicai.auth import (
     DUMMY_PASSWORD_HASH, AdminAuth, CsrfAuth, OperatorAuth, create_login_session,
     create_user, record_audit, token_digest, utc_now, verify_password, update_user,
@@ -160,6 +160,12 @@ async def create(request: Request, session: DatabaseSession):
             values["image_ref"] = None
             values["tracking_token"] = tracking_token(
                 complaint.complaint_id, request.app.state.runtime_settings.public_tracking_secret
+            )
+            notifications.notify_complaint_received(
+                session,
+                complaint,
+                request.app.state.email_service,
+                request.app.state.auth_settings.public_base_url,
             )
             return values
         except Exception:
@@ -312,9 +318,19 @@ def admin_history(complaint_id: UUID, session: DatabaseSession, auth: OperatorAu
     tags=["municipal operations"],
 )
 def admin_update_status(
-    complaint_id: UUID, data: ComplaintStatusUpdate, session: DatabaseSession, auth: CsrfAuth
+    complaint_id: UUID, data: ComplaintStatusUpdate, request: Request,
+    session: DatabaseSession, auth: CsrfAuth,
 ):
-    return service.update_complaint_status(session, complaint_id, data, auth.user)
+    previous_status = service.get_complaint(session, complaint_id).status
+    complaint = service.update_complaint_status(session, complaint_id, data, auth.user)
+    if complaint.status != previous_status:
+        notifications.notify_complaint_status_changed(
+            session,
+            complaint,
+            request.app.state.email_service,
+            request.app.state.auth_settings.public_base_url,
+        )
+    return complaint
 
 
 @router.get("/api/v1/admin/departments", response_model=list[MunicipalDepartmentRead], tags=["municipal departments"])

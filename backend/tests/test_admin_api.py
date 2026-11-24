@@ -2,6 +2,9 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
+from sqlalchemy.orm import Session
+
+from civicai.models import CitizenAccount, Complaint
 
 
 def create_complaint(client, description="Blocked drain", **values):
@@ -66,6 +69,56 @@ def test_valid_lifecycle_and_history(client):
     assert history[-1]["operator_note"] == "Reopened after verification"
     assert history[0]["actor_id"] is None
     assert all(event["actor_id"] is not None for event in history[1:])
+
+
+def test_status_change_emails_active_citizen_without_internal_details(client):
+    complaint = create_complaint(client, "Private complaint description")
+    with Session(bind=client.app.state.test_connection, join_transaction_mode="create_savepoint") as session:
+        account = CitizenAccount(
+            email="owner@example.com", email_normalized="owner@example.com",
+            display_name="Report Owner", state="active",
+        )
+        session.add(account)
+        session.flush()
+        row = session.get(Complaint, complaint["complaint_id"])
+        row.citizen_account_id = account.account_id
+        session.commit()
+
+    client.app.state.email_service.messages.clear()
+    response = change_status(client, complaint, "under_review", "Internal inspection detail")
+    assert response.status_code == 200
+    message = client.app.state.email_service.messages[-1]
+    assert message.recipient == "owner@example.com"
+    assert "now Under review" in message.subject
+    assert complaint["complaint_id"] in message.text
+    assert f"http://testserver/complaints/{complaint['complaint_id']}" in message.text
+    assert "Internal inspection detail" not in message.text
+    assert "Private complaint description" not in message.text
+
+
+def test_email_provider_failure_does_not_undo_status_change(client):
+    complaint = create_complaint(client)
+    with Session(bind=client.app.state.test_connection, join_transaction_mode="create_savepoint") as session:
+        account = CitizenAccount(
+            email="owner-failure@example.com", email_normalized="owner-failure@example.com",
+            display_name="Report Owner", state="active",
+        )
+        session.add(account)
+        session.flush()
+        row = session.get(Complaint, complaint["complaint_id"])
+        row.citizen_account_id = account.account_id
+        session.commit()
+
+    class FailingEmailService:
+        def send(self, message):
+            raise RuntimeError("provider unavailable with sensitive diagnostics")
+
+    client.app.state.email_service = FailingEmailService()
+    response = change_status(client, complaint, "under_review")
+    assert response.status_code == 200
+    assert response.json()["status"] == "under_review"
+    detail = client.get(f"/api/v1/admin/complaints/{complaint['complaint_id']}")
+    assert detail.json()["status"] == "under_review"
 
 
 @pytest.mark.parametrize("target", ["in_progress", "resolved"])

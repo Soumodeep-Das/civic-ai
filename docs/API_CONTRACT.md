@@ -16,6 +16,8 @@ Multipart fields: description (required trimmed nonempty text), latitude (option
 
 POST returns 201 with complaint_id, description, latitude, longitude, location_label, location_precision, location_details, location_source, location_accuracy_m, status, created_at, updated_at and a 64-character `tracking_token`. `image_ref` is always null in this anonymous response even when evidence was stored. New complaints start as `submitted`; UUID and UTC timestamps remain server-owned. The tracking token is shown only on submission, is a bearer capability and must not be logged or published.
 
+If the request has an active citizen session, the committed complaint is linked to that account and CivicAI submits a transactional receipt through the configured email adapter. Anonymous submissions do not send email. A provider failure never rolls back or changes the successful complaint response; it is logged without recipient, description, evidence, location or provider response. Email acceptance by the configured provider is not proof of inbox delivery.
+
 The citizen Issue #4 frontend requires a photo and confirmed location. The API intentionally keeps both optional for existing records, compatibility and non-browser clients; frontend policy must not be described as a database invariant.
 
 ## Issue-location search
@@ -46,6 +48,8 @@ Issue #11 extends municipal resources only. Issue #12's capability status respon
 `GET /api/v1/admin/complaints` additionally accepts `department_id`, `assignee_user_id`, `assignment_state=assigned|unassigned`, and `queue=unassigned|mine|my_departments_unassigned`. The organization-wide `unassigned` queue is administrator-only. Operators receive only current member-department complaints or complaints individually assigned to them. Existing pagination and filters compose server-side.
 
 Municipal list/detail items add safe department/assignee summaries. Detail adds chronological immutable `assignment_history`. `PATCH /api/v1/admin/complaints/{id}/assignment` is administrator-only and accepts nullable `department_id`, nullable `assignee_user_id`, timezone-aware `expected_updated_at`, and optional 1–1,000 character reason. Assignee requires an active member of the active selected department. An exact desired-state retry is idempotent; different stale state returns `409 stale_complaint_update`.
+
+After `PATCH /api/v1/admin/complaints/{id}/status` commits a genuine status transition on an active citizen-owned complaint, CivicAI submits a citizen-safe transactional email. Idempotent retries, anonymous reports and reports owned by disabled accounts send no message. The email contains the complaint reference, public status, account detail link and a short generic explanation; it excludes operator notes, description, photo and location. Provider failure does not reverse the committed status/history transaction.
 
 `POST /api/v1/admin/complaints/{id}/claim` accepts timezone-aware `expected_updated_at`. An active operator can claim only an unassigned complaint owned by a current member department. Concurrent claims use conditional update; one wins and stale competitors receive 409. `GET /api/v1/admin/work-summary` returns truthful personal/department queue counts, never performance or priority scores.
 

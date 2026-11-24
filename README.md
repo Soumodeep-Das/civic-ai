@@ -9,7 +9,7 @@ Citizens submit a description, photo, issue location and reported impact. Munici
 
 [Project guide](docs/README.md) · [System design](docs/ARCHITECTURE.md) · [Research results](research/EXPLORATORY_BASELINE_RESULTS.md) · [Limitations & major scope](docs/ROADMAP.md) · [Demo guide](docs/MINOR_DEMO_RUNBOOK.md)
 
-> **Current scope — November 22, 2026:** the local demonstration integrates a small text classifier and a transparent context-based priority policy. Photos remain evidence for human inspection. Image classification, validated severity and the planned multimodal comparison are unfinished research objectives. The November 27 presentation build is feature-frozen.
+> **Current scope — November 24, 2026:** the local demonstration integrates a small text classifier, a transparent context-based priority policy and account-owned complaint email updates. Photos remain evidence for human inspection. Image classification, validated severity and the planned multimodal comparison are unfinished research objectives. Only narrowly tested presentation-readiness changes are being accepted before November 27.
 
 ## What the product does
 
@@ -20,6 +20,7 @@ Citizens submit a description, photo, issue location and reported impact. Munici
 | Report danger, access blockage and service disruption, including “Not sure” | Review separate category and priority suggestions |
 | Save a private tracking link or use My Complaints | Accept, correct or defer suggestions with explanations |
 | Verify email, reset a password or use configured Google sign-in | Assign work and update status with recorded history |
+| Receive a submission receipt and status-change emails for account-owned reports | Trigger citizen-safe updates through genuine lifecycle changes |
 
 The citizen form requires photo and location; the API preserves legacy submissions that omit them. Google sign-in grants citizen access only. Staff access is provisioned by administrators.
 
@@ -118,7 +119,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 
 Bootstrap prompts privately and refuses when an active administrator already exists. Run it only for initial provisioning. Open [citizen portal](http://127.0.0.1:5173/), [staff sign-in](http://127.0.0.1:5173/staff/sign-in) or [API docs](http://127.0.0.1:8000/docs). Backend port defaults to 8000; `BACKEND_PORT` changes both the launcher and Vite proxy after restart.
 
-Development email capture writes private verification/reset/invitation JSON messages to ignored `tmp/dev-mail`. Production/beta reject capture and disabled email modes; configure SMTP or Brevo as appropriate. The local Docker demo uses a loopback-only Mailpit inbox. Details: [deployment](docs/DEPLOYMENT.md).
+Development email capture writes private verification/reset/invitation/complaint-notification JSON messages to ignored `tmp/dev-mail`. Production/beta reject capture and disabled email modes; configure SMTP or Brevo as appropriate. The local Docker demo uses a loopback-only Mailpit inbox. Signed-in citizens receive a receipt for newly owned reports and a message after a genuine status transition. Anonymous reports have no address and continue to use their private tracking link. Details: [deployment](docs/DEPLOYMENT.md).
 
 ## Test and build
 
@@ -165,7 +166,7 @@ ml/               Reserved directory; active experiment code lives in research/
 
 ## Limitations and major-project direction
 
-The minor deliverable is an integrated experimental system. Independent labels and evaluation, image/multimodal classification, category-specific severity, broader Indian coverage and contextual ranking remain substantial research work. Product gaps include status notifications, richer communication and broader accessibility/device validation. Operational gaps include a Python lockfile, shared abuse controls, monitoring and formal recovery/scale validation.
+The minor deliverable is an integrated experimental system. Independent labels and evaluation, image/multimodal classification, category-specific severity, broader Indian coverage and contextual ranking remain substantial research work. Account-owned complaint receipts and lifecycle email alerts are implemented; notification preferences, SMS, anonymous subscriptions, durable delivery retries and provider delivery/bounce tracking remain future work. Broader communication and accessibility/device validation also remain. Operational gaps include a Python lockfile, shared abuse controls, monitoring and formal recovery/scale validation.
 
 The [major-project roadmap](docs/ROADMAP.md) connects each gap to an acceptance criterion. It makes no promise of image-severity accuracy, emergency response, municipal adoption or novel algorithms.
 

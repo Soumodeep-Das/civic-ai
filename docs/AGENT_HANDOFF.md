@@ -82,7 +82,7 @@ Status terms below have precise meanings:
 | My Complaints | IMPLEMENTED BUT NOT RECENTLY VERIFIED | Account-scoped list/detail UI/API tests pass; no retained public-beta journey record. |
 | Complaint ownership | VERIFIED IMPLEMENTED | Server-side ownership and privacy tests pass. |
 | Anonymous complaint claiming | IMPLEMENTED BUT NOT RECENTLY VERIFIED | Capability-based claim is tested; no current beta human record. |
-| Citizen status/history presentation | IMPLEMENTED BUT NOT RECENTLY VERIFIED | Sanitized history is tested; notifications are not implemented. |
+| Citizen status/history presentation | IMPLEMENTED BUT NOT RECENTLY VERIFIED | Sanitized history and account-owned lifecycle emails are tested; the rebuilt Docker/Mailpit path has not yet been exercised for the notification increment. |
 | Responsive/mobile behavior | PARTIAL | Responsive/component tests and earlier Chromium checks exist. No broad beta device/browser study, screen-reader study or formal WCAG/GIGW conformance claim exists. |
 | Error and empty states | VERIFIED IMPLEMENTED | Frontend suites exercise route, validation, provider, retry, empty and image failures. |
 
@@ -271,7 +271,7 @@ Repository-backed items:
 | Low | TECHNICAL DEBT | `RELEASE_ID` is configured as `render-beta`, not the deployed commit SHA, reducing runtime provenance. |
 | Low | TECHNICAL DEBT | Login throttling is process-local; no distributed abuse-control layer exists. |
 | Low | TECHNICAL DEBT | Python dependencies have ranges but no resolved lock; three upstream deprecation warnings remain. |
-| Product gap | PLANNED | Citizen status notifications, richer communication, map visual polish and broader logged-in status UX are deferred. |
+| Product gap | PARTIAL | Basic account-owned receipt/status emails are implemented. Durable retry/delivery observability, preferences, anonymous subscriptions, SMS, richer communication, map polish and broader logged-in status UX remain deferred. |
 | Research blocker | PARTIAL | Independent reference labels and genuine paired Indian text-image evaluation remain unavailable. Stage B is incomplete; the separate experimental text model is implemented locally. |
 
 Resolved deployment incidents retained for context: Supabase pooler/URL configuration initially prevented startup; Google initially returned `redirect_uri_mismatch`; MapTiler origin formatting/geocoding caused 403/503 behavior; and an early Docker build exposed a Vite key in build-command output. Current code/config addresses these (exact URLs/origins, provider-specific adapters, and a non-interpolating build validation). Never reintroduce secret values into Docker `RUN` text or a public storage bucket.

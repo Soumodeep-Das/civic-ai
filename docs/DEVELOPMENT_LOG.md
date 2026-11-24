@@ -1,5 +1,9 @@
 # Development Log
 
+## 2026-11-24 — Citizen complaint lifecycle email notifications
+
+Added receipt emails for active signed-in citizen submissions and status-change emails after genuine municipal transitions. Reused the established capture/SMTP/Brevo boundary; anonymous behavior and API responses are unchanged. Messages deliberately omit complaint content, evidence, location and municipal notes. Provider exceptions are sanitized and do not undo committed workflow state. The design was checked against NYC311 service-request updates and GOV.UK transactional-message guidance. Full backend/research verification passed 550 tests with three known dependency deprecation warnings; all 61 frontend tests, `pip check`, TypeScript and the Vite production build passed. Diff/credential-pattern checks passed. Direct Docker/Mailpit verification could not start because the agent was denied access to Docker Desktop's named pipe; no running container was changed.
+
 ## 2026-11-24 — Professional service-interface pass
 
 Reviewed the live layout and current React/CSS implementation against established government-service patterns. Added shared surface, type, spacing, action and interaction treatments across the citizen and municipal applications. Reworked the text-assessment and contextual-priority panels into structured decision-support components with visible capability boundaries, suggestion summaries, correction controls and audit timelines. Corrected the missing queue-tab color token that caused selected tabs to retain white text on a light surface, then made active and hover states explicit. Added no dependency and changed no endpoint, model, permission or stored record.

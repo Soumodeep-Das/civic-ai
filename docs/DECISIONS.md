@@ -1,5 +1,15 @@
 # Decision Log
 
+## D045 Notify account owners at meaningful complaint lifecycle points (2026-11-24, accepted)
+
+- Send a transactional receipt after an account-owned complaint commits and a status email after each genuine municipal lifecycle transition. Anonymous complaints keep capability-based tracking because CivicAI has no verified address for them.
+- Reuse the configured capture, SMTP or Brevo adapter. Keep complaint persistence authoritative: provider failure is recorded in sanitized logs and must not roll back a complaint, status or history event.
+- Include only the account display name, complaint reference, public status, generic explanation and direct CivicAI account link. Exclude description, coordinates, location label, photo and internal municipal notes.
+- Keep the first presentation slice deliberately small: synchronous best-effort provider submission, no schema change, preference centre, SMS, anonymous subscription, outbox/retry worker or delivery/bounce claim.
+- This follows the established civic pattern documented by [NYC311](https://portal.311.nyc.gov/article/?kanumber=KA-03116), where a confirmation reference precedes action updates without personal information, and [GOV.UK transactional-message guidance](https://www.gov.uk/service-manual/design/sending-emails-and-text-messages), which recommends immediate, concise confirmations while excluding sensitive information.
+
+Consequences: signed-in citizens no longer need to poll for every lifecycle change, while the primary workflow remains available during an email outage. “Sent” means submitted to the configured adapter/provider, not proven inbox delivery. A durable outbox and delivery observability remain major-project reliability work.
+
 ## D044 Refine the existing service interface before the minor demonstration (2026-11-24, accepted)
 
 - Apply one consistent set of typography, spacing, surface, status, form, table and action patterns across citizen and municipal views.

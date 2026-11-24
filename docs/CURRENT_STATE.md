@@ -1,5 +1,11 @@
 # Current State
 
+## 2026-11-24 — Citizen complaint lifecycle email notifications
+
+Account-owned submissions now produce a privacy-minimized receipt after the complaint commits. Genuine municipal status transitions produce an update to the active owner through the existing environment-specific email adapter. Messages include the complaint UUID, public status and signed-in detail link; they exclude complaint text, photo, location and internal operator notes. Anonymous reports remain unchanged and use private tracking. Provider failure cannot roll back the already-committed complaint or status event and is logged without recipient/content/provider diagnostics.
+
+Full backend/research verification passes 550 tests with three known upstream deprecation warnings, including notification success, privacy, anonymous, idempotent and provider-failure paths. All 61 frontend tests, `pip check`, TypeScript and the Vite production build pass. `git diff --check` passes and the tracked diff contains no recognized credential pattern. Direct Docker/Mailpit verification is blocked because this agent cannot access the Docker Desktop named pipe; the existing stack was not rebuilt or changed. Email delivery is synchronous best-effort: no durable outbox, automatic retry, bounce tracking, SMS, notification preference or guaranteed inbox-delivery claim exists.
+
 ## 2026-11-24 — Citizen and municipal interface refinement
 
 Applied a shared professional service-interface system to the citizen portal, identity surfaces, municipal dashboard, queue, tables and complaint details. Rebuilt the classification and priority panels around explicit scope summaries, current suggestions, review controls and readable audit histories. Defined the previously missing queue-tab green token and added explicit selected, hover and focus-visible contrast, fixing white active text on a light background. Existing workflow behavior, permissions, API contracts and data are unchanged. The implementation uses the existing React/CSS stack and adds no runtime dependency.

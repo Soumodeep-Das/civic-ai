@@ -42,6 +42,7 @@ For the beta topology, FastAPI serves the built SPA directly; Caddy/Vite are not
 | Sessions, citizen identity, federation | `auth.py`, `citizen_auth.py`, `oidc.py` |
 | SQLAlchemy persistence | `models.py`, `database.py`; Alembic in `backend/migrations/` |
 | Image validation and private storage | `uploads.py`, `evidence.py` |
+| Transactional complaint notifications | `notifications.py`, using `emailing.py` adapters |
 | Experimental assessment | `assessments.py`, `assessment_contract.py`, `assessment_policy.py` |
 | Contextual priority | `priorities.py`, `priority_policy.py` |
 | Citizen and municipal UI | `frontend/src/App.tsx`, `frontend/src/admin/` |
@@ -62,6 +63,9 @@ sequenceDiagram
     API->>Files: Save generated image reference
     API->>DB: Complaint + initial event + optional citizen context
     DB-->>API: Transaction committed
+    opt Active signed-in owner
+        API->>API: Submit privacy-minimized receipt to configured email adapter
+    end
     API-->>UI: UUID, Submitted status, private tracking capability
     Note over API,DB: Model inference is not part of this transaction
 ```
@@ -99,6 +103,7 @@ The priority service uses three explicit facts: immediate danger, blocked access
 - Photos are validated JPEG/PNG, at most 5 MiB and 20 million pixels, re-encoded without source metadata.
 - Precise coordinates, photos, tokens and internal notes must not be copied into public documentation.
 - The browser MapTiler key is publicly observable; if shared with geocoding, that shared value is also public.
+- Account-owned complaint emails contain only citizen-safe status, reference and a same-origin account link. They exclude internal notes, complaint text, evidence and location. Anonymous complaints have no email notification path.
 
 ## Deployment designs
 
@@ -115,6 +120,6 @@ Caddy routes API paths before SPA fallback, enforces a 6 MiB outer body limit an
 
 ## Operational limits
 
-The system has no automatic failover, distributed rate limiting, inference job queue, learned routing or validated capacity/SLA claim. Backups coordinate PostgreSQL and evidence, with disposable restore verification documented separately. The local artifact's hash establishes integrity, not trust in pickle/joblib deserialization. Public clones and base deployment images do not contain the private model.
+The system has no automatic failover, distributed rate limiting, inference job queue, learned routing or validated capacity/SLA claim. Complaint notification submission is synchronous and best-effort after the database commit; there is no durable outbox, retry worker, bounce tracking, SMS or per-account preference yet. Backups coordinate PostgreSQL and evidence, with disposable restore verification documented separately. The local artifact's hash establishes integrity, not trust in pickle/joblib deserialization. Public clones and base deployment images do not contain the private model.
 
 [API contract](API_CONTRACT.md) · [Deployment](DEPLOYMENT.md) · [Recovery](BACKUP_RESTORE.md) · [Research boundary](RESEARCH_PLAN.md)

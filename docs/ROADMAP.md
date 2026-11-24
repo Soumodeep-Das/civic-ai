@@ -1,5 +1,5 @@
 # Scope, limitations and major-project roadmap
-Updated November 22, 2026. Future items are proposals with acceptance criteria, not scheduled or implemented features.
+Updated November 24, 2026. Future items are proposals with acceptance criteria, not scheduled or implemented features.
 
 ## Minor deliverable and original synopsis
 
@@ -7,7 +7,7 @@ The original synopsis proposed a controlled text-only, image-only and multimodal
 
 | Area | Delivered minor scope | Remaining limitation |
 |---|---|---|
-| Reporting | Description, photo, confirmed location, reported impact | No offline submission or status notifications |
+| Reporting | Description, photo, confirmed location, reported impact; account receipts and status emails | No offline submission, delivery retry/observability, SMS or notification preferences |
 | Identity | Guest tracking, optional citizen accounts, Google OIDC, municipal roles | No claim of independent security certification |
 | Operations | Department ownership, queues, lifecycle/history, review explanations | No municipal integration, guaranteed response time or automatic routing |
 | Text ML | 97 Bengaluru texts; four families; TF-IDF/logistic regression | AI labels, small sample, selected development-fold metrics |
@@ -31,7 +31,7 @@ Available image candidates do not form an approved, representative paired datase
 | 2. Stronger text evaluation | Measure transfer and abstention beyond AI-label development folds | Frozen grouped test set, baseline comparison, per-class errors, coverage and calibration analysis where probabilities are exposed |
 | 3. Image task and genuine pairs | Evaluate visible defects and image/text classification | Compatible labels, independent scenes, event/source split controls, aligned incident pairs and equal held-out comparisons |
 | 4. Severity and contextual ranking | Incorporate evidenced condition, duration and exposure | Category-specific observable rubric, municipal/domain review, unknown/conflict handling and under/over-triage evaluation |
-| 5. Citizen communication | Status notifications and clearer follow-up | Delivery/retry tests, privacy controls and usable citizen history |
+| 5. Citizen communication reliability | Extend implemented account receipts/status email | Durable outbox/retry, delivery and bounce evidence, preferences and clearer follow-up UX |
 | 6. Product usability | Better map refinement, accessibility and multilingual guidance | Physical-device and keyboard/screen-reader checks; comprehension and language testing |
 | 7. Operational readiness | Dependency locking, monitoring, abuse controls and recovery | Repeatable environment, capacity measurements, off-host restore exercise, shared rate limits where required |
 | 8. Optional AI assistance | Bounded description/observation help | Selected provider/local model, disclosed data handling, measured costs/resources, failure limits and human confirmation |
