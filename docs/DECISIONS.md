@@ -1,5 +1,15 @@
 # Decision Log
 
+## D044 Refine the existing service interface before the minor demonstration (2026-11-24, accepted)
+
+- Apply one consistent set of typography, spacing, surface, status, form, table and action patterns across citizen and municipal views.
+- Give experimental classification and contextual priority distinct headers, scope summaries, suggestion cards, review workspaces and audit timelines.
+- Retain semantic HTML, visible focus, reduced-motion support, responsive layouts and the existing React component structure.
+- Keep the existing dependency set for the presentation build. The required components are small and project-specific, and a late framework migration would widen the regression surface.
+- Use established public-service component guidance as the design reference. Relevant sources are the [GOV.UK Design System components](https://design-system.service.gov.uk/components/) and [U.S. Web Design System card guidance](https://designsystem.digital.gov/components/card/).
+
+Consequences: the presentation interface gains a clearer information hierarchy without changing API contracts, stored data or decision authority. The visual pass still requires inspection in the rebuilt HTTPS demo on desktop and mobile widths.
+
 ## D043 Defer unvalidated photo AI before the minor demonstration (2026-11-21, accepted)
 
 - Keep citizen photographs as protected evidence for authorized human inspection; no current model consumes them.

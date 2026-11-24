@@ -15,7 +15,7 @@ it("sends a correction and displays its saved history", async () => {
  const user = userEvent.setup();
  await user.type(await screen.findByLabelText("Review explanation"), "Checked evidence");
  await user.click(screen.getByRole("button", { name: "Save correction" }));
- await waitFor(() => expect(screen.getByText("corrected")).toBeInTheDocument());
+ await waitFor(() => expect(screen.getByText(/corrected/)).toBeInTheDocument());
  const post = fetcher.mock.calls.find(call => call[1]?.method === "POST");
  expect(JSON.parse(post![1]!.body as string)).toEqual({ decision: "corrected", corrected_family: "solid_waste", note: "Checked evidence" });
  expect(post![1]!.headers).toMatchObject({ "X-CSRF-Token": "test-csrf" });

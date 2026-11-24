@@ -18,12 +18,12 @@ it("preserves unknown context and shows persisted deferral", async () => {
  const user = userEvent.setup();
  await user.type(screen.getByLabelText("Context evidence explanation"), "Needs inspection");
  await user.click(screen.getByRole("button", { name: "Save context and suggest priority" }));
- await screen.findByText("Needs municipal review");
+ await screen.findByText("Municipal review needed");
  expect(screen.getByRole("button", { name: "Accept priority" })).toBeDisabled();
  const post = fetcher.mock.calls.find(c => c[1]?.method === "POST")!;
  expect(JSON.parse(post[1]!.body as string).context.immediate_danger).toBe("unknown");
  expect(post[1]!.headers).toMatchObject({ "X-CSRF-Token": "csrf" });
- await user.type(screen.getByLabelText("Priority review explanation"), "Inspection requested");
- await user.click(screen.getByRole("button", { name: "Defer priority" }));
+ await user.type(screen.getByLabelText("Review explanation"), "Inspection requested");
+ await user.click(screen.getByRole("button", { name: "Defer for review" }));
  await waitFor(() => expect(screen.getByText("Inspection requested", { selector: "p" })).toBeInTheDocument());
 });

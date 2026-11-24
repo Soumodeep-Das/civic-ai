@@ -1,10 +1,16 @@
 # Current State
 
+## 2026-11-24 — Citizen and municipal interface refinement
+
+Applied a shared professional service-interface system to the citizen portal, identity surfaces, municipal dashboard, queue, tables and complaint details. Rebuilt the classification and priority panels around explicit scope summaries, current suggestions, review controls and readable audit histories. Defined the previously missing queue-tab green token and added explicit selected, hover and focus-visible contrast, fixing white active text on a light background. Existing workflow behavior, permissions, API contracts and data are unchanged. The implementation uses the existing React/CSS stack and adds no runtime dependency.
+
+All 61 frontend tests and the TypeScript/Vite production build pass. The earlier owner rebuild at 10:49 IST passed backup, image builds, migrations, evidence initialization, container health and readiness 200 for commit `c70b163`. This later visual change requires one further rebuild and browser inspection before presentation sign-off.
+
 ## November 24 municipal queue update
 
 The municipal queue shows category and priority from current staff reviews. Filters apply to the authorized result set before returning the requested page. Pending review includes complaints with either decision outstanding, deferred or stale. Accepted and corrected values are visible on desktop and mobile. Review panels distinguish confirmed writes with failed history refreshes from uncertain network outcomes.
 
-Local checks passed 547 Python tests (three warnings), 60 existing frontend tests, the added confirmed-save regression and the TypeScript/Vite production build. Docker Desktop denied engine access during verification. The rebuilt HTTPS browser journey is pending. Filtered reads scan authorized complaints in batches and have not been load-tested.
+Local checks passed 547 Python tests (three warnings), 60 existing frontend tests, the added confirmed-save regression and the TypeScript/Vite production build. The owner subsequently rebuilt the HTTPS demo successfully with backup, migrations, healthy services and readiness 200, then confirmed the reviewed-priority filter. Filtered reads scan authorized complaints in batches and have not been load-tested.
 
 ## 2026-11-22 — Documentation audit and reader-facing overhaul
 

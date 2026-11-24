@@ -1,10 +1,16 @@
 # Development Log
 
+## 2026-11-24 — Professional service-interface pass
+
+Reviewed the live layout and current React/CSS implementation against established government-service patterns. Added shared surface, type, spacing, action and interaction treatments across the citizen and municipal applications. Reworked the text-assessment and contextual-priority panels into structured decision-support components with visible capability boundaries, suggestion summaries, correction controls and audit timelines. Corrected the missing queue-tab color token that caused selected tabs to retain white text on a light surface, then made active and hover states explicit. Added no dependency and changed no endpoint, model, permission or stored record.
+
+The visual direction follows the [GOV.UK Design System](https://design-system.service.gov.uk/components/) emphasis on consistent reusable components and the [U.S. Web Design System](https://designsystem.digital.gov/components/card/) guidance for simple, purposeful cards. The existing semantic controls, focus states and reduced-motion behavior remain. All 61 frontend tests and the TypeScript/Vite production build passed. Final HTTPS desktop/mobile inspection follows the owner rebuild.
+
 ## November 24 municipal queue update
 
 The municipal queue shows category and priority from current staff reviews. Filters apply to the authorized result set before returning the requested page. Pending review includes complaints with either decision outstanding, deferred or stale. Accepted and corrected values are visible on desktop and mobile. Review panels distinguish confirmed writes with failed history refreshes from uncertain network outcomes.
 
-Local checks passed 547 Python tests (three warnings), 60 existing frontend tests, the added confirmed-save regression and the TypeScript/Vite production build. Docker Desktop denied engine access during verification. The rebuilt HTTPS browser journey is pending. Filtered reads scan authorized complaints in batches and have not been load-tested.
+Local checks passed 547 Python tests (three warnings), 60 existing frontend tests, the added confirmed-save regression and the TypeScript/Vite production build. The owner subsequently rebuilt the HTTPS demo successfully with backup, migrations, healthy services and readiness 200, then confirmed the reviewed-priority filter. Filtered reads scan authorized complaints in batches and have not been load-tested.
 
 ## 2026-11-22 — Documentation audit and reader-facing overhaul
 
