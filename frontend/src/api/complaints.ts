@@ -19,7 +19,7 @@ export type ComplaintSubmission = Complaint & { tracking_token: string };
 
 export type DepartmentSummary = { department_id: string; slug: string; display_name: string; is_active: boolean };
 export type AssigneeSummary = { user_id: string; username: string; is_active: boolean };
-export type AdminComplaint = Complaint & { department: DepartmentSummary | null; assignee: AssigneeSummary | null };
+export type AdminComplaint = Complaint & { review_summary?: {category_state: string; priority_state: string; category: string | null; priority: string | null} | null; department: DepartmentSummary | null; assignee: AssigneeSummary | null };
 
 export type AssignmentEvent = {
   event_id: string; complaint_id: string; event_type: string;
@@ -79,6 +79,8 @@ export type AdminComplaintFilters = {
   departmentId?: string;
   assigneeUserId?: string;
   assignmentState?: "assigned" | "unassigned";
+  reviewedPriority?: string;
+  pendingReview?: boolean;
   queue?: "unassigned" | "mine" | "my_departments_unassigned";
 };
 
@@ -223,6 +225,8 @@ export function listAdminComplaints(filters: AdminComplaintFilters = {}): Promis
   if (filters.departmentId) parameters.set("department_id", filters.departmentId);
   if (filters.assigneeUserId) parameters.set("assignee_user_id", filters.assigneeUserId);
   if (filters.assignmentState) parameters.set("assignment_state", filters.assignmentState);
+  if (filters.reviewedPriority) parameters.set("reviewed_priority", filters.reviewedPriority);
+  if (filters.pendingReview) parameters.set("pending_review", "true");
   if (filters.queue) parameters.set("queue", filters.queue);
   return request<AdminComplaintPage>(`/api/v1/admin/complaints?${parameters}`);
 }

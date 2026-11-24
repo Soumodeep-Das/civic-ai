@@ -226,6 +226,8 @@ def admin_list(
     department_id: UUID | None = None,
     assignee_user_id: UUID | None = None,
     assignment_state: Literal["assigned", "unassigned"] | None = None,
+    reviewed_priority: Literal["Low", "Medium", "High", "Critical"] | None = None,
+    pending_review: bool = False,
     queue: Literal["unassigned", "mine", "my_departments_unassigned"] | None = None,
 ):
     if created_from and (created_from.tzinfo is None or created_from.utcoffset() is None):
@@ -238,15 +240,43 @@ def admin_list(
         raise HTTPException(403, "Only administrators can view the organization-wide unassigned queue.")
     if assignee_user_id is not None and auth.user.role != "municipal_admin" and assignee_user_id != auth.user.user_id:
         raise HTTPException(403, "Operators may filter only their own individual assignments.")
-    items, total = service.list_admin_complaints(
-        session, page=page, page_size=page_size, status=status,
+    from civicai.queue_reviews import summarize
+    options = dict(status=status,
         created_from=created_from, created_to=created_to,
         has_location=has_location, has_photo=has_photo, query=q, actor=auth.user,
         department_id=department_id, assignee_user_id=assignee_user_id,
         assignment_state=assignment_state, queue=queue,
     )
+    def page_rows(number, size):
+        return service.list_admin_complaints(session, page=number, page_size=size, **options)
+
+    def as_item(row, summary):
+        return admin_complaint_read(session, row).model_copy(update={"review_summary": summary})
+
+    if reviewed_priority or pending_review:
+        # Scan authorized rows in batches so pagination and totals reflect both filters.
+        items, total, batch = [], 0, 1
+        while True:
+            rows, count = page_rows(batch, 100)
+            summaries = summarize(session, rows)
+            for row in rows:
+                summary = summaries[row.complaint_id]
+                if reviewed_priority and summary["priority"] != reviewed_priority:
+                    continue
+                if pending_review and summary["category_state"] == summary["priority_state"] == "reviewed":
+                    continue
+                if (page - 1) * page_size <= total < page * page_size:
+                    items.append(as_item(row, summary))
+                total += 1
+            if batch * 100 >= count:
+                break
+            batch += 1
+    else:
+        rows, total = page_rows(page, page_size)
+        summaries = summarize(session, rows)
+        items = [as_item(row, summaries[row.complaint_id]) for row in rows]
     return AdminComplaintPage(
-        items=[admin_complaint_read(session, item) for item in items], page=page, page_size=page_size, total=total,
+        items=items, page=page, page_size=page_size, total=total,
         total_pages=service.page_count(total, page_size),
     )
 

@@ -8,12 +8,19 @@ def test_priority_persistence_and_review(client):
     assert snapshot['suggestion']['band'] == 'High'
     review = {'snapshot_id': snapshot['event_id'], 'decision': 'accepted', 'note': 'Reviewed context'}
     assert client.post(base + '/reviews', json=review).status_code == 201
+    queue = '/api/v1/admin/complaints'
+    accepted = client.get(queue, params={'reviewed_priority': 'High'}).json()
+    assert accepted['total'] == 1
+    assert accepted['items'][0]['review_summary']['priority'] == 'High'
     history = client.get(base).json()
     assert len(history) == 2 and history[0]['actor_id'] == history[1]['actor_id']
     detail = client.get(base.removesuffix('/priority')).json()
     assert detail['status'] == created['status'] and detail['updated_at'] == created['updated_at']
     second = client.post(base + '/context', json={'context': {'source': 'citizen_report'}, 'note': 'Unknown facts'}).json()
     assert client.post(base + '/reviews', json=review).status_code == 409
+    assert client.get(queue, params={'reviewed_priority': 'High'}).json()['total'] == 0
+    pending = client.get(queue, params={'pending_review': True}).json()['items'][0]
+    assert pending['review_summary']['priority_state'] == 'needs reassessment'
     review['snapshot_id'] = second['event_id']
     assert client.post(base + '/reviews', json=review).status_code == 422
     review['decision'] = 'corrected'

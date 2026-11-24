@@ -119,3 +119,8 @@ GET `/api/v1/admin/complaints/{complaint_id}/priority` returns scoped chronologi
 `POST /api/v1/complaints` additionally accepts the optional multipart fields `immediate_danger`, `access_blocked` and `essential_service_interrupted`. Each value is `yes`, `no` or `unknown`. Clients must either omit all three for backward compatibility or submit all three; partial sets and the staff-only `conflict` value return 422. The current citizen UI submits all three and labels `unknown` as “Not sure.”
 
 The backend atomically creates the complaint, initial status event and a separate `citizen_report` priority-context event. Anonymous context has a null staff actor; it is still bound to the complaint description hash. The ordinary complaint response and private tracking response do not expose the internal suggestion. A reported emergency does not change complaint status or promise dispatch. Authorized municipal staff inspect and review it through the existing `/priority` endpoints.
+
+
+### Municipal queue review filters
+
+The staff complaint list accepts optional `reviewed_priority` (Low, Medium, High, Critical) and `pending_review` (boolean). Each list item includes `review_summary` with category, priority and their respective states. Only a current accepted or corrected decision supplies a value. New context supersedes earlier priority approval. Existing access restrictions, sort order and pagination apply.

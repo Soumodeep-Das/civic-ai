@@ -125,6 +125,7 @@ class AssigneeSummary(BaseModel):
 
 
 class AdminComplaintRead(ComplaintRead):
+    review_summary: dict[str, str | None] | None = None
     department: DepartmentSummary | None = None
     assignee: AssigneeSummary | None = None
 

@@ -20,3 +20,23 @@ it("sends a correction and displays its saved history", async () => {
  expect(JSON.parse(post![1]!.body as string)).toEqual({ decision: "corrected", corrected_family: "solid_waste", note: "Checked evidence" });
  expect(post![1]!.headers).toMatchObject({ "X-CSRF-Token": "test-csrf" });
 });
+
+it("reports a confirmed review when reloading its history fails", async () => {
+  let saved = false;
+  vi.stubGlobal("fetch", vi.fn(async (url: string, options?: RequestInit) => {
+    if (options?.method === "POST") {
+      saved = true;
+      return { ok: true, json: async () => ({}) };
+    }
+    if (url.endsWith("/reviews")) {
+      if (saved) throw new Error("Connection lost");
+      return { ok: true, json: async () => [] };
+    }
+    return { ok: true, json: async () => [{ assessment_id: "a", state: "suggested", suggested_family: "solid_waste", reasons: [] }] };
+  }));
+  render(<AssessmentPanel complaintId="c" csrf="test" />);
+  const user = userEvent.setup();
+  await user.type(await screen.findByLabelText("Review explanation"), "Evidence checked");
+  await user.click(screen.getByRole("button", { name: "Accept suggestion" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Review saved");
+});

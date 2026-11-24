@@ -11,7 +11,10 @@ export function AssessmentPanel({ complaintId, csrf }: { complaintId: string; cs
   const [history, setHistory] = useState<{ review_id: string; decision: string; note: string; corrected_family?: string }[]>([]);
   const base = `/api/v1/admin/complaints/${complaintId}/assessments`;
   async function request(url: string, body?: object) {
-    const response = await fetch(url, body === undefined ? { credentials: "same-origin" } : { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(body) });
+    const response = await fetch(url, body === undefined ? { credentials: "same-origin" } : { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(body) }).catch(error => {
+      if (body) throw new Error("Save outcome unknown. Reload the complaint and check its history before retrying.");
+      throw error;
+    });
     if (!response.ok) throw new Error(response.status === 503 ? "Experimental model is not configured or unavailable. Normal complaint handling remains available." : "Assessment action failed. Check your session and reload before trying again.");
     return response.json();
   }
@@ -23,8 +26,8 @@ export function AssessmentPanel({ complaintId, csrf }: { complaintId: string; cs
     if (item) request(`${base}/${item.assessment_id}/reviews`).then(data => { if (active) setHistory(data); }).catch(e => { if (active) setError(e.message); });
     return () => { active = false; };
   }, [base, items]);
-  async function generate() { setBusy(true); setError(""); try { await request(base, {}); setItems(await request(base)); } catch (e) { setError(e instanceof Error ? e.message : "Assessment unavailable"); } finally { setBusy(false); } }
-  async function review(item: Assessment, decision: string) { setBusy(true); setError(""); try { await request(`${base}/${item.assessment_id}/reviews`, { decision, note, ...(decision === "corrected" ? { corrected_family: family } : {}) }); setMessage("Review saved. Complaint status and priority were not changed."); setNote(""); setHistory(await request(`${base}/${item.assessment_id}/reviews`)); } catch (e) { setError(e instanceof Error ? e.message : "Review failed"); } finally { setBusy(false); } }
+  async function generate() { setBusy(true); setError(""); try { await request(base, {}); try { setItems(await request(base)); } catch { setError("Assessment saved. Reload the complaint to see the updated history."); } } catch (e) { setError(e instanceof Error ? e.message : "Assessment unavailable"); } finally { setBusy(false); } }
+  async function review(item: Assessment, decision: string) { setBusy(true); setError(""); try { await request(`${base}/${item.assessment_id}/reviews`, { decision, note, ...(decision === "corrected" ? { corrected_family: family } : {}) }); setMessage("Review saved. Complaint status and priority were not changed."); setNote(""); try { setHistory(await request(`${base}/${item.assessment_id}/reviews`)); } catch { setError("Review saved. Reload the complaint to see the updated history."); } } catch (e) { setError(e instanceof Error ? e.message : "Review failed"); } finally { setBusy(false); } }
   return <article className="detail-card"><h2>Experimental text assessment</h2><p>Trained on a small Bengaluru sample with AI-proposed labels. Suggestions require staff review; photos and urgency are not assessed.</p>
     {error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}
     <button type="button" disabled={busy} onClick={() => void generate()}>{busy ? "Working…" : "Generate experimental assessment"}</button>

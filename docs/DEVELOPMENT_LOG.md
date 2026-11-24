@@ -1,5 +1,11 @@
 # Development Log
 
+## November 24 municipal queue update
+
+The municipal queue shows category and priority from current staff reviews. Filters apply to the authorized result set before returning the requested page. Pending review includes complaints with either decision outstanding, deferred or stale. Accepted and corrected values are visible on desktop and mobile. Review panels distinguish confirmed writes with failed history refreshes from uncertain network outcomes.
+
+Local checks passed 547 Python tests (three warnings), 60 existing frontend tests, the added confirmed-save regression and the TypeScript/Vite production build. Docker Desktop denied engine access during verification. The rebuilt HTTPS browser journey is pending. Filtered reads scan authorized complaints in batches and have not been load-tested.
+
 ## 2026-11-22 — Documentation audit and reader-facing overhaul
 
 Reviewed GitHub and the local implementation, rebuilt the README and architecture, added a documentation index and major-project roadmap, and corrected stale research/API/identity/deployment claims. Public-clone model limitations, AI-label metrics, the CI artifact-test skip and the distinction between original synopsis and delivered scope are explicit. Historical files and reference attachments are retained. No application or research data changed. See [review findings](DOCUMENTATION_REVIEW_2026_11_22.md).
