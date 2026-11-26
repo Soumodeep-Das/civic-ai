@@ -29,23 +29,15 @@ def review_assessment(session, complaint_id, assessment_id, data, actor):
 
 
 def generate_assessment(session, complaint_id, actor):
-    import os, io
-    from pathlib import Path
     from uuid import uuid4
     from datetime import datetime, timezone
     from civicai.assessment_policy import assess, POLICY_VERSION
+    from civicai.experimental_model import load_experimental_model
     complaint=service.get_complaint(session, complaint_id)
     ownership.require_complaint_access(session, actor, complaint)
-    path=os.environ.get('CIVICAI_EXPERIMENTAL_MODEL_PATH','')
-    expected=os.environ.get('CIVICAI_EXPERIMENTAL_MODEL_SHA256','')
-    if not path or len(expected)!=64: raise HTTPException(503,'Experimental assessment is not configured')
     try:
-        import joblib
-        content=Path(path).read_bytes()
-        if hashlib.sha256(content).hexdigest()!=expected: raise ValueError('Artifact mismatch')
-        bundle=joblib.load(io.BytesIO(content))
-        if bundle.get('label_origin')!='AI_proposals' or bundle.get('operational_release_approved') is not False: raise ValueError('Unsupported artifact')
-        result=assess(complaint.description,bundle['pipeline'])
+        model, expected = load_experimental_model()
+        result=assess(complaint.description,model)
     except Exception:
         raise HTTPException(503,'Experimental model unavailable') from None
     record=AssessmentRecord(assessment_id=uuid4(),complaint_id=complaint_id,

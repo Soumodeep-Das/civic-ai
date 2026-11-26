@@ -9,6 +9,9 @@ CUES = {
  'drainage_and_sewerage': r'\b(drain|drains|drainage|sewage|sewer|manhole|manholes)\b',
  'public_lighting': r'\b(streetlight|streetlights|street light|street lights|lamp post)\b',
 }
+ROAD_STRONG_CUE = re.compile(
+    r'\b(pothole|potholes|footpath|footpaths|pavement|damaged road|broken road|road damage)\b'
+)
 
 
 def assess(text, model=None):
@@ -22,6 +25,11 @@ def assess(text, model=None):
     if any(c.isalpha() and 'LATIN' not in unicodedata.name(c,'') for c in normalized): return stop('unsupported_script')
     if re.search(r"\b(repaired|resolved|fixed|no problem|no longer|not broken|not blocked)\b",normalized): return stop('possible_resolved_or_negated_issue')
     cues=[family for family,pattern in CUES.items() if re.search(pattern,normalized)]
+    # A location phrase such as "garbage beside the road" must not turn a
+    # single waste report into a mixed road-and-waste incident.  Keep the road
+    # family when it is the only cue, or when a road-specific defect is named.
+    if len(cues)>1 and 'roads_and_pedestrian_access' in cues and not ROAD_STRONG_CUE.search(normalized):
+        cues.remove('roads_and_pedestrian_access')
     if not cues: return stop('outside_supported_vocabulary')
     if len(cues)>1: return stop('multiple_family_cues')
     if model is None: return stop('model_unavailable')

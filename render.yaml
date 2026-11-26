@@ -65,3 +65,7 @@ services:
         sync: false
       - key: GOOGLE_OIDC_REDIRECT_URI
         sync: false
+      - key: CIVICAI_EXPERIMENTAL_MODEL_BASE64_PATH
+        value: /etc/secrets/civicai-experimental-model.joblib.b64
+      - key: CIVICAI_EXPERIMENTAL_MODEL_SHA256
+        value: d92b2a6475f6665355bc8efd18bc9d6939f933377ec6299badaf88677ae7f860

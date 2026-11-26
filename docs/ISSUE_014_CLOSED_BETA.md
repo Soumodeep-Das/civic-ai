@@ -2,6 +2,8 @@
 
 Status: deployed at `https://civicai-beta.onrender.com/`; citizen account creation, Google sign-in, complaint submission and maps have owner-reported live verification. Full municipal/admin, staff-invitation, recovery and multi-user beta protocol evidence is still pending. This is not production certification.
 
+Presentation-readiness update, 2026-11-26: source now supports the existing experimental text model in the beta through a checksum-pinned Render Secret File. The model remains staff-only, text-only, human-reviewed and explicitly experimental. Live deployment and browser inference are still pending and must not be claimed until the secret is added, the new image deploys and the four fixed probes pass through the public URL.
+
 Local Phase A gates: 147 backend tests and 56 unchanged research tests passed (203 total), 57 frontend tests passed, TypeScript compilation and the beta-configured Vite production build passed, `pip check` and `git diff --check` passed. The raw OpenCity checksum was reverified as `d951dbb484532421801f6cbd7550edaa6f9ab143da7c4d0e835ba574e4e6d5ac`. The Dockerfile could not initially be executed from the Codex sandbox because access to the local Docker named pipe was denied; GitHub CI and the subsequent Render deployment supplied runtime proof.
 
 The Render deployment succeeded. Supabase PostgreSQL/private Storage, Brevo HTTPS mail, Google OIDC and MapTiler were configured. Deployment debugging corrected the pooler/database URL, exact Google callback, and MapTiler allowed-origin/request-origin setup; commit `cadb4c5` also prevents the browser-public Vite MapTiler key value from being interpolated into Docker build-command logs. The app previously returned 200 from `/health` and `/ready`. See `AGENT_HANDOFF.md` for the current evidence boundary and remaining validation checklist.
@@ -30,6 +32,14 @@ Use `.env.beta.example` only as a variable-name guide. Never commit a populated 
 `render.yaml` declares a free Singapore Docker service, `/ready` health check, and deployment only after GitHub checks pass. The generated Render hostname must replace all example host values before deployment. Migrations run before each process start and fail the deployment if they fail.
 
 Docker validates that the public MapTiler build key exists through `process.env`; the key is never interpolated into a `RUN` command because that would disclose it in provider build logs.
+
+### Experimental text-model secret
+
+The beta image installs the exact research dependency versions but does not contain the model. Create a Render Secret File named `civicai-experimental-model.joblib.b64` from the locally generated Base64 file of the same name. Render mounts it at `/etc/secrets/civicai-experimental-model.joblib.b64`. `render.yaml` supplies that runtime path and the reviewed SHA-256. The service user belongs to Render's secret-file group. The loader permits exactly one source, enforces size limits, verifies the decoded SHA-256 and expected experimental metadata, and returns a sanitized 503 if any check fails.
+
+Never paste the Base64 artifact into an environment variable, Git, build log, issue, report or chat. It is an executable Python serialization after decoding; do not replace it with a downloaded or edited file. The live beta continues to label every suggestion experimental and requires a municipal explanation plus accept/correct/defer decision.
+
+The narrow guard refinement ignores the word `road` when it is merely another issue's location phrase (for example, garbage beside a road), while retaining deferral for a genuine mixed report such as garbage filling a pothole. It changes no fitted weights and adds no accuracy claim.
 
 ## Backup and recovery limits
 

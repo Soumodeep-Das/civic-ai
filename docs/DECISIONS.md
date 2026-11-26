@@ -381,3 +381,11 @@ Persist reported-context snapshots and separate staff review events under existi
 - Decision: collect three bounded facts as `yes` / `no` / `unknown`, require all-or-none API submission, and store them atomically as a separate `citizen_report` priority event. Preserve legacy clients that omit the set. Anonymous reports use a null staff actor; this does not imply verification.
 - Safety: a reported immediate danger shows official India 112 guidance and forces policy review, while complaint submission still succeeds. Citizen answers cannot set status, assignment, routing, staff review or operational priority.
 - Consequence: migration 0011 changes priority-event actor nullability only. Direct context is available to the existing municipal review panel without duplicating it into complaint columns.
+
+## Presentation-beta experimental model delivery
+
+- Date: 2026-11-26
+- Status: implemented in source; live Render verification pending
+- Decision: keep the reviewed 97-text exploratory model unchanged and deliver it to the Render beta as a Base64-encoded Secret File. The beta image installs the exact locked research runtime, reads the secret only at runtime, decodes it in memory, verifies the pre-recorded SHA-256 and bundle metadata, and then loads it for staff-only assessment. The binary and encoded secret remain ignored and untracked.
+- Rationale: the public beta must demonstrate the existing human-reviewed classifier without placing an executable joblib artifact in Git or a Docker layer. Render secret files are runtime-mounted and the encoded artifact remains below the provider's documented combined 1 MB limit.
+- Consequence: browser users never receive the artifact. Because joblib/pickle deserialization can execute code, only the locally generated, checksum-pinned artifact may be uploaded. This enables experimental staff decision support, not operational release approval, automatic routing, independent accuracy, image analysis or severity inference. A future independently reviewed release should use a safer portable model format.

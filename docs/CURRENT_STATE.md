@@ -1,5 +1,11 @@
 # Current State
 
+## 2026-11-26 — Render experimental classifier preparation
+
+Prepared the existing checksum-pinned, 97-text Bengaluru exploratory classifier for the live closed beta without committing its joblib binary. `Dockerfile.beta` installs the exact locked research runtime; Render reads a Base64 Secret File at runtime; the backend applies source exclusivity, size, SHA-256 and bundle-metadata checks before staff-only inference. The fitted model and disclosed development metric are unchanged. A narrow guard fix prevents a phrase such as “garbage beside the public road” from being falsely treated as a mixed road/waste report while genuine mixed pothole/waste wording still defers.
+
+Focused guard/loader tests pass, followed by all 317 research tests. The four prepared presentation descriptions loaded through the actual Base64 secret path and produced roads/pedestrian access, drainage/sewerage, solid waste and public lighting respectively with model/guard agreement. The database-backed assessment test could not reach the local PostgreSQL/Docker service from this agent and was stopped without redirecting it to a normal database. Render deployment, isolated CI, public-URL inference, resource behavior and browser review persistence remain pending; no live completion or improved accuracy claim is made yet.
+
 ## 2026-11-24 — Citizen complaint lifecycle email notifications
 
 Account-owned submissions now produce a privacy-minimized receipt after the complaint commits. Genuine municipal status transitions produce an update to the active owner through the existing environment-specific email adapter. Messages include the complaint UUID, public status and signed-in detail link; they exclude complaint text, photo, location and internal operator notes. Anonymous reports remain unchanged and use private tracking. Provider failure cannot roll back the already-committed complaint or status event and is logged without recipient/content/provider diagnostics.

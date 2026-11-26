@@ -13,8 +13,11 @@ WORKDIR /app
 COPY pyproject.toml alembic.ini ./
 COPY backend ./backend
 COPY --from=frontend /app/frontend/dist ./frontend-dist
-RUN pip install --no-cache-dir .
-RUN groupadd --system civicai && useradd --system --gid civicai --home-dir /app civicai && chown -R civicai:civicai /app
+RUN pip install --no-cache-dir ".[research]"
+RUN groupadd --system civicai && useradd --system --gid civicai --home-dir /app civicai \
+    && (getent group 1000 || groupadd --gid 1000 render-secrets) \
+    && usermod -a -G 1000 civicai \
+    && chown -R civicai:civicai /app
 USER civicai
 EXPOSE 10000
 CMD ["sh", "-c", "python -m alembic upgrade head && exec uvicorn civicai.main:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers --forwarded-allow-ips='*'"]
